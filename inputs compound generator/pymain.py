@@ -1,9 +1,11 @@
 import PySimpleGUI
 from lib.db.Custom_SQLite import Custom_SQLite as cS
 from lib.db.ConnectPostgree import ConnectDb as pg
+from lib.db.renameSQLite import renameSQLite as rS
 
 from GUI.views.mainGUI import mainGUI as mainGUI
 from GUI.views.settingsGUI import settingsGUI as settingsGUI
+from GUI.views.renameGUI import renameGUI as renameGUI
 import csv
 import xlsxwriter
 import sqlite3
@@ -26,20 +28,26 @@ from scipy.optimize import curve_fit, least_squares
 config_db_url = r"db\config.sqlite"
 mGUI = mainGUI()
 sGUI = settingsGUI(config_db_url)
+rGUI = renameGUI(config_db_url)
+
 
 def init():
     config_db = cS(config_db_url)
     config_db.create_connection()
 
+
 init()
-window = PySimpleGUI.Window("IG+", mGUI.init_GUI(), finalize=True)
+#window = PySimpleGUI.Window("IG+", mGUI.init_GUI(), finalize=True, location=(0, -1000))
+window = PySimpleGUI.Window("IG+", mGUI.init_GUI(), finalize=True, location=(0,0))
+
 # configWindow = PySimpleGUI.Window("Settings", config_db_GUI(), modal=True, finalize=True)
 
 sGUI.refreshList(0)
 sGUI.load_data(0)
 
 if sGUI.selected_config is not None:
-    connection = pg(sGUI.selected_config.postgre_url, sGUI.selected_config.postgre_dbname, sGUI.selected_config.postgre_user, sGUI.selected_config.postgre_pass)
+    connection = pg(sGUI.selected_config.postgre_url, sGUI.selected_config.postgre_dbname,
+                    sGUI.selected_config.postgre_user, sGUI.selected_config.postgre_pass)
 
     wwtps = connection.getAllWWTP()
     industries = connection.getIndustriesToEdar()
@@ -47,9 +55,9 @@ if sGUI.selected_config is not None:
     for wwtp in wwtps:
         acceptedWWTP.append(wwtp[0])
 
-    window['dp_total'].update("Number of discharge points: "+str(len(wwtps)))
+    window['dp_total'].update("Number of discharge points: " + str(len(wwtps)))
 
-    window['industries_total'].update("Number of industries: "+str(len(industries)))
+    window['industries_total'].update("Number of industries: " + str(len(industries)))
 
     # Fields of edar compounts
     # cabal_diari m3/dia
@@ -82,7 +90,7 @@ if sGUI.selected_config is not None:
             else:
                 compound = {}
                 for cell in range(2, len(row)):
-                    compound[listOfCompounds[cell-2]] = row[cell]
+                    compound[listOfCompounds[cell - 2]] = row[cell]
                 compoundByCountry[row[0]] = compound
 
     listOfUww = {}
@@ -184,7 +192,8 @@ if sGUI.selected_config is not None:
                 # Per tornar a calcular els percentatges hem de sumar tot el que hem evocat al final
                 listOfUww[row[2]]['pe'] += peC2 + peC3 + peC4 + peC5
 
-        arrayOfUww = [["NOM", "CODI", "C1", "C2", "C3", "C4", "C5", "PE", "WATER GENERATED", "ACA DATA", "CABAL INDUSTRIAL"]]
+        arrayOfUww = [
+            ["NOM", "CODI", "C1", "C2", "C3", "C4", "C5", "PE", "WATER GENERATED", "ACA DATA", "CABAL INDUSTRIAL"]]
 
         poblacio = []
         cabal = []
@@ -196,6 +205,7 @@ if sGUI.selected_config is not None:
         dataDBO = []
         dataTON = []
         dataTOP = []
+        dataRename = []
 
         for uww in listOfUww:
             if listOfUww[uww]['pe'] > 0:
@@ -213,11 +223,13 @@ if sGUI.selected_config is not None:
                             cabal_industria += industria[9]
 
                 poblacio.append(listOfUww[uww]['C4'] + listOfUww[uww]['C5'])
-                cabal.append(float(listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.'))-cabal_industria)
-                dbo.append(float(listOfEDARCompounds[uww]['dbo5'].replace(',', '.'))*float(listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.'))-cabal_industria)
-                top.append(float(listOfEDARCompounds[uww]['top'].replace(',', '.'))*float(listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.'))-cabal_industria)
-                ton.append(float(listOfEDARCompounds[uww]['ton'].replace(',', '.'))*float(listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.'))-cabal_industria)
-
+                cabal.append(float(listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.')) - cabal_industria)
+                dbo.append(float(listOfEDARCompounds[uww]['dbo5'].replace(',', '.')) * float(
+                    listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.')) - cabal_industria)
+                top.append(float(listOfEDARCompounds[uww]['top'].replace(',', '.')) * float(
+                    listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.')) - cabal_industria)
+                ton.append(float(listOfEDARCompounds[uww]['ton'].replace(',', '.')) * float(
+                    listOfEDARCompounds[uww]['cabal_diari'].replace(',', '.')) - cabal_industria)
 
                 # listOfUww[uww]['Water2WWTP'] = ((listOfUww[uww]['C4'] + listOfUww[uww]['C5']) * 0.150) + cabal_industria
                 listOfUww[uww]['AcaWater2WWTP'] = listOfEDARCompounds[uww]['cabal_diari']
@@ -274,7 +286,6 @@ if sGUI.selected_config is not None:
         data_compute_top = pd.DataFrame({'poblacio': poblacio, 'top': top})
         data_compute_ton = pd.DataFrame({'poblacio': poblacio, 'ton': ton})
 
-
         X_poblacio = data_compute_cabal['poblacio']
         global y_cabal
         y_cabal = data_compute_cabal['cabal']
@@ -282,7 +293,6 @@ if sGUI.selected_config is not None:
         y_dbo = data_compute_dbo['dbo']
         y_top = data_compute_top['top']
         y_ton = data_compute_ton['ton']
-
 
         # X_train, X_test, y_train, y_test = train_test_split(
         #     X_poblacio.values.reshape(-1, 1),
@@ -314,6 +324,7 @@ if sGUI.selected_config is not None:
         window["ton_response"].update(modelo.summary())
 
         window["dp_table"].update(dataToTable)
+
         window["cabal_table"].update(dataCabal)
         window["dbo_table"].update(dataDBO)
         window["top_table"].update(dataTOP)
@@ -322,10 +333,9 @@ if sGUI.selected_config is not None:
 
         for uww_id in acceptedWWTP:
             if uww_id not in listOfUww:
-                print("Somthing not ok with "+uww_id)
+                print("Somthing not ok with " + uww_id)
             # else:
-                # print("Found: "+listOfUww[uww_id])
-
+            # print("Found: "+listOfUww[uww_id])
 
         print(len(acceptedWWTP))
         print(len(listOfUww))
@@ -333,6 +343,7 @@ if sGUI.selected_config is not None:
 while True:
     win, event, values = PySimpleGUI.read_all_windows()
     # Tanca el programa si es tanca l'app
+    # print(win, event, values)
     if event != '__TIMEOUT__':
         print(values)
     if event == 'Settings':
@@ -340,23 +351,24 @@ while True:
         if sGUI.configWindow is None:
             sGUI.createWindow(window)
     if event == 'Export DP':
-        res = PySimpleGUI.popup_get_file("Select where to save data:", save_as=True, file_types=(('Excel file', '.xlsx'),))
+        res = PySimpleGUI.popup_get_file("Select where to save data:", save_as=True,
+                                         file_types=(('Excel file', '.xlsx'),))
         print(res)
         workbook = xlsxwriter.Workbook(res)
         worksheet = workbook.add_worksheet()
         row = 1
         col = 0
         for item in [
-                "EDAR EU_ID",
-                "DP ID",
-                "Name",
-                "Latitude",
-                "Longitude",
-                "Population",
-                "Septic tank (C2)",
-                "Direct (C3/C6)",
-                "Canalized to WWTP (C4)",
-                "Transported to WWTP (C5)"]:
+            "EDAR EU_ID",
+            "DP ID",
+            "Name",
+            "Latitude",
+            "Longitude",
+            "Population",
+            "Septic tank (C2)",
+            "Direct (C3/C6)",
+            "Canalized to WWTP (C4)",
+            "Transported to WWTP (C5)"]:
             worksheet.write(0, col, item)
             col += 1
 
@@ -431,12 +443,36 @@ while True:
                 sGUI.configWindow['test_db_response'].update('Successfull: DB Version ' + str(reason))
             else:
                 sGUI.configWindow['test_db_response'].update(reason)
+    if event == 'Change Recall Name SWAT+ Editor':  #Obrir finestra per canviar noms de .sqlite
+        if rGUI.renameWindow is None:
+            rGUI.createWindow(window)
+        #rGUI.renameWindow["rename_table"].update(dataRename)
+    if event == 'wwt_file_name':  #Omplir taula amb WWTP de base de dades i fitxer .sqlite
+        renameHelper = rS(values["wwt_file_name"])
+        try:
+            float(values["input_rename_threshold"])
+            dataRename = renameHelper.populate_table("recall_con", dataToTable, float(values["input_rename_threshold"]))
+            rGUI.renameWindow["rename_table"].update(dataRename)
+        except Exception as e:
+            print(e)
+    if event == 'run_rename':  #Canviar dades a fitxer .sqlite
+        try:
+            if len(dataRename) == 0: #No ha penjat cap arxiu encara
+                raise SystemError
+            if PySimpleGUI.popup_yes_no('This action will overwrite the uploaded file.\nDo you want to continue?') == "Yes":
+                renameHelper = rS(values["wwt_file_name"])
+                new_data_table = renameHelper.rename_db(dataRename)
+                rGUI.renameWindow["rename_table"].update(new_data_table)
+                print(new_data_table)
+        except:
+            print("Upload any .SQLite file first")
 
-    elif event == PySimpleGUI.WIN_CLOSED:
+    if event == PySimpleGUI.WIN_CLOSED:
         win.close()
         if win == window:
             break
         elif win == sGUI.configWindow:
             sGUI.configWindow = None
-
+        elif win == rGUI.renameWindow:
+            rGUI.renameWindow = None
 window.close()

@@ -8,7 +8,7 @@ class mainGUI:
     def init_GUI(self):
         menu_def = [
             ['File', ['Settings', '---', 'Quit']],
-            ['Data', ['Export DP']]
+            ['Data', ['Export DP', '---', 'Change Recall Name SWAT+ Editor']]
         ]
 
         layout_cabal = [
