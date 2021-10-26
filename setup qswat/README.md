@@ -1,1 +1,1 @@
-Watershed generator
+Project setup, QSWAT+ and SWAT+ Editor
