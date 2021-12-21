@@ -1,25 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-import math
-from classes.Config import Config
-
-
-# Distancia entre p1 i p2 (km) sobre una esfera. Han de ser un diccionari amb entrades "lan" i "lon"
-def distance(p1, p2):
-    r = 6373.0  # radius of the earth
-    lat1 = math.radians(p1["lat"])
-    lon1 = math.radians(p1["lon"])
-    lat2 = math.radians(p2["lat"])
-    lon2 = math.radians(p2["lon"])
-
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-
-    haversine_a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    haversine_c = 2 * math.atan2(math.sqrt(haversine_a), math.sqrt(1 - haversine_a))
-
-    distance_between_points = r * haversine_c
-    return distance_between_points
+from lib.utils import distance
 
 
 class renameSQLite:
@@ -76,8 +57,6 @@ class renameSQLite:
             raise e
 
     def rename_db(self, data_rename):
-
-        # wwt_file_name = values["wwt_file_name"]
         try:
             conn = sqlite3.connect(self.url)
             conn.row_factory = sqlite3.Row
@@ -93,11 +72,14 @@ class renameSQLite:
                     distance = row[4]
                     c.execute('UPDATE recall_con SET name=? where name=?', (dp_id, name_sql,))
                     c.execute('UPDATE recall_rec SET name=?, rec_typ=1 where name=?', (dp_id, name_sql,))
-                    c.execute('DELETE FROM recall_dat where id=?', (id_sql,))
+                    c.execute('DELETE FROM recall_dat where recall_rec_id=?', (id_sql,))
                     new_data_table.append([
                         dp_id, name, id_sql, dp_id, distance
                     ])
                 else:
+                    c.execute('DELETE FROM recall_dat where id=?', (id_sql,))   #No te cap depuradora de la db assignada
+                    c.execute('DELETE FROM recall_rec where id=?', (id_sql,))
+                    c.execute('DELETE FROM recall_con where recall_rec_id=?', (id_sql,))
                     new_data_table.append(row)
             conn.commit()
             return new_data_table
@@ -107,3 +89,6 @@ class renameSQLite:
         finally:
             if conn:
                 conn.close()
+
+    def add_data_to_swat(self, estimated_concentrations):
+        print(estimated_concentrations)

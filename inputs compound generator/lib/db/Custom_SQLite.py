@@ -24,10 +24,12 @@ class Custom_SQLite:
     def getConfigurations(self):
         conn = None
         data = []
+
         try:
             conn = sqlite3.connect(self.url)
+            print(conn.execute("SELECT * FROM config").fetchall())
             for c in conn.execute("SELECT * FROM config").fetchall():
-                conf = Config(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9])
+                conf = Config(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9], c[10])
                 data.append(conf)
         except Error as e:
             print(e)

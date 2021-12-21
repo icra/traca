@@ -2,6 +2,7 @@ import PySimpleGUI
 from lib.db.Custom_SQLite import Custom_SQLite as cS
 from lib.db.ConnectPostgree import ConnectDb as pg
 from lib.db.renameSQLite import renameSQLite as rS
+import lib.utils as utils
 
 from GUI.views.mainGUI import mainGUI as mainGUI
 from GUI.views.settingsGUI import settingsGUI as settingsGUI
@@ -30,22 +31,21 @@ mGUI = mainGUI()
 sGUI = settingsGUI(config_db_url)
 rGUI = renameGUI(config_db_url)
 
-
 def init():
     config_db = cS(config_db_url)
     config_db.create_connection()
-
 
 init()
 #window = PySimpleGUI.Window("IG+", mGUI.init_GUI(), finalize=True, location=(0, -1000))
 window = PySimpleGUI.Window("IG+", mGUI.init_GUI(), finalize=True, location=(0,0))
 
-# configWindow = PySimpleGUI.Window("Settings", config_db_GUI(), modal=True, finalize=True)
+#configWindow = PySimpleGUI.Window("Settings", config_db_GUI(), modal=True, finalize=True)
 
 sGUI.refreshList(0)
 sGUI.load_data(0)
 
 if sGUI.selected_config is not None:
+
     connection = pg(sGUI.selected_config.postgre_url, sGUI.selected_config.postgre_dbname,
                     sGUI.selected_config.postgre_user, sGUI.selected_config.postgre_pass)
 
@@ -62,6 +62,7 @@ if sGUI.selected_config is not None:
     # Fields of edar compounts
     # cabal_diari m3/dia
     # unidades mg/l
+
     listOfEDARCompounds = {}
     with open(sGUI.selected_config.wwtp_con_db, encoding='utf8', newline='') as csvEDARCompounts:
         reader = csv.reader(csvEDARCompounts, delimiter=';')
@@ -340,6 +341,33 @@ if sGUI.selected_config is not None:
         print(len(acceptedWWTP))
         print(len(listOfUww))
 
+    # Llegim paràmetres calibrats
+    calibrated_parameters = {}
+    with open(sGUI.selected_config.comp_removal_rate, encoding='utf8', newline='') as csvfile:
+        isFirst = True
+        reader = csv.reader(csvfile, delimiter=';')
+        for row in reader:
+            if isFirst:
+                isFirst = False
+            else:
+                compound_id, name, generation_per_capita, primary, sp, sn, sc, uf, cl, uv, other, sf = row
+                calibrated_parameters[compound_id] = {
+                    "name": name,
+                    "generation_per_capita": float(generation_per_capita.replace(",", ".")),
+                    "P": float(primary.replace(",", ".")),
+                    "SP": float(sp.replace(",", ".")),
+                    "SN": float(sn.replace(",", ".")),
+                    "SC": float(sc.replace(",", ".")),
+                    "UF": float(uf.replace(",", ".")),
+                    "CL": float(cl.replace(",", ".")),
+                    "UV": float(uv.replace(",", ".")),
+                    "OTHER": float(other.replace(",", ".")),
+                    "SF": float(sf.replace(",", ".")),
+                }
+
+    # Per cada DP, diu concentracio de cada contaminant a l'efluent
+    estimated_concentration_wwtp_effluent = utils.estimate_effluent(calibrated_parameters, listOfUww)
+
 while True:
     win, event, values = PySimpleGUI.read_all_windows()
     # Tanca el programa si es tanca l'app
@@ -445,7 +473,8 @@ while True:
                 sGUI.configWindow['test_db_response'].update(reason)
     if event == 'Change Recall Name SWAT+ Editor':  #Obrir finestra per canviar noms de .sqlite
         if rGUI.renameWindow is None:
-            rGUI.createWindow(window)
+            rGUI.createWindow(window, calibrated_parameters)
+
         #rGUI.renameWindow["rename_table"].update(dataRename)
     if event == 'wwt_file_name':  #Omplir taula amb WWTP de base de dades i fitxer .sqlite
         renameHelper = rS(values["wwt_file_name"])
@@ -453,6 +482,8 @@ while True:
             float(values["input_rename_threshold"])
             dataRename = renameHelper.populate_table("recall_con", dataToTable, float(values["input_rename_threshold"]))
             rGUI.renameWindow["rename_table"].update(dataRename)
+
+
         except Exception as e:
             print(e)
     if event == 'run_rename':  #Canviar dades a fitxer .sqlite
@@ -463,9 +494,12 @@ while True:
                 renameHelper = rS(values["wwt_file_name"])
                 new_data_table = renameHelper.rename_db(dataRename)
                 rGUI.renameWindow["rename_table"].update(new_data_table)
-                print(new_data_table)
+                rGUI.renameWindow["calibration_tab"].update(disabled=False)
         except:
             print("Upload any .SQLite file first")
+
+    if event == 'run_estimate_effluent':
+        print("estimate effluent")
 
     if event == PySimpleGUI.WIN_CLOSED:
         win.close()

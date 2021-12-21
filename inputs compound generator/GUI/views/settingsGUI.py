@@ -32,6 +32,7 @@ class settingsGUI:
             config = self.list_configs[list_index]
             self.selected_config = config
             if self.configWindow is not None:
+
                 self.configWindow['url'].update(config.postgre_url)
                 self.configWindow['db_name'].update(config.postgre_dbname)
                 self.configWindow['user'].update(config.postgre_user)
@@ -40,6 +41,7 @@ class settingsGUI:
                 self.configWindow['dp_pop_db'].update(config.dp_pop_db)
                 self.configWindow['wwtp_con_db'].update(config.wwtp_con_db)
                 self.configWindow['comp_con_db'].update(config.comp_con_db)
+                self.configWindow['comp_removal_rate'].update(config.comp_removal_rate)
 
     def config_db_GUI(self):
         config_db = cS(self.config_db_url)
@@ -73,6 +75,9 @@ class settingsGUI:
              PySimpleGUI.InputText('', key='wwtp_con_db'), PySimpleGUI.FileBrowse('Select')],
             [PySimpleGUI.Text('COMPOUNTS BY COUNTRY (csv)', size=(35, 1)), PySimpleGUI.InputText('', key='comp_con_db'),
              PySimpleGUI.FileBrowse('Select')],
+            [PySimpleGUI.Text('COMPOUND REMOVAL RATE (csv)', size=(35, 1)), PySimpleGUI.InputText('', key='comp_removal_rate'),
+             PySimpleGUI.FileBrowse('Select')]
+
         ]
 
         config_data_col = [[PySimpleGUI.TabGroup([[
