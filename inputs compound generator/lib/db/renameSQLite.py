@@ -64,23 +64,42 @@ class renameSQLite:
             new_data_table = []
 
             for row in data_rename:
+                dp_id = row[0]
+                name = row[1]
+                id_sql = row[2]
+                name_sql = row[3]
+                distance_between = row[4]
+
                 if row[2] != "-":
-                    dp_id = row[0]
-                    name = row[1]
-                    id_sql = row[2]
-                    name_sql = row[3]
-                    distance = row[4]
+                    c.execute('DELETE FROM recall_dat WHERE recall_rec_id = ('
+                              'SELECT rec_id FROM recall_con WHERE name=?)', (name_sql,))
+
                     c.execute('UPDATE recall_con SET name=? where name=?', (dp_id, name_sql,))
-                    c.execute('UPDATE recall_rec SET name=?, rec_typ=1 where name=?', (dp_id, name_sql,))
-                    c.execute('DELETE FROM recall_dat where recall_rec_id=?', (id_sql,))
+                    #c.execute('UPDATE recall_rec SET name=?, rec_typ=1 where name=?', (dp_id, name_sql,))
+                    c.execute('UPDATE recall_rec SET name=?, rec_typ=4 where name=?', (dp_id, name_sql,))
+
                     new_data_table.append([
-                        dp_id, name, id_sql, dp_id, distance
+                        dp_id, name, id_sql, dp_id, distance_between
                     ])
-                else:
-                    c.execute('DELETE FROM recall_dat where id=?', (id_sql,))   #No te cap depuradora de la db assignada
-                    c.execute('DELETE FROM recall_rec where id=?', (id_sql,))
-                    c.execute('DELETE FROM recall_con where recall_rec_id=?', (id_sql,))
+                else:  # No te cap depuradora de la db assignada
+                    # c.execute('DELETE FROM recall_con where name=?', (id_sql,))
+                    # c.execute('DELETE FROM recall_rec where id=?', (id_sql,))
                     new_data_table.append(row)
+
+            """
+            c.execute('DELETE FROM recall_con_out WHERE recall_con_id IN ('
+                      'SELECT id FROM recall_con where rec_id IN ('
+                      'SELECT id FROM recall_rec where rec_typ!=1))')
+
+            c.execute('DELETE FROM recall_con WHERE rec_id IN ('
+                      'SELECT id FROM recall_rec where rec_typ!=1)')
+
+            c.execute('DELETE FROM recall_dat WHERE recall_rec_id IN ('
+                      'SELECT id FROM recall_rec where rec_typ!=1)')
+
+            c.execute('DELETE FROM recall_rec WHERE rec_typ!=1')
+            """
+
             conn.commit()
             return new_data_table
 
@@ -91,4 +110,33 @@ class renameSQLite:
                 conn.close()
 
     def add_data_to_swat(self, estimated_concentrations):
-        print(estimated_concentrations)
+        try:
+            conn = sqlite3.connect(self.url)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            for dp_id in estimated_concentrations.keys():
+                dp = estimated_concentrations[dp_id]
+                dbo = dp["dbo"]
+                fosfor = dp["fosfor"]
+                cabal = dp["cabal"]
+                try:
+                    """
+                    for i in range(1, 366):
+                        c.execute('INSERT INTO recall_dat (recall_rec_id, yr, t_step, flo, sed, ptl_n, ptl_p, no3_n, sol_p, chla, nh3_n, no2_n, cbn_bod, oxy, sand, silt, clay, sm_agg, lg_agg, gravel, tmp) '
+                          'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 2021, ?, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)', (dp_id, i, cabal, fosfor, dbo))
+                    """
+                    c.execute(
+                        'INSERT INTO recall_dat (recall_rec_id, yr, t_step, flo, sed, ptl_n, ptl_p, no3_n, sol_p, chla, nh3_n, no2_n, cbn_bod, oxy, sand, silt, clay, sm_agg, lg_agg, gravel, tmp) '
+                        'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 2021, 0, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)',(dp_id, cabal, fosfor, dbo))
+
+
+                except Error:
+                    print("No es pot afegir WWTP ", dp_id)
+            conn.commit()
+
+        except Error as e:
+            raise e
+        finally:
+            if conn:
+                conn.close()
+

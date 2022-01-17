@@ -476,6 +476,7 @@ while True:
             rGUI.createWindow(window, calibrated_parameters)
 
         #rGUI.renameWindow["rename_table"].update(dataRename)
+
     if event == 'wwt_file_name':  #Omplir taula amb WWTP de base de dades i fitxer .sqlite
         renameHelper = rS(values["wwt_file_name"])
         try:
@@ -483,23 +484,30 @@ while True:
             dataRename = renameHelper.populate_table("recall_con", dataToTable, float(values["input_rename_threshold"]))
             rGUI.renameWindow["rename_table"].update(dataRename)
 
-
         except Exception as e:
             print(e)
     if event == 'run_rename':  #Canviar dades a fitxer .sqlite
         try:
             if len(dataRename) == 0: #No ha penjat cap arxiu encara
-                raise SystemError
+                raise Exception('Upload any .SQLite file first') from e
+
             if PySimpleGUI.popup_yes_no('This action will overwrite the uploaded file.\nDo you want to continue?') == "Yes":
                 renameHelper = rS(values["wwt_file_name"])
                 new_data_table = renameHelper.rename_db(dataRename)
                 rGUI.renameWindow["rename_table"].update(new_data_table)
                 rGUI.renameWindow["calibration_tab"].update(disabled=False)
-        except:
-            print("Upload any .SQLite file first")
+                PySimpleGUI.popup("WWTP's renamed successfully!")
+
+        except Exception as e:
+            print(str(e))
 
     if event == 'run_estimate_effluent':
-        print("estimate effluent")
+        try:
+            renameHelper.add_data_to_swat(estimated_concentration_wwtp_effluent)
+            PySimpleGUI.popup("Effluent data estimated successfully!!")
+        except:
+            pass
+
 
     if event == PySimpleGUI.WIN_CLOSED:
         win.close()
