@@ -75,8 +75,8 @@ class renameSQLite:
                               'SELECT rec_id FROM recall_con WHERE name=?)', (name_sql,))
 
                     c.execute('UPDATE recall_con SET name=? where name=?', (dp_id, name_sql,))
-                    #c.execute('UPDATE recall_rec SET name=?, rec_typ=1 where name=?', (dp_id, name_sql,))
-                    c.execute('UPDATE recall_rec SET name=?, rec_typ=4 where name=?', (dp_id, name_sql,))
+                    #c.execute('UPDATE recall_rec SET name=?, rec_typ=1 where name=?', (dp_id, name_sql,))  #Diari
+                    c.execute('UPDATE recall_rec SET name=?, rec_typ=4 where name=?', (dp_id, name_sql,))   #Constant
 
                     new_data_table.append([
                         dp_id, name, id_sql, dp_id, distance_between
@@ -118,16 +118,21 @@ class renameSQLite:
                 dp = estimated_concentrations[dp_id]
                 dbo = dp["dbo"]
                 fosfor = dp["fosfor"]
+                ptl_n = dp["nitrogen_org"]  #organic nitrogen
+                nh3_n = dp["amoni"]  #ammonia
+                no3_n = dp["nitrats"]  #nitrate
                 cabal = dp["cabal"]
                 try:
+                    #Diari
                     """
                     for i in range(1, 366):
                         c.execute('INSERT INTO recall_dat (recall_rec_id, yr, t_step, flo, sed, ptl_n, ptl_p, no3_n, sol_p, chla, nh3_n, no2_n, cbn_bod, oxy, sand, silt, clay, sm_agg, lg_agg, gravel, tmp) '
                           'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 2021, ?, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)', (dp_id, i, cabal, fosfor, dbo))
                     """
+                    # Constant
                     c.execute(
                         'INSERT INTO recall_dat (recall_rec_id, yr, t_step, flo, sed, ptl_n, ptl_p, no3_n, sol_p, chla, nh3_n, no2_n, cbn_bod, oxy, sand, silt, clay, sm_agg, lg_agg, gravel, tmp) '
-                        'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 2021, 0, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)',(dp_id, cabal, fosfor, dbo))
+                        'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 2021, 0, ?, 0, ?, ?, ?, 0, 0, ?, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)',(dp_id, cabal, ptl_n, fosfor, no3_n, nh3_n, dbo))
 
 
                 except Error:
