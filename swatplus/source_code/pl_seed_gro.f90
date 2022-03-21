@@ -1,4 +1,4 @@
-      subroutine pl_seed_gro
+      subroutine pl_seed_gro(j)
       
       use plant_data_module
       use basin_module
@@ -12,17 +12,16 @@
       
       implicit none 
       
-      integer :: j              !none               |HRU number
-      integer :: idp            !                   |
-      real :: ajhi              !
-      real :: ajhi_min          !
-      real :: dhi               !
-      real :: temp_dif          !
-      real :: temp_adj          !
-      real :: etr               !%          |plant uptake/PET 
+      integer, intent (in) :: j     !none               |HRU number
+      integer :: idp                !                   |
+      real :: ajhi                  !
+      real :: ajhi_min              !
+      real :: dhi                   !
+      real :: temp_dif              !
+      real :: temp_adj              !
+      real :: etr                   !%          |plant uptake/PET 
       integer :: xyz
       
-      j = ihru
       idp = pcom(j)%plcur(ipl)%idplt
       iwst = ob(j)%wst
 

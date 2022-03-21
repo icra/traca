@@ -1,4 +1,4 @@
-      subroutine pl_partition
+      subroutine pl_partition(j)
       
       use plant_data_module
       use basin_module
@@ -10,22 +10,21 @@
       
       implicit none 
       
-      integer :: j              !none               |HRU number
-      integer :: idp            !                   |
-      real :: root_frac         !none               |root mass fraction
-      real :: ab_gr_frac        !none               |above ground mass fraction
-      real :: leaf_mass_frac    !none               |leaf mass fraction of above ground biomass
-      real :: stem_mass_frac    !none               |stem mass fraction of above ground biomass
-      real :: seed_mass_frac    !none               |stem mass fraction of above ground biomass
-      real :: n_left            !none               |n left after seed is removed
-      real :: n_frac            !none               |n fraction in remainder of plant
-      real :: p_left            !none               |p left after seed is removed
-      real :: p_frac            !none               |p fraction in remainder of plant
-      real :: m_left            !none               |mass left after seed is removed
-      real :: leaf_frac_veg     !none               |fraction veg mass (stem+leaf) that is leaf
-      real :: leaf_mass_frac_veg     !none               |fraction veg mass (stem+leaf) that is leaf
+      integer, intent (in) :: j     !none               |HRU number
+      integer :: idp                !                   |
+      real :: root_frac             !none               |root mass fraction
+      real :: ab_gr_frac            !none               |above ground mass fraction
+      real :: leaf_mass_frac        !none               |leaf mass fraction of above ground biomass
+      real :: stem_mass_frac        !none               |stem mass fraction of above ground biomass
+      real :: seed_mass_frac        !none               |stem mass fraction of above ground biomass
+      real :: n_left                !none               |n left after seed is removed
+      real :: n_frac                !none               |n fraction in remainder of plant
+      real :: p_left                !none               |p left after seed is removed
+      real :: p_frac                !none               |p fraction in remainder of plant
+      real :: m_left                !none               |mass left after seed is removed
+      real :: leaf_frac_veg         !none               |fraction veg mass (stem+leaf) that is leaf
+      real :: leaf_mass_frac_veg    !none               |fraction veg mass (stem+leaf) that is leaf
            
-      j = ihru
       idp = pcom(j)%plcur(ipl)%idplt
       
       !! update plant mass for daily biomass/c increase

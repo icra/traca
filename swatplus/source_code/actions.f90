@@ -736,7 +736,10 @@
           case ("hru_fr_update")
             !"option" is the updated lsu_unit.ele and "file_pointer" is rout_unit.ele
             call hru_fr_change (d_tbl%act(iac)%option, d_tbl%act(iac)%file_pointer)
-              
+            !! write to new landuse change file
+            write (3612,*) j, time%yrc, time%mo, time%day_mo,  "   HRU_FRACTION_CHANGE ",        &
+                    d_tbl%act(iac)%option, d_tbl%act(iac)%file_pointer, "   0   0"
+                            
           !land use change - total land use and management change
           case ("lu_change")
             j = d_tbl%act(iac)%ob_num
@@ -747,7 +750,7 @@
             hru(j)%land_use_mgt_c = d_tbl%act(iac)%file_pointer
             isol = hru(j)%dbs%soil
             call hru_lum_init (j)
-            call plant_init (1)     ! (1) is to deallocate and reset
+            call plant_init (1,j)     ! (1) is to deallocate and reset
             call cn2_init (j)
             !! reset composite usle value - in hydro_init
             rock = Exp(-.053 * soil(j)%phys(1)%rock)

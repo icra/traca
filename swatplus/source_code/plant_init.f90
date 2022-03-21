@@ -1,6 +1,6 @@
-      subroutine plant_init (init)
+      subroutine plant_init (init, iihru)
 
-      use hru_module, only : cn2, cvm_com, hru, ihru, ipl, isol, rsdco_plcom
+      use hru_module, only : cn2, cvm_com, hru, ipl, isol, rsdco_plcom
       use soil_module
       use plant_module
       use hydrograph_module
@@ -18,6 +18,7 @@
       implicit none
       
       integer, intent (in) :: init   !           |
+      integer, intent (in) :: iihru  !none       |hru number to send to plant_init
       integer :: day_mo
       integer :: icom                !           |plant community counter
       integer :: idp                 !           |
@@ -56,7 +57,7 @@
       real :: daylength              !hours      |daylength
       real :: laimx_pop              !           |max lai given plant population
 
-      j = ihru
+      j = iihru
 
       !! allocate plants
         icom = hru(j)%plant_cov
@@ -113,7 +114,7 @@
           
           ! set heat units to maturity
           ! first compute base0 units for entire year
-          iob = hru(ihru)%obj_no
+          iob = hru(j)%obj_no
           iwst = ob(iob)%wst
           iwgn = wst(iwst)%wco%wgn
           phu0 = 0.
@@ -284,34 +285,34 @@
           pcom(j)%plcur(ipl)%lai_pot = laimx_pop
           
           !! initialize plant mass
-          call pl_root_gro
-          call pl_seed_gro
-          call pl_partition
+          call pl_root_gro(j)
+          call pl_seed_gro(j)
+          call pl_partition(j)
 
         end do   ! ipl loop
         end if   ! icom > 0
 
-        ilum = hru(ihru)%land_use_mgt
+        ilum = hru(iihru)%land_use_mgt
                  
         !! set epco parameter for each crop
-        do ipl = 1, pcom(ihru)%npl
-          pcom(ihru)%plcur(ipl)%epco = hru(ihru)%hyd%epco
+        do ipl = 1, pcom(iihru)%npl
+          pcom(iihru)%plcur(ipl)%epco = hru(iihru)%hyd%epco
         end do
         
         !! set p factor and slope length (ls factor)
         icp = lum_str(ilum)%cons_prac
-        xm = .6 * (1. - Exp(-35.835 * hru(ihru)%topo%slope))
-        sin_sl = Sin(Atan(hru(ihru)%topo%slope))
-        sl_len = amin1 (hru(ihru)%topo%slope_len, cons_prac(icp)%sl_len_mx)
-        hru(ihru)%lumv%usle_ls = (hru(ihru)%topo%slope_len / 22.128) ** xm *          & 
+        xm = .6 * (1. - Exp(-35.835 * hru(iihru)%topo%slope))
+        sin_sl = Sin(Atan(hru(iihru)%topo%slope))
+        sl_len = amin1 (hru(iihru)%topo%slope_len, cons_prac(icp)%sl_len_mx)
+        hru(iihru)%lumv%usle_ls = (hru(iihru)%topo%slope_len / 22.128) ** xm *          & 
                       (65.41 * sin_sl * sin_sl + 4.56 * sin_sl + .065)
-        hru(ihru)%lumv%usle_p = cons_prac(icp)%pfac
+        hru(iihru)%lumv%usle_p = cons_prac(icp)%pfac
         
         !! xwalk urban land use type with urban name in urban.urb
-        hru(ihru)%luse%urb_ro = lum(ilum)%urb_ro
+        hru(iihru)%luse%urb_ro = lum(ilum)%urb_ro
         do idb = 1, db_mx%urban
           if (lum(ilum)%urb_lu == urbdb(idb)%urbnm) then
-            hru(ihru)%luse%urb_lu = idb
+            hru(iihru)%luse%urb_lu = idb
             exit
           endif
         end do
@@ -319,7 +320,7 @@
         !! xwalk overland n with name in ovn_table.lum
         do idb = 1, db_mx%ovn
           if (lum(ilum)%ovn == overland_n(idb)%name) then
-            hru(ihru)%luse%ovn = overland_n(idb)%ovn
+            hru(iihru)%luse%ovn = overland_n(idb)%ovn
             exit
           endif
         end do

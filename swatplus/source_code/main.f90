@@ -10,7 +10,7 @@
       integer :: date_time(8)           !              |
       character*10 b(3)                 !              |
       
-      prog = " SWAT+ Mar 15 2022    MODULAR Rev 2020.60.5.4"
+      prog = " SWAT+ Mar 18 2022    MODULAR Rev 2020.60.5.4"
 
       write (*,1000)
       open (9003,file='simulation.out')
