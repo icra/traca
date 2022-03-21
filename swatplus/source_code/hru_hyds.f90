@@ -11,6 +11,7 @@
       use basin_module
       use time_module
       use constituent_mass_module
+      use output_landscape_module
       use output_ls_pesticide_module
       use climate_module
       
@@ -19,7 +20,6 @@
       integer :: j                   !none          |same as ihru (hru number)
       real :: cnv_m3                 !              |
       real :: cnv_kg                 !              |
-      real :: ssq                    !mm            |lat soil and tile flow during subdaily time step
       integer :: iob                 !              |
       integer :: ihyd                !none          |counter
       integer :: ipest               !none          |counter
@@ -51,7 +51,7 @@
       ob(icmd)%hd(3)%sedp = (sedorgp(j) + sedminpa(j) +                 &
                         sedminps(j)) * cnv_kg         !!sedorgp & sedminps
       ob(icmd)%hd(3)%no3 = surqno3(j) * cnv_kg        !!surqno3 & latno3 & no3gw
-      ob(icmd)%hd(3)%solp = surqsolp(j) * cnv_kg      !!surqsolp & sedminpa
+      ob(icmd)%hd(3)%solp = (surqsolp(j) + hls_d(j)%tilelabp) * cnv_kg      !!surqsolp & sedminpa
       ob(icmd)%hd(3)%chla = chl_a(j) *cnv_kg          !!chl_a
       ob(icmd)%hd(3)%nh3 = 0.                         !! NH3
       ob(icmd)%hd(3)%no2 = 0.                         !! NO2
@@ -111,6 +111,7 @@
       do ihyd = 3, 5
         ob(icmd)%hd(1) = ob(icmd)%hd(1) + ob(icmd)%hd(ihyd)
       end do
+      
       !set constituents
       do ipest = 1, cs_db%num_pests
         obcs(icmd)%hd(1)%pest(ipest) = obcs(icmd)%hd(3)%pest(ipest) + obcs(icmd)%hd(4)%pest(ipest) +    &
@@ -122,17 +123,14 @@
       
       !! set subdaily hydrographs
       if (time%step > 0) then
-        if (bsn_cc%gampt == 1) then
-          !! set previous and next days for adding previous and translating to next
-          day_cur = ob(icmd)%day_cur
-          day_next = day_cur + 1
-          if (day_next > ob(icmd)%day_max) day_next = 1
+        !! set previous and next days for adding previous and translating to next
+        day_cur = ob(icmd)%day_cur
+        day_next = day_cur + 1
+        if (day_next > ob(icmd)%day_max) day_next = 1
           
+        if (bsn_cc%gampt == 1) then
           !! hhsurf1 from sq_greenampt - mm
-          !! subsurface flow = lateral + tile --> assume uniform throughout the day
-          ssq = (latq(j) + qtile)  / time%step
-          ob(icmd)%lat_til_flo = ssq
-          ob(icmd)%hyd_flo(day_cur,:) = ob(icmd)%hyd_flo(day_cur,:) + (hhsurfq(j,:) + ssq) * cnv_m3
+          ob(icmd)%hyd_flo(day_cur,:) = ob(icmd)%hyd_flo(day_cur,:) + hhsurfq(j,:) * cnv_m3
           
           !! translate the hydrogrpah by time of concentration - no attenuation
           ob(icmd)%hyd_flo(day_next,:) = 0.

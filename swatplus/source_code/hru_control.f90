@@ -9,7 +9,7 @@
          yr_skip, latq, tconc, smx, sepbtm, igrz, iseptic, i_sep, filterw, sed_con, soln_con, solp_con, & 
          orgn_con, orgp_con, cnday, nplnt, percn, tileno3, pplnt, sedorgn, sedorgp, surqno3, latno3,    &
          surqsolp, sedminpa, sedminps, fertn, fertp, fixn, grazn, grazp, ipl, qp_cms, qtile,            &
-         snofall, snomlt, tloss, usle, canev, ep_day, es_day, etday, inflpcp, isep, iwgen, ls_overq,    &
+         snofall, snomlt, usle, canev, ep_day, es_day, etday, inflpcp, isep, iwgen, ls_overq,           &
          nd_30, pet_day, precip_eff, qday, latqrunon, gwtranq, satexq, surf_bs, bss, bss_ex, brt,       &
          gwtrann, gwtranp, satexn, satexq_chan !rtb gwflow
       use soil_module 
@@ -93,9 +93,15 @@
       isched = hru(j)%mgt_ops
       
       w = wst(iwst)%weat
-      precip_eff = w%precip
       !! adjust precip and temperature for elevation using lapse rates
-      if (bsn_cc%lapse == 1) call cli_lapse (iob, iwst)
+      if (bsn_cc%lapse == 1) then
+        w%precip = w%precip + ob(iob)%plaps
+        w%precip = amax1 (0., w%precip)
+        w%tmax = w%tmax + ob(iob)%tlaps
+        w%tmin = w%tmin + ob(iob)%tlaps
+        w%tave = w%tave + ob(iob)%tlaps
+      end if
+      precip_eff = w%precip
       
       hru(ihru)%water_seep = 0.
       irrig(j)%demand = 0.
@@ -131,6 +137,15 @@
         ht1 = hz
         ht2 = hz
 
+        !! check irrigation demand decision table for water allocation
+        if (hru(ihru)%irr_dmd_dtbl > 0) then
+          id = hru(ihru)%irr_dmd_dtbl
+          jj = j
+          d_tbl => dtbl_lum(id)
+          call conditions (jj, iauto)
+          call actions (jj, iob, iauto)
+        end if
+        
         !! check auto operations
         if (sched(isched)%num_autos > 0) then
           do iauto = 1, sched(isched)%num_autos
@@ -220,6 +235,10 @@
           
         !! compute crack volume
         if (bsn_cc%crk == 1) call sq_crackvol
+                  
+        !! compute evapotranspiration
+        call et_pot
+        call et_act
 
         !! compute surface runoff processes
         if (ires == 0) then
@@ -230,21 +249,35 @@
           surfq(j) = 0.
           sedyld(j) = 0.
         end if
-                  
-        !! compute evapotranspiration
-        call et_pot
-        call et_act
 
         !! ht2%sed==sediment routed across hru from surface runon
         sedyld(j) = sedyld(j) + ht2%sed
-
+      
+        !! wetland processes
+        if (ires > 0) then
+          call wetland_control
+        else
+          ht2%flo = wet(j)%flo * hru(j)%area_ha * 10.
+          wet(j)%flo = 0.
+        end if
+ 
         !! compute effective rainfall (amount that percs into soil)
-        !! add infiltration wetland seepage - and from surface runon
-        inflpcp = (precip_eff - surfq(j)) + hru(j)%water_seep /(10.* hru(j)%area_ha)
+        if (ires > 0) then
+          !! for wetland use seepage into soil from ponded water
+          inflpcp = hru(j)%water_seep /(10.* hru(j)%area_ha)
+        else
+          !! no wetland (no ponded water)
+          inflpcp = precip_eff - surfq(j)
+        end if
         inflpcp = Max(0., inflpcp)
          
         !! perform management operations
         if (yr_skip(j) == 0) call mgt_operatn   
+        
+        !! add irrigation to subdaily effective precip
+        if (time%step > 0) then
+          w%ts(:) = w%ts(:) + irrig(j)%applied / time%step
+        end if
         
         !! perform soil water routing
         call swr_percmain
@@ -254,15 +287,6 @@
         satexq_chan = bss_ex(1,j) * brt(j)
         bss_ex(1,j) = bss_ex(1,j) - satexq_chan
 
-        
-        !! wetland processes
-        if (ires > 0) then
-          call wetland_control
-        else
-          ht2%flo = wet(j)%flo * hru(j)%area_ha * 10.
-          wet(j)%flo = 0.
-        end if
- 
         !! compute peak rate similar to swat-deg using SCS triangular unit hydrograph
         !runoff_m3 = 10. * surfq(j) * hru(j)%area_ha
         !bf_m3 = 10. * latq(j) * hru(j)%area_ha
@@ -281,6 +305,25 @@
             ndeat(j) = 0
           end if
         end if
+       
+        !! compute nitrogen and phosphorus mineralization
+        if (bsn_cc%cswat == 0) then
+          call nut_nminrl
+        end if
+
+	    if (bsn_cc%cswat == 2) then
+	      call cbn_zhang2
+	    end if
+
+        call nut_nitvol  
+        call nut_pminrl
+        
+        !! compute biozone processes in septic HRUs
+        !! if 1) current is septic hru and 2) soil temperature is above zero
+        isep = iseptic(j)
+	    if (sep(isep)%opt /= 0. .and. time%yrc >= sep(isep)%yr) then
+	      if (soil(j)%phys(i_sep(j))%tmp > 0.) call sep_biozone     
+        endif
 
         !! compute plant community partitions
         call pl_community
@@ -291,16 +334,7 @@
         end do
         !! compute plant biomass, leaf, root and seed growth
         call pl_grow
-      
-        !! moisture growth perennials - start growth
-        if (pcom(j)%mseas == 1) then
-          call pl_moisture_gro_init
-        end if
-        !! moisture growth perennials - start senescence
-        if (pcom(j)%mseas == 0) then
-          call pl_moisture_senes_init
-        end if
-        
+
         !! compute total parms for all plants in the community
         strsw_av = 0.; strsa_av = 0.; strsn_av = 0.; strsp_av = 0.; strstmp_av = 0.
         npl_gro = 0
@@ -348,37 +382,14 @@
         
         !! compute actual ET for day in HRU
         etday = ep_day + es_day + canev
+        es_day = es_day
 
         !rtb gwflow
         if(gwflow_flag.eq.1) then
           etremain(j) = pet_day - etday
           etactual(j) = etday
         endif
-        
-
-        !! compute nitrogen and phosphorus mineralization
-        if (bsn_cc%cswat == 0) then
-          call nut_nminrl
-        end if
-
-	    if (bsn_cc%cswat == 2) then
-	      call cbn_zhang2
-	    end if
-
-        call nut_nitvol
-        !if (bsn_cc%sol_P_model == 0) then
-            call nut_pminrl
-        !else
-        !    call nut_pminrl2
-        !end if
-
-        !! compute biozone processes in septic HRUs
-        !! if 1) current is septic hru and 2) soil temperature is above zero
-        isep = iseptic(j)
-	    if (sep(isep)%opt /= 0. .and. time%yrc >= sep(isep)%yr) then
-	      if (soil(j)%phys(i_sep(j))%tmp > 0.) call sep_biozone     
-        endif
-
+ 
         !! compute pesticide washoff   
         if (w%precip >= 2.54) call pest_washp
 
@@ -557,7 +568,7 @@
       end do
 
       ! output_waterbal
-        hwb_d(j)%precip = wst(iwst)%weat%precip
+        hwb_d(j)%precip = w%precip
         hwb_d(j)%snofall = snofall
         hwb_d(j)%snomlt = snomlt
         hwb_d(j)%surq_gen = qday
@@ -569,7 +580,7 @@
         end if
         !! add evap from impounded water (wetland) to et and esoil
         hwb_d(j)%et = etday + hru(j)%water_evap
-        hwb_d(j)%tloss = tloss
+        hwb_d(j)%ecanopy = canev
         hwb_d(j)%eplant = ep_day
         hwb_d(j)%esoil = es_day + hru(j)%water_evap 
         hwb_d(j)%surq_cont = surfq(j)

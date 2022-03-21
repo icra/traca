@@ -16,9 +16,9 @@
       implicit none
       
       character*10 b(3) 
-      character(len=13) :: gwflow_hdr_day(17),gwflow_hdr_yr(11),gwflow_hdr_aa(11)
-      character(len=13) :: gwflown_hdr_day(16),gwflown_hdr_yr(12),gwflown_hdr_aa(12)
-      character(len=13) :: gwflowp_hdr_day(16),gwflowp_hdr_yr(12),gwflowp_hdr_aa(12)
+      character(len=13) :: gwflow_hdr_day(19),gwflow_hdr_yr(13),gwflow_hdr_aa(13)
+      character(len=13) :: gwflown_hdr_day(18),gwflown_hdr_yr(14),gwflown_hdr_aa(14)
+      character(len=13) :: gwflowp_hdr_day(18),gwflowp_hdr_yr(14),gwflowp_hdr_aa(14)
       character(len=16) :: hydsep_hdr(10)
       integer  date_time(8)  
       integer  in_gw,in_hru_cell,in_cell_hru,in_huc_cell,hru,num_unique,cell,hru_count,hru_cell,nhru_connected
@@ -26,7 +26,8 @@
       integer  nzones_aquK,nzones_aquSy,nzones_aqun,nzones_strK,nzones_strbed,K_zone,Sy_zone,n_zone,bed_zone
       integer  hru_read,hru_cell_row,hru_cell_col,cell_count,obs_cell_row,obs_cell_col
       integer  first_found,first_cell,last_cell,found
-      integer  already_written,counter,riv_num,count,obs_cell_ID,cell_id,num_connected_hrus,num_cells,cell_row,cell_col
+      integer  already_written,counter,riv_num,count,obs_cell_ID,cell_id,num_connected_hrus, &
+               num_cells,cell_row,cell_col,pumpex_cell_ID
       integer  line_array(5000)
       integer  dum1,dum2,dum3,dum7,dum8
       integer  channel_id,num_hydsep
@@ -81,7 +82,9 @@
       out_gwtile_hru = 1267
       out_gwobs_ss = 1268
       out_gw_tran = 1270
-      out_gw_pump = 1271
+      out_gw_lake = 1271
+      out_gw_pumpag = 1272 
+      out_gw_pumpex = 1273
       
       !number of HRUs in the simulation
       num_hru = sp_ob%hru
@@ -109,7 +112,9 @@
       read(in_gw,*) gw_transfer_flag !flag to simulate groundwater-soil interactions
       read(in_gw,*) gw_satexcess_flag !flag to simulate saturation excess routing
       read(in_gw,*) gw_et_flag
-      read(in_gw,*) gw_tile_flag !flag to simulate tile drain flow
+      read(in_gw,*) gw_tile_flag !flag to simulate groundwater-tile drain exchange	
+      read(in_gw,*) gw_lake_flag !flag to simulate groundwater-lake exchange	
+      read(in_gw,*) gw_pumpex_flag !flag to simulate specified groundwater pumping	
       read(in_gw,*) gw_rech_flag !flag to simulate recharge
       allocate(gw_delay(num_hru)) !groundwater delay
       allocate(gw_rech(num_hru))
@@ -174,6 +179,11 @@
       allocate(gw_cell_tile(grid_nrow,grid_ncol))
       allocate(gw_cell_initcn(grid_nrow,grid_ncol))
       allocate(gw_cell_initcp(grid_nrow,grid_ncol))
+      if(gw_lake_flag.eq.1) then	
+        allocate(gw_cell_lake(grid_nrow,grid_ncol))	
+        allocate(gw_cell_lake_bed(grid_nrow,grid_ncol))	
+        allocate(gw_cell_lake_stage(grid_nrow,grid_ncol))	
+      endif	
       gw_cell_inithead = 0.
       gw_cell_initcn = 0.
       gw_cell_initcp = 0.
@@ -185,7 +195,9 @@
       read(in_gw,*)
       do i=1,grid_nrow
         do j=1,grid_ncol
-          read(in_gw,*) gw_cell_id(i,j),gw_cell_status(i,j),gw_cell_top(i,j),thickness,K_zone,Sy_zone,n_zone,gw_cell_exdp(i,j),gw_cell_et(i,j),gw_cell_tile(i,j),gw_cell_initcn(i,j),gw_cell_initcp(i,j)
+          read(in_gw,*) gw_cell_id(i,j),gw_cell_status(i,j),gw_cell_top(i,j),thickness,K_zone,Sy_zone,n_zone, &
+                        gw_cell_exdp(i,j),gw_cell_et(i,j),gw_cell_tile(i,j),gw_cell_initcn(i,j),gw_cell_initcp(i,j), &
+                        gw_cell_lake(i,j),gw_cell_lake_bed(i,j),gw_cell_lake_stage(i,j)
           gw_cell_bot(i,j) = gw_cell_top(i,j) - thickness
           if(gw_cell_status(i,j).gt.0 .and. wt_init_type.lt.3) then !only proceed if initial head should be calculated
             if(wt_init_type.eq.1) then  
@@ -307,8 +319,8 @@
       open(out_gwobs_ss,file='gwflow_cell_ss')
       write(out_gwobs_ss,*) 'Daily sources and sinks for cell'
       write(out_gwobs_ss,*) 'Row:',gw_cell_obs_ss_row,'Column:',gw_cell_obs_ss_col
-      write(out_gwobs_ss,*) 'head,volume_before,volume_after,rech,et,gw-->sw,sw-->gw,satex,lateral,pump,tile,gw-->soil'  
-      allocate(gw_cell_obs_ss_vals(12))
+      write(out_gwobs_ss,*) 'head,volume_before,volume_after,rech,et,gw-->sw,sw-->gw,satex,lateral,pumpag,pumpex,tile,gw-->soil,lake'  
+      allocate(gw_cell_obs_ss_vals(14))
       
       !river cell information (cells that are connected to SWAT+ chandeg channels)
       !(most of the river cell information was already read in the gwflow.riv file)
@@ -410,6 +422,61 @@
       gwflow_tilep_sum = 0.
       ss_tilep_cell_total = 0.
       
+      !lake information
+      if(gw_lake_flag.eq.1) then
+        open(out_gw_lake,file='gwflow_flux_lake')
+        if(gw_transport_flag.eq.1) then
+          write(out_gw_lake,*) 'Annual groundwater-lake exchange (m3/day) and nutrient mass (kg/day)'
+        else
+          write(out_gw_lake,*) 'Annual groundwater-lake exchange (m3/day)'  
+        endif
+        read(in_gw,*)
+        read(in_gw,*) lake_thick
+        read(in_gw,*) lake_K
+        read(in_gw,*) lake_no3
+        read(in_gw,*) lake_p
+      endif
+      allocate(gwflow_lake_sum(grid_nrow,grid_ncol))
+      allocate(ss_lake_cell_total(grid_nrow,grid_ncol))
+      allocate(gwflow_laken_sum(grid_nrow,grid_ncol))
+      allocate(ss_laken_cell_total(grid_nrow,grid_ncol))
+      allocate(gwflow_lakep_sum(grid_nrow,grid_ncol))
+      allocate(ss_lakep_cell_total(grid_nrow,grid_ncol))
+      gwflow_lake_sum = 0.
+      ss_lake_cell_total = 0.
+      gwflow_laken_sum = 0.
+      ss_laken_cell_total = 0.
+      gwflow_lakep_sum = 0.
+      ss_lakep_cell_total = 0.
+      
+      !pumping information (specified pumping, for groundwater that leaves the hydrologic system)
+      if(gw_pumpex_flag.eq.1) then
+        read(in_gw,*)
+        read(in_gw,*)
+        read(in_gw,*) gw_npumpex !number of pumps
+        allocate(gw_pumpex_cell_row(gw_npumpex))
+        allocate(gw_pumpex_cell_col(gw_npumpex))
+        allocate(gw_pumpex_nperiods(gw_npumpex))
+        allocate(gw_pumpex_dates(gw_npumpex,2,1000))
+        allocate(gw_pumpex_rates(gw_npumpex,1000))
+        gw_pumpex_nperiods = 0
+        gw_pumpex_rates = 0.
+        do i=1,gw_npumpex !read in the information for each pump
+          read(in_gw,*) 
+          read(in_gw,*) pumpex_cell_ID,gw_pumpex_nperiods(i)
+          remainder = mod(pumpex_cell_ID,grid_ncol)
+          if(remainder.eq.0) then
+            gw_pumpex_cell_row(i) = pumpex_cell_ID / grid_ncol !row
+          else
+            gw_pumpex_cell_row(i) = int(pumpex_cell_ID/grid_ncol) + 1 !row
+          endif
+          gw_pumpex_cell_col(i) = pumpex_cell_ID - ((gw_pumpex_cell_row(i)-1)*grid_ncol) !column
+          do j=1,gw_pumpex_nperiods(i)
+            read(in_gw,*) gw_pumpex_dates(i,1,j),gw_pumpex_dates(i,2,j),gw_pumpex_rates(i,j)
+          enddo
+        enddo
+      endif
+      
       !chemical transport information
       if(gw_transport_flag.eq.1) then
         read(in_gw,*)
@@ -439,9 +506,10 @@
       allocate(gw_cell_satex(grid_nrow,grid_ncol))
       allocate(gw_cell_tran(grid_nrow,grid_ncol))
       allocate(hru_gwtran(num_hru,20))
-      allocate(gw_cell_ss_pump(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpag(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpex(grid_nrow,grid_ncol))
       allocate(gw_cell_ss_tile(grid_nrow,grid_ncol))
-      allocate(gw_cell_ss_other(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_lake(grid_nrow,grid_ncol))
       allocate(gw_cell_ss(grid_nrow,grid_ncol))
       allocate(gw_cell_Q(grid_nrow,grid_ncol))
       allocate(gw_volume_before_cell(grid_nrow,grid_ncol))
@@ -457,9 +525,10 @@
       gw_cell_satex = 0.
       gw_cell_tran = 0.
       hru_gwtran = 0.
-      gw_cell_ss_pump = 0.
+      gw_cell_ss_pumpag = 0.
+      gw_cell_ss_pumpex = 0.
       gw_cell_ss_tile = 0.
-      gw_cell_ss_other = 0.
+      gw_cell_ss_lake = 0.
       gw_cell_ss = 0.
       gw_cell_Q = 0.
       gwflow_perc = 0.
@@ -490,10 +559,11 @@
       allocate(gw_cell_ss_gwswn(grid_nrow,grid_ncol))
       allocate(gw_cell_ss_swgwn(grid_nrow,grid_ncol))
       allocate(gw_cell_satexn(grid_nrow,grid_ncol))
-      allocate(gw_cell_ss_pumpn(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpagn(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpexn(grid_nrow,grid_ncol))
       allocate(gw_cell_ss_tilen(grid_nrow,grid_ncol))
       allocate(gw_cell_trann(grid_nrow,grid_ncol))
-      allocate(gw_cell_ss_pumpn(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_laken(grid_nrow,grid_ncol))
       allocate(nmass_adv(grid_nrow,grid_ncol))
       allocate(nmass_dsp(grid_nrow,grid_ncol))
       allocate(nmass_rct(grid_nrow,grid_ncol))
@@ -509,9 +579,11 @@
       gw_cell_ss_gwswn = 0.
       gw_cell_ss_swgwn = 0.
       gw_cell_satexn = 0.
-      gw_cell_ss_pumpn = 0.
+      gw_cell_ss_pumpagn = 0.
+      gw_cell_ss_pumpexn = 0.
       gw_cell_ss_tilen = 0.
       gw_cell_trann = 0.
+      gw_cell_ss_laken = 0.
       nmass_adv = 0.
       nmass_dsp = 0.
       nmass_rct = 0.
@@ -533,10 +605,11 @@
       allocate(gw_cell_ss_gwswp(grid_nrow,grid_ncol))
       allocate(gw_cell_ss_swgwp(grid_nrow,grid_ncol))
       allocate(gw_cell_satexp(grid_nrow,grid_ncol))
-      allocate(gw_cell_ss_pumpp(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpagp(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_pumpexp(grid_nrow,grid_ncol))
       allocate(gw_cell_ss_tilep(grid_nrow,grid_ncol))
       allocate(gw_cell_tranp(grid_nrow,grid_ncol))
-      allocate(gw_cell_ss_pumpp(grid_nrow,grid_ncol))
+      allocate(gw_cell_ss_lakep(grid_nrow,grid_ncol))
       allocate(pmass_adv(grid_nrow,grid_ncol))
       allocate(pmass_dsp(grid_nrow,grid_ncol))
       allocate(pmass_rct(grid_nrow,grid_ncol))
@@ -550,9 +623,11 @@
       gw_cell_ss_gwswp = 0.
       gw_cell_ss_swgwp = 0.
       gw_cell_satexp = 0.
-      gw_cell_ss_pumpp = 0.
+      gw_cell_ss_pumpagp = 0.
+      gw_cell_ss_pumpexp = 0.
       gw_cell_ss_tilep = 0.
       gw_cell_tranp = 0.
+      gw_cell_ss_lakep = 0.
       pmass_adv = 0.
       pmass_dsp = 0.
       pmass_rct = 0.
@@ -743,14 +818,17 @@
       write(out_gwbal,*) 'satex:         mm   saturation excess flow (water table above ground)'
       write(out_gwbal,*) 'gwsoil:        mm   groundwater transferred to HRU soil profile'
       write(out_gwbal,*) 'bound:         mm   groundwater added/removed at watershed boundary'
-      write(out_gwbal,*) 'pump:          mm   groundwater removed by pumping'
+      write(out_gwbal,*) 'pump_ag:       mm   groundwater pumped for irrigation'
+      write(out_gwbal,*) 'pump_ex:       mm   groundwater pumping specified by user'
       write(out_gwbal,*) 'tile:          mm   groundwater removed via tile drains'
+      write(out_gwbal,*) 'lake:          mm   groundwater exchanged with lakes'	
       write(out_gwbal,*) 'error:         --   water balance error for aquifer'
       write(out_gwbal,*) 'satfr:              fraction of cells that have water table at ground'
       write(out_gwbal,*) 'wtdep:         m    average depth to water table for watershed'
       write(out_gwbal,*)
-      gwflow_hdr_day = (/"  year","   day","ts","vol_bef","vol_aft","rech","gwet","gwsw","swgw","satex","gwsoil","bound","pump","tile","error","satfr","wtdepth"/)
-      write(out_gwbal,120) (gwflow_hdr_day(j),j=1,17)
+      gwflow_hdr_day = (/"  year","   day","ts","vol_bef","vol_aft","rech","gwet","gwsw","swgw","satex","gwsoil", &
+                         "bound","pump_ag","pump_ex","tile","lake","error","satfr","wtdepth"/)
+      write(out_gwbal,119) (gwflow_hdr_day(j),j=1,19)
       endif
 
       !open file to track yearly groundwater water balance
@@ -771,11 +849,13 @@
       write(out_gwbal_yr,*) 'satex:         mm   saturation excess flow (water table above ground)'
       write(out_gwbal_yr,*) 'gwsoil:        mm   groundwater transferred to HRU soil profile'
       write(out_gwbal_yr,*) 'bound:         mm   groundwater added/removed at watershed boundary'
-      write(out_gwbal_yr,*) 'pump:          mm   groundwater removed by pumping'
+      write(out_gwbal_yr,*) 'pump_ag:       mm   groundwater pumped for irrigation'
+      write(out_gwbal_yr,*) 'pump_ex:       mm   groundwater pumping specified by user'
       write(out_gwbal_yr,*) 'tile:          mm   groundwater removed via tile drains'
+      write(out_gwbal_yr,*) 'lake:          mm   groundwater exchanged with lakes'
       write(out_gwbal_yr,*)
-      gwflow_hdr_yr = (/"  year","delvol","rech","gwet","gwsw","swgw","satex","gwsoil","bound","pump","tile"/)
-      write(out_gwbal_yr,120) (gwflow_hdr_yr(j),j=1,11)
+      gwflow_hdr_yr = (/"  year","delvol","rech","gwet","gwsw","swgw","satex","gwsoil","bound","pump_ag","pump_ex","tile","lake"/)
+      write(out_gwbal_yr,120) (gwflow_hdr_yr(j),j=1,13)
       vol_change_yr = 0.
       ss_rech_yr = 0.
       ss_et_yr = 0.
@@ -784,7 +864,9 @@
       ss_satex_yr = 0.
       ss_tran_yr = 0.
       ss_Q_yr = 0.
-      ss_pump_yr = 0.
+      ss_pumpag_yr = 0.
+      ss_pumpex_yr = 0.
+      ss_lake_yr = 0.
       endif
       
       !open file to write out average annual groundwater water balance
@@ -805,11 +887,13 @@
       write(out_gwbal_aa,*) 'satex:         mm   saturation excess flow (water table above ground)'
       write(out_gwbal_aa,*) 'gwsoil:        mm   groundwater transferred to HRU soil profile'
       write(out_gwbal_aa,*) 'bound:         mm   groundwater added/removed at watershed boundary'
-      write(out_gwbal_aa,*) 'pump:          mm   groundwater removed by pumping'
+      write(out_gwbal_aa,*) 'pump_ag:       mm   groundwater pumped for irrigation'
+      write(out_gwbal_aa,*) 'pump_ex:       mm   groundwater pumping specified by user'
       write(out_gwbal_aa,*) 'tile:          mm   groundwater removed via tile drains'
+      write(out_gwbal_aa,*) 'lake:          mm   groundwater exchanged with lakes'
       write(out_gwbal_aa,*)
-      gwflow_hdr_aa = (/"  year","delvol","rech","gwet","gwsw","swgw","satex","gwsoil","bound","pump","tile"/)
-      write(out_gwbal_aa,120) (gwflow_hdr_aa(j),j=1,11)
+      gwflow_hdr_aa = (/"  year","delvol","rech","gwet","gwsw","swgw","satex","gwsoil","bound","pump_ag","pump_ex","tile","lake"/)
+      write(out_gwbal_aa,120) (gwflow_hdr_aa(j),j=1,13)
       vol_change_total = 0.
       ss_rech_total = 0.
       ss_et_total = 0.
@@ -818,8 +902,10 @@
       ss_satex_total = 0.
       ss_tran_total = 0.
       ss_Q_total = 0.
-      ss_pump_total = 0.
+      ss_pumpag_total = 0.
+      ss_pumpex_total = 0.
       ss_tile_total = 0.
+      ss_lake_total = 0.
       endif
       
       !initialize nutrient mass balance ---------------------------------------------------------------------------------------------------------------
@@ -844,12 +930,15 @@
         write(out_gwbaln,*) 'adv:           kg   NO3 mass transported by advection'
         write(out_gwbaln,*) 'dsp:           kg   NO3 mass transported by dispersion'
         write(out_gwbaln,*) 'rct:           kg   NO3 mass removed by denitrification'
-        write(out_gwbaln,*) 'pump:          kg   NO3 mass removed by groundwater pumping'
+        write(out_gwbaln,*) 'pump_ag:       kg   NO3 mass removed by groundwater pumping for irrigation'
+        write(out_gwbaln,*) 'pump_ex:       kg   NO3 mass removed by groundwater pumping specified by user'
         write(out_gwbaln,*) 'tile:          kg   NO3 mass removed by tile drains'
+        write(out_gwbaln,*) 'lake:          kg   NO3 mass loaded to/from lakes'
         write(out_gwbaln,*) 'error:         --   mass balance error for aquifer'
         write(out_gwbaln,*)
-        gwflown_hdr_day = (/"  year","   day","ts","massbef","massaft","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile","error"/)
-        write(out_gwbaln,120) (gwflown_hdr_day(j),j=1,16)
+        gwflown_hdr_day = (/"  year","   day","ts","massbef","massaft","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct", &
+                            "pump_ag","pump_ex","tile","lake","error"/)
+        write(out_gwbaln,119) (gwflown_hdr_day(j),j=1,18)
         open(out_gwbalp,file='gwflow_balance_p_day')
         write(out_gwbalp,*) 'Groundwater watershed-wide P loads for each day'
         write(out_gwbalp,*)
@@ -867,12 +956,15 @@
         write(out_gwbalp,*) 'adv:           kg   P mass transported by advection'
         write(out_gwbalp,*) 'dsp:           kg   P mass transported by dispersion'
         write(out_gwbalp,*) 'rct:           kg   P mass removed by denitrification'
-        write(out_gwbalp,*) 'pump:          kg   P mass removed by groundwater pumping'
+        write(out_gwbalp,*) 'pump_ag:       kg   P mass removed by groundwater pumping for irrigation'
+        write(out_gwbalp,*) 'pump_ex:       kg   P mass removed by groundwater pumping specified by user'
         write(out_gwbalp,*) 'tile:          kg   P mass removed by tile drains'
+        write(out_gwbalp,*) 'lake:          kg   P mass loaded to/from lakes'
         write(out_gwbalp,*) 'error:         --   mass balance error for aquifer'
         write(out_gwbalp,*)
-        gwflowp_hdr_day = (/"  year","   day","ts","massbef","massaft","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile","error"/)
-        write(out_gwbalp,120) (gwflowp_hdr_day(j),j=1,16)
+        gwflowp_hdr_day = (/"  year","   day","ts","massbef","massaft","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct", &
+                            "pump_ag","pump_ex","tile","lake","error"/)
+        write(out_gwbalp,119) (gwflowp_hdr_day(j),j=1,18)
         endif
         
         !open file to track yearly nutrient mass balance
@@ -892,11 +984,13 @@
         write(out_gwbaln_yr,*) 'adv:           kg   NO3 mass transported by advection'
         write(out_gwbaln_yr,*) 'dsp:           kg   NO3 mass transported by dispersion'
         write(out_gwbaln_yr,*) 'rct:           kg   NO3 mass removed by denitrification'
-        write(out_gwbaln_yr,*) 'pump:          kg   NO3 mass removed by groundwater pumping'
+        write(out_gwbaln_yr,*) 'pump_ag:       kg   NO3 mass removed by groundwater pumping for irrigation'
+        write(out_gwbaln_yr,*) 'pump_ex:       kg   NO3 mass removed by groundwater pumping specified by user'
         write(out_gwbaln_yr,*) 'tile:          kg   NO3 mass removed by tile drains'
+        write(out_gwbaln_yr,*) 'lake:          kg   NO3 mass loaded to/from lakes'
         write(out_gwbaln_yr,*)
-        gwflown_hdr_yr = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile"/)
-        write(out_gwbaln_yr,120) (gwflown_hdr_yr(j),j=1,12)
+        gwflown_hdr_yr = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump_ag","pump_ex","tile","lake"/)
+        write(out_gwbaln_yr,120) (gwflown_hdr_yr(j),j=1,14)
         nmass_change_yr = 0.
         ss_rechn_yr = 0.
         ss_gwn_yr = 0.
@@ -905,8 +999,10 @@
         ss_advn_yr = 0.
         ss_dspn_yr = 0.
         ss_rctn_yr = 0.
-        ss_pumpn_yr = 0.
+        ss_pumpagn_yr = 0.
+        ss_pumpexn_yr = 0.
         ss_tilen_yr = 0.
+        ss_laken_yr = 0.
         open(out_gwbalp_yr,file='gwflow_balance_p_yr')
         write(out_gwbalp_yr,*) 'Groundwater watershed-wide P loads for each year'
         write(out_gwbalp_yr,*)
@@ -922,11 +1018,13 @@
         write(out_gwbalp_yr,*) 'adv:           kg   P mass transported by advection'
         write(out_gwbalp_yr,*) 'dsp:           kg   P mass transported by dispersion'
         write(out_gwbalp_yr,*) 'rct:           kg   P mass removed by denitrification'
-        write(out_gwbalp_yr,*) 'pump:          kg   P mass removed by groundwater pumping'
+        write(out_gwbalp_yr,*) 'pump_ag:       kg   P mass removed by groundwater pumping for irrigation'
+        write(out_gwbalp_yr,*) 'pump_ex:       kg   P mass removed by groundwater pumping specified by user'
         write(out_gwbalp_yr,*) 'tile:          kg   P mass removed by tile drains'
+        write(out_gwbalp_yr,*) 'lake:          kg   P mass loaded to/from lakes'
         write(out_gwbalp_yr,*)
-        gwflowp_hdr_yr = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile"/)
-        write(out_gwbalp_yr,120) (gwflowp_hdr_yr(j),j=1,12)
+        gwflowp_hdr_yr = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump_ag","pump_ex","tile","lake"/)
+        write(out_gwbalp_yr,120) (gwflowp_hdr_yr(j),j=1,14)
         pmass_change_yr = 0.
         ss_rechp_yr = 0.
         ss_gwp_yr = 0.
@@ -935,8 +1033,10 @@
         ss_advp_yr = 0.
         ss_dspp_yr = 0.
         ss_rctp_yr = 0.
-        ss_pumpp_yr = 0.
+        ss_pumpagp_yr = 0.
+        ss_pumpexp_yr = 0.
         ss_tilep_yr = 0.
+        ss_lakep_yr = 0.
         endif
         
         !open file to write out average annual nutrient mass balance
@@ -956,11 +1056,13 @@
         write(out_gwbaln_aa,*) 'adv:           kg   NO3 mass transported by advection'
         write(out_gwbaln_aa,*) 'dsp:           kg   NO3 mass transported by dispersion'
         write(out_gwbaln_aa,*) 'rct:           kg   NO3 mass removed by denitrification'
-        write(out_gwbaln_aa,*) 'pump:          kg   NO3 mass removed by groundwater pumping'
+        write(out_gwbaln_aa,*) 'pump_ag:       kg   NO3 mass removed by groundwater pumping for irrigation'
+        write(out_gwbaln_aa,*) 'pump_ex:       kg   NO3 mass removed by groundwater pumping specified by user'
         write(out_gwbaln_aa,*) 'tile:          kg   NO3 mass removed by tile drains'
+        write(out_gwbaln_aa,*) 'lake:          kg   NO3 mass loaded to/from lakes'
         write(out_gwbaln_aa,*)
-        gwflown_hdr_aa = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile"/)
-        write(out_gwbaln_aa,120) (gwflown_hdr_aa(j),j=1,12)
+        gwflown_hdr_aa = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump_ag","pump_ex","tile","lake"/)
+        write(out_gwbaln_aa,120) (gwflown_hdr_aa(j),j=1,14)
         nmasschange_total = 0.
         ss_rechn_total = 0.
         ss_gwn_total = 0.
@@ -969,8 +1071,10 @@
         ss_advn_total = 0.
         ss_dspn_total = 0.
         ss_rctn_total = 0.
-        ss_pumpn_total = 0.
+        ss_pumpagn_total = 0.
+        ss_pumpexn_total = 0.
         ss_tilen_total  = 0.
+        ss_laken_total  = 0.
         open(out_gwbalp_aa,file='gwflow_balance_p_aa')
         write(out_gwbalp_aa,*) 'Average annual groundwater watershed-wide P loads'
         write(out_gwbalp_aa,*)
@@ -986,11 +1090,13 @@
         write(out_gwbalp_aa,*) 'adv:           kg   P mass transported by advection'
         write(out_gwbalp_aa,*) 'dsp:           kg   P mass transported by dispersion'
         write(out_gwbalp_aa,*) 'rct:           kg   P mass removed by denitrification'
-        write(out_gwbalp_aa,*) 'pump:          kg   P mass removed by groundwater pumping'
+        write(out_gwbalp_aa,*) 'pump_ag:       kg   P mass removed by groundwater pumping for irrigation'
+        write(out_gwbalp_aa,*) 'pump_ex:       kg   P mass removed by groundwater pumping specified by user'
         write(out_gwbalp_aa,*) 'tile:          kg   P mass removed by tile drains'
+        write(out_gwbalp_aa,*) 'lake:          kg   P mass loaded to/from lakes'
         write(out_gwbalp_aa,*)
-        gwflowp_hdr_aa = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump","tile"/)
-        write(out_gwbalp_aa,120) (gwflowp_hdr_aa(j),j=1,12)
+        gwflowp_hdr_aa = (/"  year","delmass","rech","gwsw","swgw","satex","gwsoil","adv","dsp","rct","pump_ag","pump_ex","tile","lake"/)
+        write(out_gwbalp_aa,120) (gwflowp_hdr_aa(j),j=1,14)
         pmasschange_total = 0.
         ss_rechp_total = 0.
         ss_gwp_total = 0.
@@ -999,8 +1105,10 @@
         ss_advp_total = 0.
         ss_dspp_total = 0.
         ss_rctp_total = 0.
-        ss_pumpp_total = 0.
+        ss_pumpagp_total = 0.
+        ss_pumpexp_total = 0.
         ss_tilep_total  = 0.
+        ss_lakep_total  = 0.
         endif
       endif
       
@@ -1064,29 +1172,50 @@
       allocate(ss_Q_cell_total(grid_nrow,grid_ncol))
       gwflow_lateral_sum = 0.
       ss_Q_cell_total = 0.
-      !groundwater pumping
-      open(out_gw_pump,file='gwflow_flux_pumping')
+      !groundwater pumping (irrigation)
+      open(out_gw_pumpag,file='gwflow_flux_pumping_ag')
       if(gw_transport_flag.eq.1) then
-        write(out_gw_pump,*) 'Annual pumping rate (m3/day) and nutrient mass (kg/day)'
+        write(out_gw_pumpag,*) 'Annual pumping rate (m3/day) and nutrient mass (kg/day) (irrigation)'
       else
-        write(out_gw_pump,*) 'Annual pumping rate (m3/day)'
+        write(out_gw_pumpag,*) 'Annual pumping rate (m3/day) (irrigation)'
       endif
-      allocate(gwflow_pump_sum(grid_nrow,grid_ncol))
-      allocate(ss_pump_cell_total(grid_nrow,grid_ncol))
-      gwflow_pump_sum = 0.
-      ss_pump_cell_total = 0.
+      allocate(gwflow_pumpag_sum(grid_nrow,grid_ncol))
+      allocate(ss_pumpag_cell_total(grid_nrow,grid_ncol))
+      gwflow_pumpag_sum = 0.
+      ss_pumpag_cell_total = 0.
       if(gw_transport_flag.eq.1) then
-        allocate(gwflow_pumpn_sum(grid_nrow,grid_ncol))
-        allocate(ss_pumpn_cell_total(grid_nrow,grid_ncol))
-        allocate(gwflow_pumpp_sum(grid_nrow,grid_ncol))
-        allocate(ss_pumpp_cell_total(grid_nrow,grid_ncol))
-        gwflow_pumpn_sum = 0.
-        ss_pumpn_cell_total = 0.
-        gwflow_pumpp_sum = 0.
-        ss_pumpp_cell_total = 0.
+        allocate(gwflow_pumpagn_sum(grid_nrow,grid_ncol))
+        allocate(ss_pumpagn_cell_total(grid_nrow,grid_ncol))
+        allocate(gwflow_pumpagp_sum(grid_nrow,grid_ncol))
+        allocate(ss_pumpagp_cell_total(grid_nrow,grid_ncol))
+        gwflow_pumpagn_sum = 0.
+        ss_pumpagn_cell_total = 0.
+        gwflow_pumpagp_sum = 0.
+        ss_pumpagp_cell_total = 0.
       endif
-      
-      
+      !groundwater pumping (specified by user)
+      if(gw_pumpex_flag.eq.1) then
+      open(out_gw_pumpex,file='gwflow_flux_pumping_ex')
+      if(gw_transport_flag.eq.1) then
+        write(out_gw_pumpex,*) 'Annual pumping rate (m3/day) and nutrient mass (kg/day) (specified)'
+      else
+        write(out_gw_pumpex,*) 'Annual pumping rate (m3/day) (specified)'
+      endif
+      allocate(gwflow_pumpex_sum(grid_nrow,grid_ncol))
+      allocate(ss_pumpex_cell_total(grid_nrow,grid_ncol))
+      gwflow_pumpex_sum = 0.
+      ss_pumpex_cell_total = 0.
+      if(gw_transport_flag.eq.1) then
+        allocate(gwflow_pumpexn_sum(grid_nrow,grid_ncol))
+        allocate(ss_pumpexn_cell_total(grid_nrow,grid_ncol))
+        allocate(gwflow_pumpexp_sum(grid_nrow,grid_ncol))
+        allocate(ss_pumpexp_cell_total(grid_nrow,grid_ncol))
+        gwflow_pumpexn_sum = 0.
+        ss_pumpexn_cell_total = 0.
+        gwflow_pumpexp_sum = 0.
+        ss_pumpexp_cell_total = 0.
+      endif
+      endif
 
       !prepare files for writing groundwater-surface water interaction ------------------------------------------------------------------------------ 
       
@@ -1261,7 +1390,8 @@
 102   format(1000(i4))
 103   format(10000(i8))
 111   format(1x,a, 5x,"Time",2x,i2,":",i2,":",i2)
-120   format(50(a12))
+119   format(a8,a11,50(a13))
+120   format(a8,50(a13))
 121   format(50(a16))
 
       end subroutine gwflow_read

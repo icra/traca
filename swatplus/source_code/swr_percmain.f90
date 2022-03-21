@@ -69,7 +69,7 @@
 
       !! initialize water entering first soil layer
       !! ht1%flo is infiltration from overland flow routing
-      sepday = inflpcp + irrig(j)%applied + hru(j)%water_seep + ht1%flo
+      sepday = inflpcp + irrig(j)%applied + ht1%flo
       hru(j)%water_seep = 0.
 
       !! calculate crack flow 

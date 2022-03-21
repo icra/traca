@@ -150,10 +150,7 @@
             do ii = 1, time%step
               !! conversion from mm to m3 and apply delivery ratio
               cnv = ru_elem(ise)%frac * ob(icmd)%area_ha * delrto%flo
-              !! assume lateral soil flow and tile flow are uniform throughout day
-              !! save lateral and tile flow for summing incoming total hydrographs
-              ob(icmd)%lat_til_flo = (latq(ihru) + hwb_d(ihru)%qtile)  / time%step
-              ts_flo_mm = cnv * (hhsurfq(ihru,ii) + ob(icmd)%lat_til_flo)
+              ts_flo_mm = cnv * hhsurfq(ihru,ii)
               iday_cur = ob(icmd)%day_cur
               !! hru hyd_flo in m3
               rto = (ru_elem(ise)%frac * ob(icmd)%area_ha) / ob(iob)%area_ha
@@ -169,7 +166,7 @@
             end do
           end select
           
-          !! set precious and next days for adding previous and translating to next
+          !! set previous and next days for adding previous and translating to next
           day_cur = ob(icmd)%day_cur
           day_next = day_cur + 1
           if (day_next > ob(icmd)%day_max) day_next = 1

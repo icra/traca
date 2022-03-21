@@ -47,7 +47,7 @@
          if (bsn_prm%nfixmx < 1.e-6) bsn_prm%nfixmx = 20.0        !! max daily n-fixation (kg/ha)
          if (bsn_prm%decr_min < 1.e-6) bsn_prm%decr_min = 0.01    !! 
          if (bsn_prm%rsd_covco < 1.e-6) bsn_prm%rsd_covco = 0.30  !! residue cover factor for computing frac of cover         
-         if (bsn_prm%vcrit < 1.e-6) bsn_prm%vcrit = 0.            !!
+         if (bsn_prm%urb_init_abst < 1.e-6) bsn_prm%urb_init_abst = 0.            !!
          if (bsn_prm%petco_pmpt < 0.5 .and. bsn_prm%petco_pmpt > 0.) bsn_prm%petco_pmpt = 0.0   !! reservoir sediment settling coeff
          bsn_prm%petco_pmpt = (100. + bsn_prm%petco_pmpt) / 100.    !! convert to fraction
          if (bsn_prm%uhalpha < 1.e-6) bsn_prm%uhalpha = 1.0       !! alpha coeff for est unit hydrograph using gamma func
@@ -56,7 +56,7 @@
          if (bsn_prm%eros_expo < 1.e-6) bsn_prm%eros_expo = 0.    !!
          if (bsn_prm%c_factor < 1.e-6) bsn_prm%c_factor = 0.      !!
          if (bsn_prm%ch_d50 < 1.e-6) bsn_prm%ch_d50 = 0.          !! median particle diameter of main channel (mm)
-         if (bsn_prm%sig_g < 1.e-6) bsn_prm%sig_g = 0.            !! geometric std dev of part sizes for the main channel
+         if (bsn_prm%co2 < 100.) bsn_prm%co2 = 400.               !! assume co2 concentration = 400 ppm
 
          !! set additional parameters
          uptake%water_dis = 10.0       !! the uptake distribution for water is hardwired - users are not allowed to modify

@@ -147,16 +147,11 @@
         character(len=25) :: snow = ""
         character(len=25) :: field = ""
       end type hru_databases_char
-        
-      type hru_parms_db
-        real :: co2 = 350.
-      end type hru_parms_db
-      
+
       type hydrologic_response_unit_db
         character(len=13) :: name = "default"
         type (hru_databases) :: dbs
         type (hru_databases_char) :: dbsc
-        type (hru_parms_db) :: parms
       end type hydrologic_response_unit_db
       type (hydrologic_response_unit_db), dimension(:),allocatable :: hru_db
       
@@ -197,7 +192,6 @@
         integer :: surf_stor                    !points to res() for surface storage
         type (hru_databases) :: dbs             !database pointers
         type (hru_databases_char) :: dbsc       !database pointers
-        type (hru_parms_db) :: parms            !calibration parameters
         integer :: land_use_mgt
         character(len=16) :: land_use_mgt_c
         integer :: lum_group
@@ -222,6 +216,7 @@
         type (snow_parameters) :: sno
         real :: snocov1, snocov2
         integer :: cur_op = 1
+        integer :: irr_dmd_dtbl = 0
         real :: sno_mm                          !mm H2O        |amount of water in snow on current day
         real :: water_seep
         real :: water_evap
@@ -254,7 +249,7 @@
       real :: qp_cms, sw_excess, albday
       real :: wt_shall
       real :: sq_rto
-      real :: tloss, snomlt, snofall, fixn, qtile
+      real :: snomlt, snofall, fixn, qtile
       real :: latlyr                 !!mm            |lateral flow in soil layer for the day
       real :: inflpcp                !!mm            |amount of precipitation that infiltrates
       real :: fertn, sepday, bioday
@@ -349,6 +344,8 @@
       real, dimension (:,:), allocatable :: wrt
       real, dimension (:,:), allocatable :: bss,surf_bs  
       integer, dimension (:), allocatable :: swtrg
+      real, dimension (:), allocatable :: rateinf_prev
+      real, dimension (:), allocatable :: urb_abstinit
       !! burn
       integer, dimension (:), allocatable :: grz_days
       integer, dimension (:), allocatable :: igrz,ndeat

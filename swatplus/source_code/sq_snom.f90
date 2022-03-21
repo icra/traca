@@ -38,12 +38,12 @@
       
       implicit none
 
-      integer :: j      !none       |HRU number
-      real :: smfac     !           |
-      real :: rto_sno   !none       |ratio of current day's snow water to minimum amount needed to
-                        !           |cover ground completely 
-      real :: snocov    !none       |fraction of HRU area covered with snow
-      real :: snotmp = 0.0    !deg C      |temperature of snow pack
+      integer :: j          !none       |HRU number
+      real :: smfac         !           |
+      real :: rto_sno  = 0. !none       |ratio of current day's snow water to minimum amount needed to
+                            !           |cover ground completely 
+      real :: snocov = 0.   !none       |fraction of HRU area covered with snow
+      real :: snotmp = 0.   !deg C      |temperature of snow pack
       integer :: ii     !none       |counter
 
       j = ihru
@@ -54,10 +54,10 @@
         if (w%tave <= hru(j)%sno%falltmp) then
           !! calculate snow fall
           hru(j)%sno_mm = hru(j)%sno_mm + precip_eff
-          !h%snofall = precip_eff
           snofall = precip_eff
           precip_eff = 0.
-          if (time%step > 0) wst(iwst)%weat%ts = 0.
+          !! set subdaily effective precip to zero
+          if (time%step > 0) w%ts = 0.
         endif
  
         if (w%tmax > hru(j)%sno%melttmp .and. hru(j)%sno_mm > 0.) then
@@ -78,10 +78,8 @@
           if (snomlt > hru(j)%sno_mm) snomlt = hru(j)%sno_mm
           hru(j)%sno_mm = hru(j)%sno_mm - snomlt
           precip_eff = precip_eff + snomlt
-          if (wst(iwst)%pcp_ts > 0) then
-            do ii = 1, time%step
-             wst(iwst)%weat%ts(ii) = wst(iwst)%weat%ts(ii) + snomlt / time%step
-            end do
+          if (time%step > 0) then
+            w%ts(:) = w%ts(:) + snomlt / time%step
           end if
           if (precip_eff < 0.) precip_eff = 0.
         else

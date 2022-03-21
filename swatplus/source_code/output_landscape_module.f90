@@ -11,7 +11,7 @@
         real :: wateryld = 0.         !mm H2O        |water yield - sum of surface runoff, lateral soil flow and tile flow
         real :: perc = 0.             !mm H2O        |amt of water perc out of the soil profile & into the vadose zone
         real :: et = 0.               !mm H2O        |actual evapotranspiration from the soil
-        real :: tloss = 0.            !mm H2O        |not reported
+        real :: ecanopy = 0.          !mm H2O        |not reported
         real :: eplant = 0.           !mm H2O        |plant transpiration
         real :: esoil = 0.            !mm H2O        |soil evaporation
         real :: surq_cont = 0.        !mm H2O        |surface runoff leaving the landscape
@@ -298,7 +298,7 @@
         character (len=12) :: wateryld   =  "    wateryld"
         character (len=12) :: perc       =  "        perc"   
         character (len=12) :: et         =  "          et"
-        character (len=12) :: tloss      =  "       tloss"
+        character (len=12) :: ecanopy    =  "     ecanopy"
         character (len=12) :: eplant     =  "      eplant"
         character (len=12) :: esoil      =  "       esoil"
         character (len=12) :: surq_cont  =  "   surq_cont"
@@ -348,7 +348,7 @@
         character (len=12) :: wateryld   =  "          mm"
         character (len=12) :: perc       =  "          mm"   
         character (len=12) :: et         =  "          mm"
-        character (len=12) :: tloss      =  "          mm"
+        character (len=12) :: ecanopy    =  "          mm"
         character (len=12) :: eplant     =  "          mm"
         character (len=12) :: esoil      =  "          mm"
         character (len=12) :: surq_cont  =  "          mm"
@@ -390,9 +390,9 @@
          character (len=8) :: id            =    " gis_id "        
          character (len=9) :: name          =    "    name "         
          character(len=12) :: grazn         =    "        grzn"
-         character(len=12) :: grazp         =    "        grzp"          
-         character(len=17) :: lab_min_p     =    "        lab_min_p"     
-         character(len=17) :: act_sta_p     =    "        act_sta_p"
+         character(len=12) :: grazp         =    "        grzp"        
+         character(len=12) :: lab_min_p     =    "   lab_min_p"     
+         character(len=12) :: act_sta_p     =    "   act_sta_p"
          character(len=17) :: fertn         =    "            fertn"       
          character(len=17) :: fertp         =    "            fertp"       
          character(len=17) :: fixn          =    "             fixn"       
@@ -421,8 +421,8 @@
          character (len=9) :: name          =    "         "         
          character(len=12) :: grazn         =    "        kgha"
          character(len=12) :: grazp         =    "        kgha"         
-         character(len=17) :: lab_min_p     =    "             kgha"     
-         character(len=17) :: act_sta_p     =    "             kgha" 
+         character(len=12) :: lab_min_p     =    "        kgha"     
+         character(len=12) :: act_sta_p     =    "        kgha" 
          character(len=17) :: fertn         =    "             kgha"        
          character(len=17) :: fertp         =    "             kgha"        
          character(len=17) :: fixn          =    "             kgha"        
@@ -773,7 +773,7 @@
         hru3%wateryld = hru1%wateryld + hru2%wateryld
         hru3%perc = hru1%perc + hru2%perc
         hru3%et = hru1%et + hru2%et
-        hru3%tloss = hru1%tloss + hru2%tloss
+        hru3%ecanopy = hru1%ecanopy + hru2%ecanopy
         hru3%eplant = hru1%eplant + hru2%eplant
         hru3%esoil = hru1%esoil + hru2%esoil
         hru3%surq_cont = hru1%surq_cont + hru2%surq_cont
@@ -1036,7 +1036,7 @@
         hru2%wateryld = hru1%wateryld / const
         hru2%perc = hru1%perc / const
         hru2%et = hru1%et / const
-        hru2%tloss = hru1%tloss / const
+        hru2%ecanopy = hru1%ecanopy / const
         hru2%eplant = hru1%eplant / const
         hru2%esoil = hru1%esoil / const
         hru2%surq_cont = hru1%surq_cont / const 
@@ -1077,7 +1077,7 @@
         hru2%wateryld = hru1%wateryld
         hru2%perc = hru1%perc
         hru2%et = hru1%et
-        hru2%tloss = hru1%tloss
+        hru2%ecanopy = hru1%ecanopy
         hru2%eplant = hru1%eplant
         hru2%esoil = hru1%esoil
         hru2%surq_cont = hru1%surq_cont
@@ -1122,7 +1122,7 @@
         hru2%wateryld = hru1%wateryld * const
         hru2%perc = hru1%perc * const
         hru2%et = hru1%et * const
-        hru2%tloss = hru1%tloss * const
+        hru2%ecanopy = hru1%ecanopy * const
         hru2%eplant = hru1%eplant * const
         hru2%esoil = hru1%esoil * const
         hru2%surq_cont = hru1%surq_cont * const 

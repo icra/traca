@@ -130,6 +130,8 @@
       allocate (surqno3(mhru))
       allocate (surqsolp(mhru))
       allocate (swtrg(mhru))
+      allocate (rateinf_prev(mhru))
+      allocate (urb_abstinit(mhru))
       allocate (t_ov(mhru))
       allocate (tconc(mhru))
       allocate (tc_gwat(mhru))

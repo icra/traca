@@ -37,32 +37,23 @@
       read(in_riv,*)
       read(in_riv,*)
       do k=1,num_rivcells
-        read(in_riv,*) river_cell
-        cell_ID = river_cell
-        backspace(in_riv)
-        do while (cell_ID.eq.river_cell)
-          read(in_riv,*) cell_ID,bed_elev,channel,riv_length,riv_zone
-          gw_riv_id(k) = cell_ID
-          gw_riv_elev(k) = bed_elev
-          gw_riv_chan(k) = channel
-          gw_riv_len(k) = gw_riv_len(k) + riv_length
-          gw_riv_zone(k) = riv_zone
-          read(in_riv,*,end=10) cell_ID
-          backspace(in_riv)
-        enddo
-10    enddo
+        read(in_riv,*) cell_ID,bed_elev,channel,riv_length,riv_zone
+        gw_riv_id(k) = cell_ID
+        gw_riv_elev(k) = bed_elev
+        gw_riv_chan(k) = channel
+        gw_riv_len(k) = riv_length
+        gw_riv_zone(k) = riv_zone
+      enddo
       
       !write out gwflow.con input file (connection file)
       write(in_con,*) 'gwflow.con: river cell spatial connections'
-      col_head_con = (/"NUMB","NAME","GISID","AREA","LAT","LONG","ELEV","CELL","WST",   &
-          "CONST","OVER","RULE","SRC_TOT ","OBTYPE_OUT1 ","OBTYPNO_OUT1 ","HTYPE_OUT1 ","FRAC_OUT1 "/)
+      col_head_con = (/"NUMB","NAME","GISID","AREA","LAT","LONG","ELEV","CELL","WST","CONST","OVER","RULE","SRC_TOT ","OBTYPE_OUT1 ","OBTYPNO_OUT1 ","HTYPE_OUT1 ","FRAC_OUT1 "/)
       write(in_con,103) (col_head_con(j),j=1,17)
       dum1 = 1
       dum2 = 0
       dum3 = 1.00
       do k=1,num_rivcells
-        write(in_con,107) dum1,dum1,dum1,dum2,dum2,dum2,dum2,gw_riv_id(k),dum1,dum2,    &
-            dum2,dum2,dum1,'sdc',gw_riv_chan(k),'tot',dum3
+        write(in_con,107) dum1,dum1,dum1,dum2,dum2,dum2,dum2,gw_riv_id(k),dum1,dum2,dum2,dum2,dum1,'sdc',gw_riv_chan(k),'tot',dum3
       enddo     
  
       

@@ -20,16 +20,13 @@
       integer :: iyr_prev             !none       |previous year
       integer :: iyrs                 !           |
       integer :: iss                  !none       |counter
-      integer :: imonth                  !none       |counter
-      integer :: iday                  !none       |counter
-      integer :: ihour                  !none       |counter
+      integer :: mo
+      integer :: day_mo
+      integer :: ihr
             
        mpcp = 0
        eof = 0
        imax = 0
-       imonth = 1
-       iday = 1
-       ihour = 1
 
       !! read all measured daily precipitation data
       inquire (file=in_cli%pcp_cli, exist=i_exist)
@@ -91,7 +88,7 @@
           ! the precip time step has to be the same as time%step
           allocate (pcp(i)%tss(time%step,366,pcp(i)%nbyr))
         else
-          allocate (pcp(i)%ts(366,pcp(i)%nbyr))
+         allocate (pcp(i)%ts(366,pcp(i)%nbyr))
         end if
 
         ! read and save start jd and yr
@@ -118,13 +115,14 @@
        backspace (108)
        iyr_prev = iyr
        iyrs = 1
-       iss = 1    !!D&A
+       iss = 1
 
        do
          if (pcp(i)%tstep > 0) then
-             read (108,*,iostat=eof)iyr, istep, imonth, iday, ihour, pcp(i)%tss(iss,istep,iyrs)  !!D&A
-             if (eof < 0) exit
-             iss = mod(iss,(pcp(i)%tstep))+1  !!D&A
+           read (108,*,iostat=eof)iyr, istep, mo, day_mo, ihr, pcp(i)%tss(iss,istep,iyrs)
+           iss = iss + 1
+           if (iss > time%step) iss = 1
+           if (eof < 0) exit
          else    
            read (108,*,iostat=eof)iyr, istep, pcp(i)%ts(istep,iyrs)
            if (eof < 0) exit

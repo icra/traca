@@ -25,8 +25,8 @@
       use fertilizer_data_module
       use maximum_data_module
       use tiles_data_module
-      use gwflow_module, only : gwflow_flag,hru_num_cells,hru_cells,cell_size,gw_cell_head, &
-        gw_cell_bot,gw_cell_sy,gw_cell_ss_pump
+      use gwflow_module, only : gwflow_flag, hru_num_cells, hru_cells, cell_size, gw_cell_head,  &
+            gw_cell_bot, gw_cell_sy, gw_cell_ss_pumpag
 
       implicit none
 
@@ -134,7 +134,7 @@
                     else
                       gwvol_removed = gwvol_demand
                     endif
-                    gw_cell_ss_pump(cell_row,cell_col) = gwvol_removed * (-1) !m3 --> store for groundwater balance calculations in gwflow_simulate (negative = leaving the aquifer)
+                    gw_cell_ss_pumpag(cell_row,cell_col) = gwvol_removed * (-1) !m3 --> store for groundwater balance calculations in gwflow_simulate (negative = leaving the aquifer)
                   enddo
                   !if available < demand, re-calculate irrigation applied
                   gwmm_diff = gwvol_diff  / (hru(j)%area_ha * 10000.) * 1000. !m3 --> mm
@@ -250,10 +250,8 @@
             end select
                   
               !! check if enough water is available - assume irrigate if > 25% of demand
-              if (vol_avail < .25 * irrig(j)%demand) then
-                exit
-              else
-              
+              if (vol_avail > .25 * irrig(j)%demand) then
+                  
               irrig_m3 = amin1 (vol_avail, irrig(j)%demand)
               irr_mm = irrig_m3 / (hru(j)%area_ha * 10.)  ! convert to mm for hru application
               irrig(j)%applied = irr_mm * irrop_db(irrop)%eff * (1. - irrop_db(irrop)%surq)
@@ -665,35 +663,39 @@
                            
           !flow control for water allocation - needs to be modified***
           case ("flow_control") !! set flow fractions to buffer tile and direct to channel
-            j = d_tbl%act(iac)%ob_num
-            if (j == 0) j = ob_cur
+            ! ob_num is the object number of the current channel
             select case (d_tbl%act(iac)%option)
-            case ("min_flo")    
-              if (hwb_d(j)%qtile < d_tbl%act(iac)%const) then
+            case ("min_cms")    
+              if (ob(ob_num)%hd(1)%flo / 86400. < d_tbl%act(iac)%const + .0001) then
                 frac = 1.
               else
-                frac = d_tbl%act(iac)%const / hwb_d(j)%qtile
+                frac = d_tbl%act(iac)%const / (ob(ob_num)%hd(1)%flo / 86400.)
               end if
-              ! set inflow hydrograph fraction of recieving objects - used for dtbl flow fractions
-              ! set first object hyd fractin as defined in decision table
-              inhyd = dtbl_flo(idtbl)%act(iac)%ob_num
-              ihyd_in = ob(ob_num)%rcvob_inhyd(inhyd)
-              iob_out = ob(ob_num)%obj_out(inhyd)
-              ob(iob_out)%frac_in(ihyd_in) = frac
               
-              ! set second hydrograph fraction
-              if (inhyd < ob(ob_num)%src_tot .and. dtbl_flo(idtbl)%act(iac)%typ /= "irrigate_direct") then
-                inhyd = inhyd + 1
-                ihyd_in = ob(ob_num)%rcvob_inhyd(inhyd)
-                iob_out = ob(ob_num)%obj_out(inhyd)
-                ob(iob_out)%frac_in(ihyd_in) = 1. - frac
-              end if
+            case ("all_flo")
+              frac = 1.
 
-            case ("linear")
-
-            case ("power")
+            case ("min_frac")
+              frac = d_tbl%act(iac)%const
+              
+            case ("demand")
                 
             end select
+            
+            ! set inflow hydrograph fraction of recieving objects - used for dtbl flow fractions
+            ! set first object hyd fractin as defined in decision table
+            inhyd = dtbl_flo(idtbl)%act(iac)%ob_num
+            ihyd_in = ob(ob_num)%rcvob_inhyd(inhyd)
+            iob_out = ob(ob_num)%obj_out(inhyd)
+            ob(iob_out)%frac_in(ihyd_in) = frac
+              
+            ! set second hydrograph fraction
+            if (inhyd < ob(ob_num)%src_tot .and. dtbl_flo(idtbl)%act(iac)%typ /= "irrigate_direct") then
+              inhyd = inhyd + 1
+              ihyd_in = ob(ob_num)%rcvob_inhyd(inhyd)
+              iob_out = ob(ob_num)%obj_out(inhyd)
+              ob(iob_out)%frac_in(ihyd_in) = 1. - frac
+            end if
                                        
           !tile flow control for saturated buffers
           case ("tile_control") !! set flow fractions to buffer tile and direct to channel
@@ -729,7 +731,12 @@
                         
           !water rights decision to move water
           case ("water_rights")
-            
+                        
+          !hru area fraction change - update lsu_unit.ele and rout_unit.ele
+          case ("hru_fr_update")
+            !"option" is the updated lsu_unit.ele and "file_pointer" is rout_unit.ele
+            call hru_fr_change (d_tbl%act(iac)%option, d_tbl%act(iac)%file_pointer)
+              
           !land use change - total land use and management change
           case ("lu_change")
             j = d_tbl%act(iac)%ob_num
@@ -957,7 +964,26 @@
             end if
             
             pcom(j)%dtbl(idtbl)%num_actions(iac) = pcom(j)%dtbl(idtbl)%num_actions(iac) + 1
-              
+                          
+          case ("pheno_reset")  !! begin and end monsoon initiation period
+            j = d_tbl%act(iac)%ob_num
+            if (j == 0) j = ob_cur
+            
+            if (pcom(j)%dtbl(idtbl)%num_actions(iac) <= Int(d_tbl%act(iac)%const2)) then
+              do ipl = 1, pcom(j)%npl
+                idp = pcom(j)%plcur(ipl)%idplt
+                if (pldb(idp)%trig == "moisture_gro") then
+                  pcom(j)%plcur(ipl)%phuacc = 0.
+                  pcom(j)%plcur(ipl)%gro = "y" 
+                  pcom(j)%plcur(ipl)%idorm = "n"
+                endif
+              end do
+            end if
+            
+            pcom(j)%dtbl(idtbl)%num_actions(iac) = pcom(j)%dtbl(idtbl)%num_actions(iac) + 1
+            pcom(j)%dtbl(idtbl)%days_act(iac) = 1     !reset days since last action
+            if (iac > 1) pcom(j)%dtbl(idtbl)%days_act(iac-1) =  0     !reset previous action day counter
+
           !herd management - move the herd
           case ("herd")
 

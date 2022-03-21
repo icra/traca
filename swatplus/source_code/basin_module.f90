@@ -12,8 +12,8 @@
       type (basin_inputs) :: bsn
       
       type basin_control_codes
-        !character(len=16) :: update     !! pointer to basin updates in schedule.upd
-        character(len=16) :: petfile     !! potential et filename
+        !character(len=16) :: update     !! pointer to basin updates in schedule.upd                                      
+        character(len=16) :: petfile ='         pet.cli'    !! potential et filename
         character(len=16) :: wwqfile     !! watershed stream water quality filename
         integer :: pet = 0       !! potential ET method code
                                  !!   0 = Priestley-Taylor 
@@ -42,7 +42,7 @@
                                  !!   0 = all stresses applied
                                  !!   1 = turn off all plant stress
                                  !!   2 = turn off nutrient plant stress only
-        integer :: cn = 0        !! not used
+        integer :: cn = 0        !! 0=call cal_soft_hyd_bfr(CEAP); 1=call cal_soft_hyd;
         integer :: cfac = 0      !!  0 = C-factor calc using CMIN
                                  !!  1 = for new C-factor from RUSLE (no min needed)      
         integer :: cswat = 0     !! carbon code
@@ -119,11 +119,11 @@
         real :: cn_froz = 0.000862  !! parameter for frozen soil adjustment on infiltraion/runoff
         real :: dorm_hr = -1.       !! time threshold used to define dormant (hrs)
         real :: plaps = 0.          !! mm/km        |precipitation lapse rate: mm per km of elevation difference
-        real :: tlaps = 0.0         !! deg C/km     |temperature lapse rate: deg C per km of elevation difference
+        real :: tlaps = 6.5         !! deg C/km     |temperature lapse rate: deg C per km of elevation difference
         real :: nfixmx = 20.0       !! max daily n-fixation (kg/ha)
         real :: decr_min = 0.01     !! minimum daily residue decay
         real :: rsd_covco = 0.30    !! residue cover factor for computing frac of cover         
-        real :: vcrit = 0.          !! critical velocity
+        real :: urb_init_abst = 1.  !! maximum initial abstraction for urban areas when using Green and Ampt
         real :: petco_pmpt = 1.0    !! PET adjustment (%) for Penman-Montieth and Preiestly-Taylor methods
         real :: uhalpha = 1.0       !! alpha coeff for est unit hydrograph using gamma func
         real :: eros_spl = 0.       !! coeff of splash erosion varing 0.9-3.1 
@@ -132,7 +132,7 @@
         real :: c_factor = 0.       !! scaling parameter for cover and management factor for 
                                     !!  overland flow erosion
         real :: ch_d50 = 0.         !! median particle diameter of main channel (mm)
-        real :: sig_g = 0.          !! geometric std dev of part sizes for the main channel
+        real :: co2 = 400.          !! co2 concentration at start of simulation (ppm)
         integer :: day_lag_mx = 0   !! max days to lag hydrographs for hru, ru and channels
                                     !!  non-draining soils
         integer :: igen = 5         !!  random generator code: 
@@ -169,14 +169,14 @@
         integer :: aa_numint                          !! number of print intervals for ave annual output
         integer, dimension(:), allocatable :: aa_yrs  !! end years for ave annual output
       ! SPECIAL OUTPUTS
-        character(len=1) :: csvout = "n"         !!  code to print .csv files n=no print; y=print;
-        character(len=1) :: dbout  = "n"         !!  code to print database (db) files n=no print; y=print;
-        character(len=1) :: cdfout = "n"         !!  code to print netcdf (cdf) files n=no print; y=print;
+        character(len=1) :: csvout = "    n"         !!  code to print .csv files n=no print; y=print;
+        character(len=1) :: dbout  = "    n"         !!  code to print database (db) files n=no print; y=print;
+        character(len=1) :: cdfout = "    n"         !!  code to print netcdf (cdf) files n=no print; y=print;
       ! OTHER OUTPUTS
-        character(len=1) :: snutc  = "a"         !!  soils nutrients carbon output (default ave annual-d,m,y,a input)
-        character(len=1) :: mgtout = "n"         !!  management output file (mgt.out) (n=no print; y=print)
-        character(len=1) :: hydcon = "n"         !!  hydrograph connect output file (hydcon.out)
-        character(len=1) :: fdcout = "n"         !!  flow duration curve output n=no print; avann=print;
+        character(len=1) :: snutc  = "    a"         !!  soils nutrients carbon output (default ave annual-d,m,y,a input)
+        character(len=1) :: mgtout = "    n"         !!  management output file (mgt.out) (default ave annual-d,m,y,a input)
+        character(len=1) :: hydcon = "    n"         !!  hydrograph connect output file (hydcon.out)
+        character(len=1) :: fdcout = "    n"         !!  flow duration curve output n=no print; avann=print;
       ! BASIN
         type(print_interval) :: wb_bsn          !!  water balance BASIN output
         type(print_interval) :: nb_bsn          !!  nutrient balance BASIN output

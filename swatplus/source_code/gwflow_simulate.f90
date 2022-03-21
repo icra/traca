@@ -28,8 +28,11 @@
       real     chan_depth,chan_width,chan_length,chan_stage,flow_area,head_diff,Q
       real     sat_thick,ts_stable
       real     Q_west,Q_east,Q_north,Q_south,face_K,face_sat,gradient,head_change,sat_thick1,sat_thick2
-      real     storage_change,ss_rech,ss_et,ss_gw,ss_sw,ss_satex,ss_tran,ss_pump,ss_Q,ss_tile,mass_error,sum_ss
-      real     gw_cell_Q_total,gw_cell_ss_rech_total,gw_cell_ss_et_total,gw_cell_ss_gwsw_total,gw_cell_ss_swgw_total,gw_cell_ss_satex_total,gw_cell_ss_tran_total,gw_cell_ss_pump_total,gw_cell_ss_tile_total
+      real     storage_change,ss_rech,ss_et,ss_gw,ss_sw,ss_satex,ss_tran,ss_pumpag,ss_pumpex,ss_Q,ss_tile, &
+               ss_lake,mass_error,sum_ss
+      real     gw_cell_Q_total,gw_cell_ss_rech_total,gw_cell_ss_et_total,gw_cell_ss_gwsw_total,gw_cell_ss_swgw_total, &
+               gw_cell_ss_satex_total,gw_cell_ss_tran_total,gw_cell_ss_pumpag_total,gw_cell_ss_pumpex_total, &
+               gw_cell_ss_tile_total,gw_cell_ss_lake_total
 			real     tile_elev,ksat
       real     gwet_volume,rech_volume,cell_rech_volume,sum
       real     satex_depth,satex_volume,frac_sat,depth_wt_avg
@@ -43,20 +46,26 @@
       real     tran_massn,tran_massp
       real     hru_soilz(sp_ob%hru),gwvol_hru(sp_ob%hru),vadose_hru(sp_ob%hru),vadose_thick(grid_nrow,grid_ncol),water_depth(10)
       real     gwmassn_hru(sp_ob%hru),gwmassp_hru(sp_ob%hru)
+      !pumping
+      integer  pumpex_start_date,pumpex_end_date
       !transport variables
       integer  t
       real     gw_trans_time_step,time_fraction
       real     gw_volume_old,gw_volume_new,gw_volume_inter
       !no3
       real     recharge_n,rech_nmass,cell_rech_nmass,nmass,chan_cn,nmass_west,nmass_east,nmass_north,nmass_south,cn_change,satex_nmass
-      real     ss_rechn,ss_gwn,ss_swn,ss_satexn,ss_advn,ss_dspn,ss_rctn,ss_pumpn,ss_tilen,ss_trann
-      real     gw_cell_ss_rechn_total,gw_cell_ss_gwswn_total,gw_cell_ss_swgwn_total,gw_cell_ss_satexn_total,gw_cell_advn_total,gw_cell_dspn_total,gw_cell_rctn_total,gw_cell_ss_pumpn_total,gw_cell_ss_tilen_total,gw_cell_ss_trann_total
+      real     ss_rechn,ss_gwn,ss_swn,ss_satexn,ss_advn,ss_dspn,ss_rctn,ss_pumpagn,ss_pumpexn,ss_tilen,ss_trann,ss_laken
+      real     gw_cell_ss_rechn_total,gw_cell_ss_gwswn_total,gw_cell_ss_swgwn_total,gw_cell_ss_satexn_total, &
+               gw_cell_advn_total,gw_cell_dspn_total,gw_cell_rctn_total,gw_cell_ss_pumpagn_total,gw_cell_ss_pumpexn_total, &
+               gw_cell_ss_tilen_total,gw_cell_ss_trann_total,gw_cell_ss_laken_total
       real     mn_change
       double precision gw_nmass_before,gw_nmass_after
       !p
       real     recharge_p,rech_pmass,cell_rech_pmass,pmass,chan_cp,pmass_west,pmass_east,pmass_north,pmass_south,cp_change,satex_pmass
-      real     ss_rechp,ss_gwp,ss_swp,ss_satexp,ss_advp,ss_dspp,ss_rctp,ss_pumpp,ss_tilep,ss_tranp
-      real     gw_cell_ss_rechp_total,gw_cell_ss_gwswp_total,gw_cell_ss_swgwp_total,gw_cell_ss_satexp_total,gw_cell_advp_total,gw_cell_dspp_total,gw_cell_rctp_total,gw_cell_ss_pumpp_total,gw_cell_ss_tilep_total,gw_cell_ss_tranp_total
+      real     ss_rechp,ss_gwp,ss_swp,ss_satexp,ss_advp,ss_dspp,ss_rctp,ss_pumpagp,ss_pumpexp,ss_tilep,ss_tranp,ss_lakep
+      real     gw_cell_ss_rechp_total,gw_cell_ss_gwswp_total,gw_cell_ss_swgwp_total,gw_cell_ss_satexp_total,gw_cell_advp_total, &
+               gw_cell_dspp_total,gw_cell_rctp_total,gw_cell_ss_pumpagp_total,gw_cell_ss_pumpexp_total,gw_cell_ss_tilep_total, &
+               gw_cell_ss_tranp_total,gw_cell_ss_lakep_total
       real     mp_change
       double precision gw_pmass_before,gw_pmass_after
       !hru
@@ -201,6 +210,8 @@
         enddo
       endif
       
+      
+      
       !remaining ET from HRUs
       ob_num = sp_ob1%hru  !object number of first HRU
       if(gw_et_flag.eq.1) then
@@ -245,6 +256,7 @@
         ob_num = ob_num + 1
       enddo
       endif
+      
       
 
       !gw/sw exchange between aquifer and streams; loop through the river cells
@@ -293,10 +305,10 @@
             if((Q*-1).ge.gw_avail(row,col)) then !can only remove what is there
               Q = gw_avail(row,col) * (-1)
             endif
-            gw_cell_ss_gwsw(row,col) = Q
+            gw_cell_ss_gwsw(row,col) = gw_cell_ss_gwsw(row,col) + Q
             gw_avail(row,col) = gw_avail(row,col) + Q !update available groundwater in the cell
           else
-            gw_cell_ss_swgw(row,col) = Q
+            gw_cell_ss_swgw(row,col) = gw_cell_ss_swgw(row,col) + Q
           endif
           chan_Q(chan_num) = chan_Q(chan_num) + Q !store in array for writing out total channel exchange rate
           gwflow_gwsw_sum(row,col) = gwflow_gwsw_sum(row,col) + Q
@@ -314,8 +326,10 @@
               gw_cell_ss_gwswp(row,col) = pmass
             else !mass entering cell from channel
               if(ob(chan_ob_num)%hd(1)%flo.gt.10) then
-                if(ob(chan_ob_num)%hd(1)%no3.gt.0) chan_cn = (ob(chan_ob_num)%hd(1)%no3 * 1000.) / ob(chan_ob_num)%hd(1)%flo !g/m3 in channel
-                if(ob(chan_ob_num)%hd(1)%solp.gt.0) chan_cp = (ob(chan_ob_num)%hd(1)%solp * 1000.) / ob(chan_ob_num)%hd(1)%flo !g/m3 in channel
+                if(ob(chan_ob_num)%hd(1)%no3.gt.0) chan_cn = (ob(chan_ob_num)%hd(1)%no3 * 1000.) / &
+                                                              ob(chan_ob_num)%hd(1)%flo !g/m3 in channel
+                if(ob(chan_ob_num)%hd(1)%solp.gt.0) chan_cp = (ob(chan_ob_num)%hd(1)%solp * 1000.) /  &
+																															 ob(chan_ob_num)%hd(1)%flo !g/m3 in channel
 						  endif
               nmass = Q * chan_cn !g
               pmass = Q * chan_cp !g
@@ -352,31 +366,158 @@
       enddo !go to next river cell object
       !write(out_gwsw_chan,104) (chan_Q(i),i=1,sp_ob%chandeg)
 
-
-      !groundwater pumping
-      !gw_cell_ss_pump is populated in the "actions" subroutine, when groundwater irrigation is simulated
+      
+      
+      
+      !groundwater pumping (specified by user)
+      !groundwater pumping (specified pumping, for groundwater that leaves the hydrologic system)
+      if(gw_pumpex_flag.eq.1) then
+        !loop through pumps and specified pumping periods; apply rate to the associated grid cells
+        do i=1,gw_npumpex
+          row = gw_pumpex_cell_row(i)
+          col = gw_pumpex_cell_col(i)
+          if(gw_cell_status(row,col).gt.0) then
+          do j=1,gw_pumpex_nperiods(i)
+            !determine if the current day of the simulation is within the pumping period; if so, apply the pumping rate to the cell
+            pumpex_start_date = gw_pumpex_dates(i,1,j)
+            pumpex_end_date = gw_pumpex_dates(i,2,j)
+            if(gw_daycount.ge.pumpex_start_date .and. gw_daycount.le.pumpex_end_date) then
+              !check to make sure there is enough groundwater to satisfy the pumping rate
+              Q = gw_pumpex_rates(i,j)
+              if(Q.ge.gw_avail(row,col)) then
+                Q = gw_avail(row,col)
+                gw_avail(row,col) = gw_avail(row,col) - Q
+							endif
+              gw_cell_ss_pumpex(row,col) = gw_cell_ss_pumpex(row,col) - Q !negative = leaving the aquifer
+              gwflow_pumpex_sum(row,col) = gwflow_pumpex_sum(row,col) - Q 
+              !if chemical transport simulated, calculate the mass of N and P removed via pumping
+              if(gw_transport_flag.eq.1) then
+                nmass = Q * gw_cell_cn(row,col)
+                pmass = Q * gw_cell_cp(row,col)
+                gw_cell_ss_pumpexn(row,col) = gw_cell_ss_pumpexn(row,col) - nmass 
+                gwflow_pumpexn_sum(row,col) = gwflow_pumpexn_sum(row,col) - nmass
+                gw_cell_ss_pumpexp(row,col) = gw_cell_ss_pumpexp(row,col) - pmass 
+                gwflow_pumpexp_sum(row,col) = gwflow_pumpexp_sum(row,col) - pmass
+              endif
+            endif
+          enddo
+          endif
+        enddo
+      endif
+      
+      
+      
+      
+      !groundwater pumping (agricultural irrigation)
+      !gw_cell_ss_pumpag is populated in the "actions" subroutine, when groundwater irrigation is simulated
       !sum up the volume of groundwater pumped during the current day
       sum10 = 0.
       do i=1,grid_nrow
         do j=1,grid_ncol
-          gwflow_pump_sum(i,j) = gwflow_pump_sum(i,j) + gw_cell_ss_pump(i,j)
-          sum10 = sum10 + gw_cell_ss_pump(i,j)
+          gwflow_pumpag_sum(i,j) = gwflow_pumpag_sum(i,j) + gw_cell_ss_pumpag(i,j)
+          sum10 = sum10 + gw_cell_ss_pumpag(i,j)
         enddo
       enddo
       if(gw_transport_flag.eq.1) then
         do i=1,grid_nrow
           do j=1,grid_ncol
-            nmass = gw_cell_ss_pump(i,j) * gw_cell_cn(i,j) !m3/day * g/m3 = g/day
-            pmass = gw_cell_ss_pump(i,j) * gw_cell_cp(i,j)
+            nmass = gw_cell_ss_pumpag(i,j) * gw_cell_cn(i,j) !m3/day * g/m3 = g/day
+            pmass = gw_cell_ss_pumpag(i,j) * gw_cell_cp(i,j)
             !add to solute source/sink arrays
-            gw_cell_ss_pumpn(i,j) = nmass * (-1)
-            gwflow_pumpn_sum(i,j) = gwflow_pumpn_sum(i,j) + (nmass*(-1))
-            gw_cell_ss_pumpp(i,j) = pmass * (-1)
-            gwflow_pumpp_sum(i,j) = gwflow_pumpp_sum(i,j) + (pmass*(-1))
+            gw_cell_ss_pumpagn(i,j) = nmass
+            gwflow_pumpagn_sum(i,j) = gwflow_pumpagn_sum(i,j) + nmass
+            gw_cell_ss_pumpagp(i,j) = pmass
+            gwflow_pumpagp_sum(i,j) = gwflow_pumpagp_sum(i,j) + pmass
           enddo
         enddo  
       endif
       
+      
+      
+      !groundwater exchange with lakes (lateral exchange only)	
+      if(gw_lake_flag.eq.1) then	
+        do i=1,grid_nrow	
+          do j=1,grid_ncol	
+            if(gw_cell_status(i,j).eq.1) then 	
+              Q = 0.	
+              !current cell has lake water (vertical exchange)	
+              if(gw_cell_lake(i,j).eq.1) then	
+                !calculate flow exchange rate (m3/day)	
+                !head difference --> head gradient --> flow rate	
+                if(gw_cell_head(i,j).lt.gw_cell_lake_bed(i,j)) then	
+                  head_diff = gw_cell_lake_stage(i,j) - gw_cell_lake_bed(i,j)	
+                  Q = lake_K * (head_diff / lake_thick) * (cell_size*cell_size) !lake leakage (positive Q: entering aquifer)	
+                endif	
+                gw_cell_ss_lake(i,j) = Q	
+              !current cell is adjacent to a cell that has lake water (horizontal exchange)  	
+              elseif(gw_cell_lake(i,j).eq.0 .and. gw_cell_lake(i+1,j).eq.1) then !lake to the south of the cell	
+                head_diff = gw_cell_lake_stage(i+1,j) - gw_cell_head(i,j)	
+                Q = lake_K * (head_diff / lake_thick) * (gw_cell_lake_stage(i+1,j) - gw_cell_lake_bed(i+1,j))	
+                if(Q.lt.0) then !gw leaving the cell --> check against available groundwater in the cell	
+                  if((Q*-1).ge.gw_avail(i,j)) then	
+                    Q = gw_avail(i,j) * (-1)	
+                    gw_avail(i,j) = gw_avail(i,j) + Q	
+									endif	
+                endif	
+                gw_cell_ss_lake(i,j) = Q	
+              elseif(gw_cell_lake(i,j).eq.0 .and. gw_cell_lake(i-1,j).eq.1) then !lake to the north of the cell	
+                head_diff = gw_cell_lake_stage(i-1,j) - gw_cell_head(i,j)	
+                Q = lake_K * (head_diff / lake_thick) * (gw_cell_lake_stage(i-1,j) - gw_cell_lake_bed(i-1,j))	
+                if(Q.lt.0) then !gw leaving the cell --> check against available groundwater in the cell	
+                  if((Q*-1).ge.gw_avail(i,j)) then	
+                    Q = gw_avail(i,j) * (-1)	
+                    gw_avail(i,j) = gw_avail(i,j) + Q	
+									endif	
+                endif	
+                gw_cell_ss_lake(i,j) = Q	
+              elseif(gw_cell_lake(i,j).eq.0 .and. gw_cell_lake(i,j+1).eq.1) then !lake to the east of the cell	
+                head_diff = gw_cell_lake_stage(i,j+1) - gw_cell_head(i,j)	
+                Q = lake_K * (head_diff / lake_thick) * (gw_cell_lake_stage(i,j+1) - gw_cell_lake_bed(i,j+1))	
+                if(Q.lt.0) then !gw leaving the cell --> check against available groundwater in the cell	
+                  if((Q*-1).ge.gw_avail(i,j)) then	
+                    Q = gw_avail(i,j) * (-1)	
+                    gw_avail(i,j) = gw_avail(i,j) + Q	
+									endif	
+                endif	
+                gw_cell_ss_lake(i,j) = Q	
+              elseif(gw_cell_lake(i,j).eq.0 .and. gw_cell_lake(i,j-1).eq.1) then !lake to the west of the cell	
+                head_diff = gw_cell_lake_stage(i,j-1) - gw_cell_head(i,j)	
+                Q = lake_K * (head_diff / lake_thick) * (gw_cell_lake_stage(i,j-1) - gw_cell_lake_bed(i,j-1))	
+                if(Q.lt.0) then !gw leaving the cell --> check against available groundwater in the cell	
+                  if((Q*-1).ge.gw_avail(i,j)) then	
+                    Q = gw_avail(i,j) * (-1)	
+                    gw_avail(i,j) = gw_avail(i,j) + Q	
+									endif	
+                endif	
+                gw_cell_ss_lake(i,j) = Q	
+              else	
+                gw_cell_ss_lake(i,j) = 0.	
+              endif	
+              gwflow_lake_sum(i,j) = gwflow_lake_sum(i,j) + Q  	
+            endif	
+					enddo	
+				enddo	
+        if(gw_transport_flag.eq.1) then
+          do i=1,grid_nrow
+            do j=1,grid_ncol
+              Q = gw_cell_ss_lake(i,j)
+              if(Q.lt.0) then !mass is leaving the cell --> lake
+                nmass = Q * gw_cell_cn(row,col) !g
+                pmass = Q * gw_cell_cp(row,col) !g
+              else
+                nmass = Q * lake_no3 !g
+                pmass = Q * lake_p !g
+							endif
+              gw_cell_ss_laken(row,col) = nmass
+              gw_cell_ss_lakep(row,col) = pmass
+              gwflow_laken_sum(i,j) = gwflow_laken_sum(i,j) + nmass
+              gwflow_lakep_sum(i,j) = gwflow_lakep_sum(i,j) + pmass
+            enddo
+          enddo  
+        endif
+			endif	
+      	
+
       
       !groundwater discharge and solute mass to tile drains; loop through the tile cells
       if(gw_tile_flag.eq.1) then
@@ -457,7 +598,8 @@
             endif
           enddo
           if(gw_transport_flag.eq.1) then
-            write(out_tile_cells,102) time%day,time%yrc,(sum_tile(i),i=1,gw_tile_num_group),(cn_tile(i),i=1,gw_tile_num_group),(cp_tile(i),i=1,gw_tile_num_group)
+            write(out_tile_cells,102) time%day,time%yrc,(sum_tile(i),i=1,gw_tile_num_group), &
+                                     (cn_tile(i),i=1,gw_tile_num_group),(cp_tile(i),i=1,gw_tile_num_group)
           else
             write(out_tile_cells,102) time%day,time%yrc,(sum_tile(i),i=1,gw_tile_num_group)
           endif
@@ -478,11 +620,13 @@
 			endif
         
       
+      
       !calculate total volume of groundwater sources/sinks for each grid cell
       do i=1,grid_nrow
         do j=1,grid_ncol
           if(gw_cell_status(i,j).eq.1) then  
-            gw_cell_ss(i,j) = gw_cell_ss_rech(i,j) + gw_cell_ss_et(i,j) + gw_cell_ss_gwsw(i,j) + gw_cell_ss_swgw(i,j) + gw_cell_ss_pump(i,j) + gw_cell_ss_tile(i,j)
+            gw_cell_ss(i,j) = gw_cell_ss_rech(i,j) + gw_cell_ss_et(i,j) + gw_cell_ss_gwsw(i,j) + gw_cell_ss_swgw(i,j) +  &
+                              gw_cell_ss_pumpag(i,j) + gw_cell_ss_pumpex(i,j) + gw_cell_ss_tile(i,j) + gw_cell_ss_lake(i,j)
           endif
         enddo
       enddo     
@@ -491,8 +635,10 @@
         do i=1,grid_nrow
           do j=1,grid_ncol
             if(gw_cell_status(i,j).eq.1) then  
-              gw_cell_ssn(i,j) = gw_cell_ss_rechn(i,j) + gw_cell_ss_gwswn(i,j) + gw_cell_ss_swgwn(i,j) + gw_cell_ss_pumpn(i,j) + gw_cell_ss_tilen(i,j)
-              gw_cell_ssp(i,j) = gw_cell_ss_rechp(i,j) + gw_cell_ss_gwswp(i,j) + gw_cell_ss_swgwp(i,j) + gw_cell_ss_pumpp(i,j) + gw_cell_ss_tilep(i,j)
+              gw_cell_ssn(i,j) = gw_cell_ss_rechn(i,j) + gw_cell_ss_gwswn(i,j) + gw_cell_ss_swgwn(i,j) + gw_cell_ss_pumpagn(i,j) + &
+                                 gw_cell_ss_pumpexn(i,j) + gw_cell_ss_tilen(i,j) + gw_cell_ss_laken(i,j)
+              gw_cell_ssp(i,j) = gw_cell_ss_rechp(i,j) + gw_cell_ss_gwswp(i,j) + gw_cell_ss_swgwp(i,j) + gw_cell_ss_pumpagp(i,j) + &
+                                 gw_cell_ss_pumpexp(i,j) + gw_cell_ss_tilep(i,j) + gw_cell_ss_lakep(i,j)
             endif
           enddo
         enddo
@@ -562,11 +708,6 @@
                   flow_area = face_sat * cell_size
                   Q_west = face_K * gradient * flow_area !Darcy's Law
                   thick_west = face_sat
-                  !if(Q_west.lt.0) then !gw leaving the cell
-                  !  if(sat_thick2.eq.0) Q_west = 0.
-                  !else !gw entering the cell
-                  !  if(sat_thick1.eq.0) Q_west = 0.
-                  !endif
                   if(Q_west.lt.0) then !check against available groundwater in current cell
                     if((Q_west*-1).ge.gw_avail(i,j)) then
                       Q_west = gw_avail(i,j) * (-1)
@@ -597,11 +738,6 @@
                   flow_area = face_sat * cell_size
                   Q_east = face_K * gradient * flow_area !Darcy's Law
                   thick_east = face_sat
-                  !if(Q_east.lt.0) then !gw leaving the cell
-                  !  if(sat_thick2.eq.0) Q_east = 0.
-                  !else !gw entering the cell
-                  !  if(sat_thick1.eq.0) Q_east = 0.
-                  !endif
                   if(Q_east.lt.0) then !check against available groundwater in the cell
                     if((Q_east*-1).ge.gw_avail(i,j)) then
                       Q_east = gw_avail(i,j) * (-1)
@@ -632,11 +768,6 @@
                   flow_area = face_sat * cell_size
                   Q_north = face_K * gradient * flow_area !Darcy's Law
                   thick_north = face_sat
-                  !if(Q_north.lt.0) then !gw leaving the cell
-                  !  if(sat_thick2.eq.0) Q_north = 0.
-                  !else !gw entering the cell
-                  !  if(sat_thick1.eq.0) Q_north = 0.
-                  !endif
                   if(Q_north.lt.0) then !check against available groundwater in the cell
                     if((Q_north*-1).ge.gw_avail(i,j)) then
                       Q_north = gw_avail(i,j) * (-1)
@@ -667,11 +798,6 @@
                   flow_area = face_sat * cell_size
                   Q_south = face_K * gradient * flow_area !Darcy's Law
                   thick_south = face_sat
-                  !if(Q_south.lt.0) then !gw leaving the cell
-                  !  if(sat_thick2.eq.0) Q_south = 0.
-                  !else !gw entering the cell
-                  !  if(sat_thick1.eq.0) Q_south = 0.
-                  !endif
                   if(Q_south.lt.0) then !check against available groundwater in the cell
                     if((Q_south*-1).ge.gw_avail(i,j)) then
                       Q_south = gw_avail(i,j) * (-1)
@@ -933,7 +1059,8 @@
         endif
       enddo
       if(gw_transport_flag.eq.1) then
-        write(out_gwobs,102) time%yrc,time%day,(gw_obs_head(k),k=1,gw_num_obs_wells),(gw_obs_cn(k),k=1,gw_num_obs_wells),(gw_obs_cp(k),k=1,gw_num_obs_wells)
+        write(out_gwobs,102) time%yrc,time%day,(gw_obs_head(k),k=1,gw_num_obs_wells), &
+                            (gw_obs_cn(k),k=1,gw_num_obs_wells),(gw_obs_cp(k),k=1,gw_num_obs_wells)
       else
         write(out_gwobs,102) time%yrc,time%day,(gw_obs_head(k),k=1,gw_num_obs_wells)
       endif
@@ -1119,10 +1246,12 @@
       gw_cell_obs_ss_vals(7) = gw_cell_ss_swgw(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
       gw_cell_obs_ss_vals(8) = gw_cell_satex(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
       gw_cell_obs_ss_vals(9) = gw_cell_Q(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
-      gw_cell_obs_ss_vals(10) = gw_cell_ss_pump(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
-      gw_cell_obs_ss_vals(11) = gw_cell_ss_tile(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
-      gw_cell_obs_ss_vals(12) = gw_cell_tran(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
-      write(out_gwobs_ss,102)  time%yrc,time%day,(gw_cell_obs_ss_vals(i),i=1,12)     
+      gw_cell_obs_ss_vals(10) = gw_cell_ss_pumpag(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
+      gw_cell_obs_ss_vals(11) = gw_cell_ss_pumpex(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
+      gw_cell_obs_ss_vals(12) = gw_cell_ss_tile(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
+      gw_cell_obs_ss_vals(13) = gw_cell_tran(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
+      gw_cell_obs_ss_vals(14) = gw_cell_ss_lake(gw_cell_obs_ss_row,gw_cell_obs_ss_col)
+      write(out_gwobs_ss,102)  time%yrc,time%day,(gw_cell_obs_ss_vals(i),i=1,14)     
 
       !compute change in groundwater storage and mass balance error (as %)
       gw_volume_before = 0.
@@ -1134,8 +1263,10 @@
       gw_cell_ss_satex_total = 0.
       gw_cell_ss_tran_total = 0.
       gw_cell_Q_total = 0.
-      gw_cell_ss_pump_total = 0.
+      gw_cell_ss_pumpag_total = 0.
+      gw_cell_ss_pumpex_total = 0.
       gw_cell_ss_tile_total = 0.
+      gw_cell_ss_lake_total = 0.
       do i=1,grid_nrow
         do j=1,grid_ncol
           if(gw_cell_status(i,j).eq.1) then
@@ -1148,12 +1279,17 @@
             gw_cell_ss_satex_total = gw_cell_ss_satex_total + gw_cell_satex(i,j)
             gw_cell_ss_tran_total = gw_cell_ss_tran_total + gw_cell_tran(i,j)
             gw_cell_Q_total = gw_cell_Q_total + gw_cell_Q(i,j)
-            gw_cell_ss_pump_total = gw_cell_ss_pump_total + gw_cell_ss_pump(i,j)
+            gw_cell_ss_pumpag_total = gw_cell_ss_pumpag_total + gw_cell_ss_pumpag(i,j)
+            gw_cell_ss_pumpex_total = gw_cell_ss_pumpex_total + gw_cell_ss_pumpex(i,j)
             gw_cell_ss_tile_total = gw_cell_ss_tile_total + gw_cell_ss_tile(i,j)
+            gw_cell_ss_lake_total = gw_cell_ss_lake_total + gw_cell_ss_lake(i,j)
           endif
         enddo
       enddo
-      mass_error = (1-((gw_volume_before + gw_cell_ss_rech_total + gw_cell_ss_et_total + gw_cell_ss_gwsw_total + gw_cell_ss_swgw_total - gw_cell_ss_satex_total - gw_cell_ss_tran_total + gw_cell_Q_total + gw_cell_ss_pump_total + gw_cell_ss_tile_total)/gw_volume_after)) * 100 
+      mass_error = (1-((gw_volume_before + gw_cell_ss_rech_total + gw_cell_ss_et_total + gw_cell_ss_gwsw_total + &
+                        gw_cell_ss_swgw_total - gw_cell_ss_satex_total - gw_cell_ss_tran_total + gw_cell_Q_total + &
+                        gw_cell_ss_pumpag_total + gw_cell_ss_pumpex_total + gw_cell_ss_tile_total + gw_cell_ss_lake_total) &
+                        /gw_volume_after)) * 100 
            
       !print out daily information (time step, water balance) in mm (normalized to watershed area)
       gw_volume_before = (gw_volume_before / watershed_area) * 1000. !m3 --> mm of water
@@ -1165,10 +1301,13 @@
       ss_satex = (gw_cell_ss_satex_total / watershed_area) * 1000. * (-1) !leaving the aquifer
       ss_tran = (gw_cell_ss_tran_total / watershed_area) * 1000. * (-1) !aquifer --> soil profile
       ss_Q = (gw_cell_Q_total / watershed_area) * 1000.
-      ss_pump = (gw_cell_ss_pump_total / watershed_area) * 1000.
+      ss_pumpag = (gw_cell_ss_pumpag_total / watershed_area) * 1000.
+      ss_pumpex = (gw_cell_ss_pumpex_total / watershed_area) * 1000.
       ss_tile = (gw_cell_ss_tile_total / watershed_area) * 1000.
+      ss_lake = (gw_cell_ss_lake_total / watershed_area) * 1000.
       if(gwflag_day.eq.1) then
-        write(out_gwbal,102) time%yrc,time%day,gw_time_step,gw_volume_before,gw_volume_after,ss_rech,ss_et,ss_gw,ss_sw,ss_satex,ss_tran,ss_Q,ss_pump,ss_tile,mass_error,frac_sat,depth_wt_avg
+        write(out_gwbal,102) time%yrc,time%day,gw_time_step,gw_volume_before,gw_volume_after,ss_rech,ss_et,ss_gw,ss_sw, &
+                             ss_satex,ss_tran,ss_Q,ss_pumpag,ss_pumpex,ss_tile,ss_lake,mass_error,frac_sat,depth_wt_avg
       endif
       
       !add daily water balance volumes to yearly and total values
@@ -1180,8 +1319,10 @@
       ss_satex_yr = ss_satex_yr + ss_satex
       ss_tran_yr = ss_tran_yr + ss_tran
       ss_Q_yr = ss_Q_yr + ss_Q
-      ss_pump_yr = ss_pump_yr + ss_pump
+      ss_pumpag_yr = ss_pumpag_yr + ss_pumpag
+      ss_pumpex_yr = ss_pumpex_yr + ss_pumpex
       ss_tile_yr = ss_tile_yr + ss_tile
+      ss_lake_yr = ss_lake_yr + ss_lake
       vol_change_total = vol_change_total + (gw_volume_after-gw_volume_before)
       ss_rech_total = ss_rech_total + ss_rech
       ss_et_total = ss_et_total + ss_et
@@ -1190,9 +1331,10 @@
       ss_satex_total = ss_satex_total + ss_satex
       ss_tran_total = ss_tran_total + ss_tran
       ss_Q_total = ss_Q_total + ss_Q
-      ss_pump_total = ss_pump_total + ss_pump
+      ss_pumpag_total = ss_pumpag_total + ss_pumpag
+      ss_pumpex_total = ss_pumpex_total + ss_pumpex
       ss_tile_total = ss_tile_total + ss_tile
-      
+      ss_lake_total = ss_lake_total + ss_lake
       
       if(gw_transport_flag.eq.1) then
       !no3: compute change in mass storage and mass balance error (as %)
@@ -1205,10 +1347,11 @@
       gw_cell_advn_total = 0.
       gw_cell_dspn_total = 0.
       gw_cell_rctn_total = 0.
-      gw_cell_ss_pumpn_total = 0.
+      gw_cell_ss_pumpagn_total = 0.
+      gw_cell_ss_pumpexn_total = 0.
       gw_cell_ss_tilen_total = 0.
       gw_cell_ss_trann_total = 0.
-      gw_cell_ss_pumpn_total = 0.
+      gw_cell_ss_laken_total = 0.
       do i=1,grid_nrow
         do j=1,grid_ncol
           if(gw_cell_status(i,j).eq.1) then
@@ -1221,9 +1364,11 @@
             gw_cell_advn_total = gw_cell_advn_total + gw_cell_advn(i,j)
             gw_cell_dspn_total = gw_cell_dspn_total + gw_cell_dspn(i,j)
             gw_cell_rctn_total = gw_cell_rctn_total + gw_cell_rctn(i,j)
-            gw_cell_ss_pumpn_total = gw_cell_ss_pumpn_total + gw_cell_ss_pumpn(i,j)
+            gw_cell_ss_pumpagn_total = gw_cell_ss_pumpagn_total + gw_cell_ss_pumpagn(i,j)
+            gw_cell_ss_pumpexn_total = gw_cell_ss_pumpexn_total + gw_cell_ss_pumpexn(i,j)
             gw_cell_ss_tilen_total = gw_cell_ss_tilen_total + gw_cell_ss_tilen(i,j)
             gw_cell_ss_trann_total = gw_cell_ss_trann_total + gw_cell_trann(i,j)
+            gw_cell_ss_laken_total = gw_cell_ss_laken_total + gw_cell_ss_laken(i,j)
           endif
         enddo
       enddo
@@ -1231,7 +1376,11 @@
       gw_cell_ss_satexn_total = gw_cell_ss_satexn_total * (-1) !leaving the aquifer
       gw_cell_ss_trann_total = gw_cell_ss_trann_total * (-1) !leaving the aquifer
       if(gw_nmass_after.gt.0) then
-        mass_error = (1-((gw_nmass_before + gw_cell_ss_rechn_total + gw_cell_ss_gwswn_total + gw_cell_ss_swgwn_total + gw_cell_ss_satexn_total + gw_cell_advn_total + gw_cell_dspn_total + gw_cell_rctn_total + gw_cell_ss_pumpn_total + gw_cell_ss_tilen_total + gw_cell_ss_trann_total)/gw_nmass_after)) * 100 
+        mass_error = (1-((gw_nmass_before + gw_cell_ss_rechn_total + gw_cell_ss_gwswn_total + gw_cell_ss_swgwn_total + &
+                          gw_cell_ss_satexn_total + gw_cell_advn_total + gw_cell_dspn_total + gw_cell_rctn_total + &
+                          gw_cell_ss_pumpagn_total + gw_cell_ss_pumpexn_total + gw_cell_ss_tilen_total + &
+                          gw_cell_ss_trann_total + gw_cell_ss_laken_total) &
+                          /gw_nmass_after)) * 100 
       endif
 
       !no3: print out daily information (time step, mass balance) in kg
@@ -1244,11 +1393,15 @@
       ss_advn = gw_cell_advn_total / 1000.
       ss_dspn = gw_cell_dspn_total / 1000.
       ss_rctn = gw_cell_rctn_total / 1000.
-      ss_pumpn = gw_cell_ss_pumpn_total / 1000.
+      ss_pumpagn = gw_cell_ss_pumpagn_total / 1000.
+      ss_pumpexn = gw_cell_ss_pumpexn_total / 1000.
       ss_tilen = gw_cell_ss_tilen_total / 1000.
       ss_trann = gw_cell_ss_trann_total / 1000.
+      ss_laken = gw_cell_ss_laken_total / 1000.
       if(gwflag_day.eq.1) then
-        write(out_gwbaln,107) time%yrc,time%day,gw_time_step,gw_nmass_before,gw_nmass_after,ss_rechn,ss_gwn,ss_swn,ss_satexn,ss_trann,ss_advn,ss_dspn,ss_rctn,ss_pumpn,ss_tilen,mass_error
+        write(out_gwbaln,107) time%yrc, time%day, gw_time_step, gw_nmass_before, gw_nmass_after,  &
+            ss_rechn, ss_gwn, ss_swn, ss_satexn, ss_trann, ss_advn, ss_dspn, ss_rctn, ss_pumpagn, &
+            ss_pumpexn, ss_tilen, ss_laken, mass_error
       endif
  
       !no3: add daily mass values to yearly and total values
@@ -1260,9 +1413,11 @@
       ss_advn_yr = ss_advn_yr + ss_advn
       ss_dspn_yr = ss_dspn_yr + ss_dspn
       ss_rctn_yr = ss_rctn_yr + ss_rctn
-      ss_pumpn_yr = ss_pumpn_yr + ss_pumpn
+      ss_pumpagn_yr = ss_pumpagn_yr + ss_pumpagn
+      ss_pumpexn_yr = ss_pumpexn_yr + ss_pumpexn
       ss_tilen_yr = ss_tilen_yr + ss_tilen
       ss_trann_yr = ss_trann_yr + ss_trann
+      ss_laken_yr = ss_laken_yr + ss_laken
       nmasschange_total = nmasschange_total + (gw_nmass_after-gw_nmass_before)
       ss_rechn_total = ss_rechn_total + ss_rechn
       ss_gwn_total = ss_gwn_total + ss_gwn
@@ -1271,9 +1426,11 @@
       ss_advn_total = ss_advn_total + ss_advn
       ss_dspn_total = ss_dspn_total + ss_dspn
       ss_rctn_total = ss_rctn_total + ss_rctn
-      ss_pumpn_total = ss_pumpn_total + ss_pumpn
+      ss_pumpagn_total = ss_pumpagn_total + ss_pumpagn
+      ss_pumpexn_total = ss_pumpexn_total + ss_pumpexn
       ss_tilen_total = ss_tilen_total + ss_tilen
       ss_trann_total = ss_trann_total + ss_trann
+      ss_laken_total = ss_laken_total + ss_laken
       
       !p: compute change in mass storage and mass balance error (as %)
       gw_pmass_before = 0.
@@ -1285,9 +1442,11 @@
       gw_cell_advp_total = 0.
       gw_cell_dspp_total = 0.
       gw_cell_rctp_total = 0.
-      gw_cell_ss_pumpp_total = 0.
+      gw_cell_ss_pumpagp_total = 0.
+      gw_cell_ss_pumpexp_total = 0.
       gw_cell_ss_tilep_total = 0.
       gw_cell_ss_tranp_total = 0.
+      gw_cell_ss_lakep_total = 0.
       do i=1,grid_nrow
         do j=1,grid_ncol
           if(gw_cell_status(i,j).eq.1) then
@@ -1300,9 +1459,11 @@
             gw_cell_advp_total = gw_cell_advp_total + (gw_cell_advp(i,j)/gw_reta_p)
             gw_cell_dspp_total = gw_cell_dspp_total + (gw_cell_dspp(i,j)/gw_reta_p)
             gw_cell_rctp_total = gw_cell_rctp_total + gw_cell_rctp(i,j)
-            gw_cell_ss_pumpp_total = gw_cell_ss_pumpp_total + (gw_cell_ss_pumpp(i,j)/gw_reta_p)
+            gw_cell_ss_pumpagp_total = gw_cell_ss_pumpagp_total + (gw_cell_ss_pumpagp(i,j)/gw_reta_p)
+            gw_cell_ss_pumpexp_total = gw_cell_ss_pumpexp_total + (gw_cell_ss_pumpexp(i,j)/gw_reta_p)
             gw_cell_ss_tilep_total = gw_cell_ss_tilep_total + (gw_cell_ss_tilep(i,j)/gw_reta_p)
             gw_cell_ss_tranp_total = gw_cell_ss_tranp_total + (gw_cell_tranp(i,j)/gw_reta_p)
+            gw_cell_ss_lakep_total = gw_cell_ss_lakep_total + (gw_cell_ss_lakep(i,j)/gw_reta_p)
           endif
         enddo
       enddo
@@ -1310,7 +1471,11 @@
       gw_cell_ss_satexp_total = gw_cell_ss_satexp_total * (-1) !leaving the aquifer
       gw_cell_ss_tranp_total = gw_cell_ss_tranp_total * (-1) !leaving the aquifer
       if(gw_pmass_after.gt.0) then
-        mass_error = (1-((gw_pmass_before + gw_cell_ss_rechp_total + gw_cell_ss_gwswp_total + gw_cell_ss_swgwp_total + gw_cell_ss_satexp_total + gw_cell_advp_total + gw_cell_dspp_total + gw_cell_rctp_total + gw_cell_ss_pumpp_total + gw_cell_ss_tilep_total + gw_cell_ss_tranp_total)/gw_pmass_after)) * 100 
+        mass_error = (1-((gw_pmass_before + gw_cell_ss_rechp_total + gw_cell_ss_gwswp_total + gw_cell_ss_swgwp_total + &
+													gw_cell_ss_satexp_total + gw_cell_advp_total + gw_cell_dspp_total + gw_cell_rctp_total + &
+                          gw_cell_ss_pumpagp_total + gw_cell_ss_pumpexp_total + gw_cell_ss_tilep_total + &
+                          gw_cell_ss_tranp_total + gw_cell_ss_lakep_total) &
+                          /gw_pmass_after)) * 100 
       endif
 
       !p: print out daily information (time step, mass balance) in kg
@@ -1323,11 +1488,14 @@
       ss_advp = gw_cell_advp_total / 1000.
       ss_dspp = gw_cell_dspp_total / 1000.
       ss_rctp = gw_cell_rctp_total / 1000.
-      ss_pumpp = gw_cell_ss_pumpp_total / 1000.
+      ss_pumpagp = gw_cell_ss_pumpagp_total / 1000.
+      ss_pumpexp = gw_cell_ss_pumpexp_total / 1000.
       ss_tilep = gw_cell_ss_tilep_total / 1000.
       ss_tranp = gw_cell_ss_tranp_total / 1000.
+      ss_lakep = gw_cell_ss_lakep_total / 1000.
       if(gwflag_day.eq.1) then
-        write(out_gwbalp,107) time%yrc,time%day,gw_time_step,gw_pmass_before,gw_pmass_after,ss_rechp,ss_gwp,ss_swp,ss_satexp,ss_tranp,ss_advp,ss_dspp,ss_rctp,ss_pumpp,ss_tilep,mass_error
+        write(out_gwbalp,107) time%yrc,time%day,gw_time_step,gw_pmass_before,gw_pmass_after,ss_rechp,ss_gwp,ss_swp, &
+                              ss_satexp,ss_tranp,ss_advp,ss_dspp,ss_rctp,ss_pumpagp,ss_pumpexp,ss_tilep,ss_lakep,mass_error
       endif
  
       !p: add daily mass values to yearly and total values
@@ -1339,9 +1507,11 @@
       ss_advp_yr = ss_advp_yr + ss_advp
       ss_dspp_yr = ss_dspp_yr + ss_dspp
       ss_rctp_yr = ss_rctp_yr + ss_rctp
-      ss_pumpp_yr = ss_pumpp_yr + ss_pumpp
+      ss_pumpagp_yr = ss_pumpagp_yr + ss_pumpagp
+      ss_pumpexp_yr = ss_pumpexp_yr + ss_pumpexp
       ss_tilep_yr = ss_tilep_yr + ss_tilep
       ss_tranp_yr = ss_tranp_yr + ss_tranp
+      ss_lakep_yr = ss_lakep_yr + ss_lakep
       pmasschange_total = pmasschange_total + (gw_pmass_after-gw_pmass_before)
       ss_rechp_total = ss_rechp_total + ss_rechp
       ss_gwp_total = ss_gwp_total + ss_gwp
@@ -1350,9 +1520,11 @@
       ss_advp_total = ss_advp_total + ss_advp
       ss_dspp_total = ss_dspp_total + ss_dspp
       ss_rctp_total = ss_rctp_total + ss_rctp
-      ss_pumpp_total = ss_pumpp_total + ss_pumpp
+      ss_pumpagp_total = ss_pumpagp_total + ss_pumpagp
+      ss_pumpexp_total = ss_pumpexp_total + ss_pumpexp
       ss_tilep_total = ss_tilep_total + ss_tilep
       ss_tranp_total = ss_tranp_total + ss_tranp
+      ss_lakep_total = ss_lakep_total + ss_lakep
       endif
 
       !if end of year: write out annual recharge, groundwater ET, gwsw rates, and saturation excess flow values and corresponding nutrient mass flux
@@ -1501,33 +1673,86 @@
           write(out_gw_tile,*)
         endif
         endif
-        !pumping
-        gwflow_pump_sum = gwflow_pump_sum / 365.
-        write(out_gw_pump,*) 'Pumping rate for year (m3/day):',time%yrc
+        !pumping (irrigation)
+        gwflow_pumpag_sum = gwflow_pumpag_sum / 365.
+        write(out_gw_pumpag,*) 'Pumping rate for year (m3/day):',time%yrc
         do i=1,grid_nrow
-          write(out_gw_pump,101) (gwflow_pump_sum(i,j),j=1,grid_ncol)
+          write(out_gw_pumpag,101) (gwflow_pumpag_sum(i,j),j=1,grid_ncol)
         enddo
-        gwflow_pump_sum = 0.
-        write(out_gw_pump,*)
+        gwflow_pumpag_sum = 0.
+        write(out_gw_pumpag,*)
         if(gw_transport_flag.eq.1) then
-          gwflow_pumpn_sum = (gwflow_pumpn_sum/1000.) / 365. !g --> kg
-          write(out_gw_pump,*) 'Pumped NO3-N for year (kg/day):',time%yrc
+          gwflow_pumpagn_sum = (gwflow_pumpagn_sum/1000.) / 365. !g --> kg
+          write(out_gw_pumpag,*) 'Pumped NO3-N for year (kg/day):',time%yrc
           do i=1,grid_nrow
-            write(out_gw_pump,101) (gwflow_pumpn_sum(i,j),j=1,grid_ncol)
+            write(out_gw_pumpag,101) (gwflow_pumpagn_sum(i,j),j=1,grid_ncol)
           enddo
-          gwflow_pumpn_sum = 0.
-          write(out_gw_pump,*)
-          gwflow_pumpp_sum = (gwflow_pumpp_sum/1000.) / 365. !g --> kg
-          write(out_gw_pump,*) 'Pumped P for year (kg/day):',time%yrc
+          gwflow_pumpagn_sum = 0.
+          write(out_gw_pumpag,*)
+          gwflow_pumpagp_sum = (gwflow_pumpagp_sum/1000.) / 365. !g --> kg
+          write(out_gw_pumpag,*) 'Pumped P for year (kg/day):',time%yrc
           do i=1,grid_nrow
-            write(out_gw_pump,101) (gwflow_pumpp_sum(i,j),j=1,grid_ncol)
+            write(out_gw_pumpag,101) (gwflow_pumpagp_sum(i,j),j=1,grid_ncol)
           enddo
-          gwflow_pumpp_sum = 0.
-          write(out_gw_pump,*)
+          gwflow_pumpagp_sum = 0.
+          write(out_gw_pumpag,*)
+        endif
+        !pumping (irrigation)
+        if(gw_pumpex_flag.eq.1) then
+        gwflow_pumpex_sum = gwflow_pumpex_sum / 365.
+        write(out_gw_pumpex,*) 'Pumping rate for year (m3/day):',time%yrc
+        do i=1,grid_nrow
+          write(out_gw_pumpex,101) (gwflow_pumpex_sum(i,j),j=1,grid_ncol)
+        enddo
+        gwflow_pumpex_sum = 0.
+        write(out_gw_pumpex,*)
+        if(gw_transport_flag.eq.1) then
+          gwflow_pumpexn_sum = (gwflow_pumpexn_sum/1000.) / 365. !g --> kg
+          write(out_gw_pumpex,*) 'Pumped NO3-N for year (kg/day):',time%yrc
+          do i=1,grid_nrow
+            write(out_gw_pumpex,101) (gwflow_pumpexn_sum(i,j),j=1,grid_ncol)
+          enddo
+          gwflow_pumpexn_sum = 0.
+          write(out_gw_pumpex,*)
+          gwflow_pumpexp_sum = (gwflow_pumpexp_sum/1000.) / 365. !g --> kg
+          write(out_gw_pumpex,*) 'Pumped P for year (kg/day):',time%yrc
+          do i=1,grid_nrow
+            write(out_gw_pumpex,101) (gwflow_pumpexp_sum(i,j),j=1,grid_ncol)
+          enddo
+          gwflow_pumpexp_sum = 0.
+          write(out_gw_pumpex,*)
+        endif
+        endif
+        !groundwater-lake exchange
+        if(gw_lake_flag.eq.1) then
+        gwflow_lake_sum = gwflow_lake_sum / 365.	
+        write(out_gw_lake,*) 'Groundwater-Lake Exchange Volumes for:',time%yrc	
+        do i=1,grid_nrow	
+          write(out_gw_lake,101) (gwflow_lake_sum(i,j),j=1,grid_ncol)	
+        enddo  	
+        gwflow_lake_sum = 0	
+        write(out_gw_lake,*)
+        if(gw_transport_flag.eq.1) then
+          gwflow_laken_sum = (gwflow_laken_sum/1000.) / 365. !g --> kg
+          write(out_gw_lake,*) 'Lake NO3-N mass for year (kg/day):',time%yrc
+          do i=1,grid_nrow
+            write(out_gw_lake,101) (gwflow_laken_sum(i,j),j=1,grid_ncol)
+          enddo  
+          gwflow_laken_sum = 0
+          write(out_gw_lake,*)
+          gwflow_lakep_sum = (gwflow_lakep_sum/1000.) / 365. !g --> kg
+          write(out_gw_lake,*) 'Lake P mass for year (kg/day):',time%yrc
+          do i=1,grid_nrow
+            write(out_gw_lake,101) (gwflow_lakep_sum(i,j),j=1,grid_ncol)
+          enddo  
+          gwflow_lakep_sum = 0
+          write(out_gw_lake,*)
+        endif
         endif
         !yearly water balance
         if(gwflag_yr.eq.1) then
-          write(out_gwbal_yr,105) time%yrc,vol_change_yr,ss_rech_yr,ss_et_yr,ss_gw_yr,ss_sw_yr,ss_satex_yr,ss_tran_yr,ss_Q_yr,ss_pump_yr,ss_tile_yr
+          write(out_gwbal_yr,105) time%yrc,vol_change_yr,ss_rech_yr,ss_et_yr,ss_gw_yr,ss_sw_yr, &
+                                  ss_satex_yr,ss_tran_yr,ss_Q_yr,ss_pumpag_yr,ss_pumpex_yr,ss_tile_yr,ss_lake_yr
         endif
         vol_change_yr = 0.
         ss_rech_yr = 0.
@@ -1537,12 +1762,16 @@
         ss_satex_yr = 0.
         ss_tran_yr = 0.
         ss_Q_yr = 0.
-        ss_pump_yr = 0.
+        ss_pumpag_yr = 0.
+        ss_pumpex_yr = 0.
         ss_tile_yr = 0.
+        ss_lake_yr = 0.
         if(gw_transport_flag.eq.1) then
           !yearly NO3-N mass balance
           if(gwflag_yr.eq.1) then
-            write(out_gwbaln_yr,108) time%yrc,nmass_change_yr,ss_rechn_yr,ss_gwn_yr,ss_swn_yr,ss_satexn_yr,ss_trann_yr,ss_advn_yr,ss_dspn_yr,ss_rctn_yr,ss_pumpn_yr,ss_tilen_yr
+            write(out_gwbaln_yr,108) time%yrc,nmass_change_yr,ss_rechn_yr,ss_gwn_yr,ss_swn_yr,ss_satexn_yr, &
+																		 ss_trann_yr,ss_advn_yr,ss_dspn_yr,ss_rctn_yr,ss_pumpagn_yr,ss_pumpexn_yr,&
+                                     ss_tilen_yr,ss_laken_yr
           endif
           nmass_change_yr = 0.
           ss_rechn_yr = 0.
@@ -1552,12 +1781,15 @@
           ss_advn_yr = 0.
           ss_dspn_yr = 0.
           ss_rctn_yr = 0.
-          ss_pumpn_yr = 0.
+          ss_pumpagn_yr = 0.
+          ss_pumpexn_yr = 0.
           ss_tilen_yr = 0.
           ss_trann_yr = 0.
+          ss_laken_yr = 0.
           !yearly P mass balance
           if(gwflag_yr.eq.1) then
-            write(out_gwbalp_yr,108) time%yrc,nmass_change_yr,ss_rechp_yr,ss_gwp_yr,ss_swp_yr,ss_satexp_yr,ss_tranp_yr,ss_advp_yr,ss_dspp_yr,ss_rctp_yr,ss_pumpp_yr,ss_tilep_yr
+            write(out_gwbalp_yr,108) time%yrc,nmass_change_yr,ss_rechp_yr,ss_gwp_yr,ss_swp_yr,ss_satexp_yr,ss_tranp_yr, &
+                                     ss_advp_yr,ss_dspp_yr,ss_rctp_yr,ss_pumpagp_yr,ss_pumpexp_yr,ss_tilep_yr,ss_lakep_yr
           endif
           pmass_change_yr = 0.
           ss_rechp_yr = 0.
@@ -1567,9 +1799,11 @@
           ss_advp_yr = 0.
           ss_dspp_yr = 0.
           ss_rctp_yr = 0.
-          ss_pumpp_yr = 0.
+          ss_pumpagp_yr = 0.
+          ss_pumpexp_yr = 0.
           ss_tilep_yr = 0.
           ss_tranp_yr = 0.
+          ss_lakep_yr = 0.
         endif
         !hru tile drain output
         !write(out_gwtile_hru,*) 'Year, HRU, Flow (m3), NO3 (kg), P (kg)'
@@ -1591,7 +1825,9 @@
       ss_tran_cell_total = ss_tran_cell_total + gw_cell_tran
       ss_Q_cell_total = ss_Q_cell_total + gw_cell_Q
       ss_tile_cell_total = ss_tile_cell_total + gw_cell_ss_tile
-      ss_pump_cell_total = ss_pump_cell_total + gw_cell_ss_pump
+      ss_lake_cell_total = ss_lake_cell_total + gw_cell_ss_lake
+      ss_pumpag_cell_total = ss_pumpag_cell_total + gw_cell_ss_pumpag
+      ss_pumpex_cell_total = ss_pumpex_cell_total + gw_cell_ss_pumpex
       !if last day of the simulation is reached: print out total source/sink values and average annual values
       if(time%yrc == time%yrc_end .and. time%day == time%day_end) then
         write(out_gw_rech,*) 'Total for entire Simulation'
@@ -1601,7 +1837,9 @@
         write(out_gw_tran,*) 'Total for entire Simulation'
         write(out_lateral,*) 'Total for entire Simulation'
         write(out_gw_tile,*) 'Total for entire Simulation'
-        write(out_gw_pump,*) 'Total for entire Simulation'
+        write(out_gw_pumpag,*) 'Total for entire Simulation'
+        write(out_gw_pumpex,*) 'Total for entire Simulation'
+        write(out_gw_lake,*) 'Total for entire Simulation'
         do i=1,grid_nrow
           write(out_gw_rech,101) (ss_rech_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_et,101) (ss_et_cell_total(i,j),j=1,grid_ncol)
@@ -1610,7 +1848,9 @@
           write(out_gw_tran,101) (ss_tran_cell_total(i,j),j=1,grid_ncol)
           write(out_lateral,101) (ss_Q_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_tile,101) (ss_tile_cell_total(i,j),j=1,grid_ncol)
-          write(out_gw_pump,101) (ss_pump_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpag,101) (ss_pumpag_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpex,101) (ss_pumpex_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_lake,101) (ss_lake_cell_total(i,j),j=1,grid_ncol)
         enddo 
         !average annual water balance
         vol_change_total = vol_change_total + (gw_volume_after-gw_volume_before)
@@ -1621,10 +1861,14 @@
         ss_satex_total = ss_satex_total / time%nbyr
         ss_tran_total = ss_tran_total / time%nbyr
         ss_Q_total = ss_Q_total / time%nbyr
-        ss_pump_total = ss_pump_total / time%nbyr
+        ss_pumpag_total = ss_pumpag_total / time%nbyr
+        ss_pumpex_total = ss_pumpex_total / time%nbyr
         ss_tile_total = ss_tile_total / time%nbyr
+        ss_lake_total = ss_lake_total / time%nbyr
         if(gwflag_aa.eq.1) then
-          write(out_gwbal_aa,105) time%yrc,vol_change_total,ss_rech_total,ss_et_total,ss_gw_total,ss_sw_total,ss_satex_total,ss_tran_total,ss_Q_total,ss_pump_total,ss_tile_total
+          write(out_gwbal_aa,105) time%yrc,vol_change_total,ss_rech_total,ss_et_total,ss_gw_total,ss_sw_total, &
+                                  ss_satex_total,ss_tran_total,ss_Q_total,ss_pumpag_total,ss_pumpex_total, &
+                                  ss_tile_total,ss_lake_total
         endif
       endif
       
@@ -1635,19 +1879,24 @@
       ss_satexn_cell_total = ss_satexn_cell_total + gw_cell_satexn
       ss_tilen_cell_total = ss_tilen_cell_total + gw_cell_ss_tilen
       ss_trann_cell_total = ss_trann_cell_total + gw_cell_trann
-      ss_pumpn_cell_total = ss_pumpn_cell_total + gw_cell_ss_pumpn
+      ss_laken_cell_total = ss_laken_cell_total + gw_cell_ss_laken
+      ss_pumpagn_cell_total = ss_pumpagn_cell_total + gw_cell_ss_pumpagn
+      ss_pumpexn_cell_total = ss_pumpexn_cell_total + gw_cell_ss_pumpexn
       if(time%yrc == time%yrc_end .and. time%day == time%day_end) then
         write(out_gw_rech,*) 'Total NO3-N (kg) for entire Simulation'
         write(out_gwsw,*) 'Total NO3-N (kg) for entire Simulation'
         write(out_gw_satex,*) 'Total NO3-N (kg) for entire Simulation'
         write(out_gw_tile,*) 'Total NO3-N (kg) for entire Simulation'
-        write(out_gw_pump,*) 'Total NO3-N (kg) for entire Simulation'
+        write(out_gw_pumpag,*) 'Total NO3-N (kg) for entire Simulation'
+        write(out_gw_pumpex,*) 'Total NO3-N (kg) for entire Simulation'
         do i=1,grid_nrow
           write(out_gw_rech,101) (ss_rechn_cell_total(i,j),j=1,grid_ncol)
           write(out_gwsw,101) (ss_gwswn_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_satex,101) (ss_satexn_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_tile,101) (ss_tilen_cell_total(i,j),j=1,grid_ncol)
-          write(out_gw_pump,101) (ss_pumpn_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpag,101) (ss_pumpagn_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpex,101) (ss_pumpexn_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_lake,101) (ss_laken_cell_total(i,j),j=1,grid_ncol)
         enddo 
         !average annual mass balance
         nmasschange_total = nmasschange_total + (gw_nmass_after-gw_nmass_before)
@@ -1658,11 +1907,15 @@
         ss_advn_total = ss_advn_total / time%nbyr
         ss_dspn_total = ss_dspn_total / time%nbyr
         ss_rctn_total = ss_rctn_total / time%nbyr
-        ss_pumpn_total = ss_pumpn_total / time%nbyr
+        ss_pumpagn_total = ss_pumpagn_total / time%nbyr
+        ss_pumpexn_total = ss_pumpexn_total / time%nbyr
         ss_tilen_total = ss_tilen_total / time%nbyr
         ss_trann_total = ss_trann_total / time%nbyr
+        ss_laken_total = ss_laken_total / time%nbyr
         if(gwflag_aa.eq.1) then
-          write(out_gwbaln_aa,105) time%yrc,nmasschange_total,ss_rechn_total,ss_gwn_total,ss_swn_total,ss_satexn_total,ss_trann_total,ss_advn_total,ss_dspn_total,ss_rctn_total,ss_pumpn_total,ss_tilen_total
+          write(out_gwbaln_aa,105) time%yrc,nmasschange_total,ss_rechn_total,ss_gwn_total,ss_swn_total,ss_satexn_total, &
+                                   ss_trann_total,ss_advn_total,ss_dspn_total,ss_rctn_total,ss_pumpagn_total, &
+                                   ss_pumpexn_total,ss_tilen_total,ss_laken_total
         endif
       endif
       
@@ -1672,19 +1925,24 @@
       ss_satexp_cell_total = ss_satexp_cell_total + gw_cell_satexp
       ss_tilep_cell_total = ss_tilep_cell_total + gw_cell_ss_tilep
       ss_tranp_cell_total = ss_tranp_cell_total + gw_cell_tranp
-      ss_pumpp_cell_total = ss_pumpp_cell_total + gw_cell_ss_pumpp
+      ss_pumpagp_cell_total = ss_pumpagp_cell_total + gw_cell_ss_pumpagp
+      ss_pumpexp_cell_total = ss_pumpexp_cell_total + gw_cell_ss_pumpexp
+      ss_lakep_cell_total = ss_lakep_cell_total + gw_cell_ss_lakep
       if(time%yrc == time%yrc_end .and. time%day == time%day_end) then
         write(out_gw_rech,*) 'Total P (kg) for entire Simulation'
         write(out_gwsw,*) 'Total P (kg) for entire Simulation'
         write(out_gw_satex,*) 'Total P (kg) for entire Simulation'
         write(out_gw_tile,*) 'Total P (kg) for entire Simulation'
-        write(out_gw_pump,*) 'Total P (kg) for entire Simulation'
+        write(out_gw_pumpag,*) 'Total P (kg) for entire Simulation'
+        write(out_gw_pumpex,*) 'Total P (kg) for entire Simulation'
         do i=1,grid_nrow
           write(out_gw_rech,101) (ss_rechp_cell_total(i,j),j=1,grid_ncol)
           write(out_gwsw,101) (ss_gwswp_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_satex,101) (ss_satexp_cell_total(i,j),j=1,grid_ncol)
           write(out_gw_tile,101) (ss_tilep_cell_total(i,j),j=1,grid_ncol)
-          write(out_gw_pump,101) (ss_pumpp_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpag,101) (ss_pumpagp_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_pumpex,101) (ss_pumpexp_cell_total(i,j),j=1,grid_ncol)
+          write(out_gw_lake,101) (ss_lakep_cell_total(i,j),j=1,grid_ncol)
         enddo 
         !average annual mass balance
         pmasschange_total = pmasschange_total + (gw_pmass_after-gw_pmass_before)
@@ -1695,11 +1953,15 @@
         ss_advp_total = ss_advp_total / time%nbyr
         ss_dspp_total = ss_dspp_total / time%nbyr
         ss_rctp_total = ss_rctp_total / time%nbyr
-        ss_pumpp_total = ss_pumpp_total / time%nbyr
+        ss_pumpagp_total = ss_pumpagp_total / time%nbyr
+        ss_pumpexp_total = ss_pumpexp_total / time%nbyr
         ss_tilep_total = ss_tilep_total / time%nbyr
+        ss_lakep_total = ss_lakep_total / time%nbyr
         ss_tranp_total = ss_tranp_total / time%nbyr
         if(gwflag_aa.eq.1) then
-          write(out_gwbalp_aa,105) time%yrc,pmasschange_total,ss_rechp_total,ss_gwp_total,ss_swp_total,ss_satexp_total,ss_tranp_total,ss_advp_total,ss_dspp_total,ss_rctp_total,ss_pumpp_total,ss_tilep_total
+          write(out_gwbalp_aa,105) time%yrc,pmasschange_total,ss_rechp_total,ss_gwp_total,ss_swp_total,ss_satexp_total, &
+                                   ss_tranp_total,ss_advp_total,ss_dspp_total,ss_rctp_total,ss_pumpagp_total, &
+                                   ss_pumpexp_total,ss_tilep_total,ss_lakep_total
         endif
       endif
       endif
@@ -1711,8 +1973,10 @@
       gw_cell_ss_swgw = 0.
       gw_cell_satex = 0.
       gw_cell_tran = 0.
-      gw_cell_ss_pump = 0.
+      gw_cell_ss_pumpag = 0.
+      gw_cell_ss_pumpex = 0.
       gw_cell_ss_tile = 0.
+      gw_cell_ss_lake = 0.
       gw_cell_ss = 0.
       gw_cell_Q = 0.
       if(gw_transport_flag.eq.1) then
@@ -1728,8 +1992,10 @@
         gw_cell_advn = 0.
         gw_cell_dspn = 0.
         gw_cell_rctn = 0.
-        gw_cell_ss_pumpn = 0.
+        gw_cell_ss_pumpagn = 0.
+        gw_cell_ss_pumpexn = 0.
         gw_cell_ss_tilen = 0.
+        gw_cell_ss_laken = 0.
         gw_cell_ssn = 0.
         !zero out arrays for next day (P)
         gw_cell_ss_rechp = 0.
@@ -1743,18 +2009,20 @@
         gw_cell_advp = 0.
         gw_cell_dspp = 0.
         gw_cell_rctp = 0.
-        gw_cell_ss_pumpp = 0.
+        gw_cell_ss_pumpagp = 0.
+        gw_cell_ss_pumpexp = 0.
         gw_cell_ss_tilep = 0.
+        gw_cell_ss_lakep = 0.
         gw_cell_ssp = 0.
       endif
         
       
 100   format(1000(f12.3))
 101   format(1000(e12.3))
-102   format(i8,i8,1000(f12.3))
+102   format(i8,i8,1000(e13.4))
 103   format(i8,i8,i8,i8,i8,i8,i8,50(f15.3))
 104   format(10000(f12.2))
-105   format(i8,50(f12.3))
+105   format(i8,50(e13.4))
 106   format(i8,i8,i8,50(f12.3))
 107   format(i8,i8,f10.2,2x,e12.6,2x,e12.6,50(f12.2))
 108   format(i8,2x,50(e12.4))

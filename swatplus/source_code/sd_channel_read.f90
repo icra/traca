@@ -45,6 +45,8 @@
       allocate (ch_benthic(0:sp_ob%chandeg))
       allocate (ch_stor(0:sp_ob%chandeg))
       allocate (fp_stor(0:sp_ob%chandeg))
+      allocate (tot_stor(0:sp_ob%chandeg))
+      allocate (wet_stor(0:sp_ob%chandeg))
       allocate (ch_stor_m(0:sp_ob%chandeg))
       allocate (ch_stor_y(0:sp_ob%chandeg))
       allocate (ch_stor_a(0:sp_ob%chandeg))

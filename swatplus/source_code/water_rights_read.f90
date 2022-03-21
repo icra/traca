@@ -21,13 +21,13 @@
       eof = 0
       imax = 0
       
-      !! read harvest only operations
-      inquire (file=in_watrts%transfer_wro, exist=i_exist)
-      if (.not. i_exist .or. in_watrts%transfer_wro == "null") then
+      !! read water rights file
+      inquire (file=in_watrts%water_rights, exist=i_exist)
+      if (.not. i_exist .or. in_watrts%water_rights == "null") then
         allocate (wro(0:0))
       else
       do 
-        open (107,file=in_watrts%transfer_wro)
+        open (107,file=in_watrts%water_rights)
         read (107,*,iostat=eof) titldum
         if (eof < 0) exit
         read (107,*,iostat=eof) imax

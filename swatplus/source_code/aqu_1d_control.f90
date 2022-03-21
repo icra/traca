@@ -63,7 +63,7 @@
       !! compute groundwater depth from surface
       aqu_d(iaq)%dep_wt = aqudb(iaqdb)%dep_bot - (aqu_d(iaq)%stor / (1000. * aqu_prm(iaq)%spyld))
       aqu_d(iaq)%dep_wt = amax1 (0., aqu_d(iaq)%dep_wt)
-      
+
       !! compute flow and substract from storage
       if (aqu_d(iaq)%dep_wt <= aqu_prm(iaq)%flo_min) then
         aqu_d(iaq)%flo = aqu_d(iaq)%flo * aqu_prm(iaq)%alpha_e + aqu_d(iaq)%rchrg * (1. - aqu_prm(iaq)%alpha_e)

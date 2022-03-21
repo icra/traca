@@ -334,6 +334,14 @@
         
        
        !! BSN
+      case ("plaps")
+        bsn_prm%plaps = chg_par(bsn_prm%plaps,                         &
+                         ielem, chg_typ, chg_val, absmin, absmax, num_db)
+        
+      case ("tlaps")
+        bsn_prm%tlaps = chg_par(bsn_prm%tlaps,                         &
+                         ielem, chg_typ, chg_val, absmin, absmax, num_db)
+                                            
       case ("surlag")
         bsn_prm%surlag = chg_par(bsn_prm%surlag,                         &
                          ielem, chg_typ, chg_val, absmin, absmax, num_db)
