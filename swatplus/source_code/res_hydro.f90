@@ -128,6 +128,12 @@
             ! jres, dtbl_res(id)%act(iac)%name, dtbl_res(id)%act(iac)%option, dtbl_res(id)%act(iac)%const,  &
             !  dtbl_res(id)%act(iac)%const2, ht2%flo, wbody%flo, pvol_m3, evol_m3
             
+            !LVerdura: write reservoir release output file
+            if (pco%res%d == "y" .and. sp_ob%res > 0 ) then
+                write (2614,*) time%day_mo, time%mo, time%yrc, jres, "      ", dtbl_res(id)%act(iac)%name, ht2%flo
+            end if
+            !LVerdura end
+            
           end if
         end do    ! iac
 

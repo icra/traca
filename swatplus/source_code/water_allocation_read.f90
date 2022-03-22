@@ -98,19 +98,28 @@
             !! for hru irrigtion, need to xwalk with irrigation demand decision table
             if (wallo(iwro)%dmd(i)%ob_typ == "hru") then
               !! xwalk with recall database
-              do idb = 1, db_mx%dtbl_lum
-                if (wallo(iwro)%dmd(i)%withdr == dtbl_lum(idb)%name) then
-                  ihru = wallo(iwro)%dmd(i)%ob_num
-                  hru(ihru)%irr_dmd_dtbl = idb
-                  do idb_irr = 1, db_mx%irrop_db 
-                    if (dtbl_lum(idb)%act(1)%option == irrop_db(idb_irr)%name) then
-                      wallo(iwro)%dmd(idmd)%irr_eff = irrop_db(idb_irr)%eff
-                      wallo(iwro)%dmd(idmd)%surq = irrop_db(idb_irr)%surq
-                      exit
+              !do idb = 1, db_mx%dtbl_lum
+              !  if (wallo(iwro)%dmd(i)%withdr == dtbl_lum(idb)%name) then
+              !    ihru = wallo(iwro)%dmd(i)%ob_num
+              !    hru(ihru)%irr_dmd_dtbl = idb
+              !    do idb_irr = 1, db_mx%irrop_db 
+              !      if (dtbl_lum(idb)%act(1)%option == irrop_db(idb_irr)%name) then
+              !        wallo(iwro)%dmd(idmd)%irr_eff = irrop_db(idb_irr)%eff
+              !        wallo(iwro)%dmd(idmd)%surq = irrop_db(idb_irr)%surq
+              !        exit
+              !      end if
+              !    end do
+              !  end if
+              !end do
+                !LVerdura: irrigation op in water_allocation.wro instead of irrigation decision table
+                do idb = 1, db_mx%irrop_db
+                    if (wallo(iwro)%dmd(i)%withdr == irrop_db(idb)%name) then
+                        wallo(iwro)%dmd(idmd)%irr_eff = irrop_db(idb)%eff
+                        wallo(iwro)%dmd(idmd)%surq = irrop_db(idb)%surq
+                        exit
                     end if
-                  end do
-                end if
-              end do
+                end do
+                !LVerdura end
             end if
             
             !! for municipal and divert demands, can use recall for daily, monthly, or annual withdrawals

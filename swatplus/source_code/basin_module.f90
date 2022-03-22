@@ -384,4 +384,26 @@
       end type basin_yld_header
       type (basin_yld_header) :: bsn_yld_hdr
       
+      !LVerdura: header and units for new output files
+      type res_rel_header                              
+          character (len=12) :: day =     "        day"                                                     
+          character (len=12) :: mon =     "        mon"
+          character (len=12) :: year =    "       year"
+          character (len=12) :: res =     "        res"  
+          character (len=12) :: action =  "     action"
+          character (len=31) :: outflow = "                       outflow"
+      end type res_rel_header
+      type (res_rel_header) :: rel_hdr
+      
+      type res_rel_units                              
+          character (len=12) :: day =     "        ---"                                                     
+          character (len=12) :: mon =     "        ---"
+          character (len=12) :: year =    "        ---"
+          character (len=12) :: res =     "        ---"  
+          character (len=12) :: action =  "        ---"
+          character (len=31) :: outflow = "                           m^3"
+      end type res_rel_units
+      type (res_rel_units) :: rel_units
+      !LVerdura end
+      
       end module basin_module
