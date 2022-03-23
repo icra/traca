@@ -4,7 +4,7 @@
       use time_module
       use aquifer_module
       use hru_module, only : hru, cn2, fertno3, fertnh3, fertorgn, fertorgp, fertsolp,   &
-        ihru, ipl, isol, ndeat, phubase, sol_sumno3, sol_sumsolp
+        ihru, ipl, isol, ndeat, phubase, sol_sumno3, sol_sumsolp, dmd_mm, pltrans !LVerdura: add last two variables
       use soil_module
       use plant_module
       use plant_data_module
@@ -108,7 +108,9 @@
             if (j == 0) j = ob_cur
 
             irrop = d_tbl%act_typ(iac)      ! irrigation application type in irr.ops
-            irrig(j)%demand = d_tbl%act(iac)%const * hru(j)%area_ha * 10.       ! m3 = mm * ha * 10.
+            !irrig(j)%demand = d_tbl%act(iac)%const * hru(j)%area_ha * 10.       ! m3 = mm * ha * 10. !LVerdura
+            irrig(j)%demand = (pltrans(j)%tplant_pot - pltrans(j)%tplant_real) * hru(j)%area_ha * 10.       ! m3 = mm * ha * 10. !LVerdura
+            dmd_mm = pltrans(j)%tplant_pot - pltrans(j)%tplant_real  !LVerdura
             
             !! if unlimited source, set irrigation applied directly to hru
             if (d_tbl%act(iac)%file_pointer == "unlim") then
@@ -157,7 +159,7 @@
               if (pco%mgtout == "y") then
                 write (2612, *) j, time%yrc, time%mo, time%day_mo, "        ", "IRRIG_DMD", phubase(j), &
                     pcom(j)%plcur(ipl)%phuacc, soil(j)%sw,pl_mass(j)%tot(ipl)%m, rsd1(j)%tot(ipl)%m, &
-                    sol_sumno3(j), sol_sumsolp(j), irrop_db(irrop)%amt_mm
+                    sol_sumno3(j), sol_sumsolp(j), dmd_mm !irrop_db(irrop)%amt_mm  LVerdura, write actual demand (in mm)
               end if
             end if
 

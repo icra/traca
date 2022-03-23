@@ -225,6 +225,14 @@
       end type hydrologic_response_unit
       type (hydrologic_response_unit), dimension(:), allocatable, target :: hru
       type (hydrologic_response_unit), dimension(:), allocatable, target :: hru_init
+      
+      !LVerdura: array to save ep_max and ep_day for each hru each day
+      type plant_transpiration
+          real :: tplant_pot = 0.         !mm H2O
+          real :: tplant_real = 0.        !mm H2O
+      end type plant_transpiration
+      type (plant_transpiration), dimension (:), allocatable :: pltrans
+      !LVerdura end
 
       
       real :: precip_eff        !! mm   |daily effective precip for runoff calculations = precipday + ls_overq + snomlt - canstor
@@ -268,6 +276,8 @@
       real :: bsprev
       real :: usle_ei
       real :: snocov1, snocov2, lyrtile
+      real :: w_stress = 1. !LVerdura
+      real :: dmd_mm        !LVerdura
 
       real :: etday
       integer :: mo

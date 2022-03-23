@@ -64,7 +64,8 @@
               j = wallo(iwallo)%dmd(idmd)%ob_num
               irr_mm = wallo(iwallo)%dmd(idmd)%withdr_tot / (hru(j)%area_ha * 10.)      !mm = m3 / (ha * 10.)
               irrig(j)%applied = irr_mm * wallo(iwallo)%dmd(idmd)%irr_eff * (1. - wallo(iwallo)%dmd(idmd)%surq)
-              irrig(j)%runoff = wallo(iwallo)%dmd(idmd)%amount * wallo(iwallo)%dmd(idmd)%surq
+              !irrig(j)%runoff = wallo(iwallo)%dmd(idmd)%amount * wallo(iwallo)%dmd(idmd)%surq !LVerdura
+              irrig(j)%runoff = irr_mm * wallo(iwallo)%dmd(idmd)%surq !LVerdura
                                 
               if (pco%mgtout == "y") then
                 write (2612, *) j, time%yrc, time%mo, time%day_mo, "        ", "IRRIGATE", phubase(j),  &

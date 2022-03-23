@@ -16,6 +16,7 @@
       call header_snutc
       call header_water_allocation
       call header_rel !LVerdura
+      call header_tplant !LVerdura
       
        call header_pest
        call header_path

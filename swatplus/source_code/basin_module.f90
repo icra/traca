@@ -404,6 +404,34 @@
           character (len=31) :: outflow = "                           m^3"
       end type res_rel_units
       type (res_rel_units) :: rel_units
+      
+      type tplant_header                              
+          character (len=12) :: day =     "        day"
+          character (len=12) :: mon =     "        mon"
+          character (len=12) :: year =    "       year"
+          character (len=12) :: hru =     "        hru"
+          character (len=12) :: ptplant = "    ptplant"
+          character (len=15) :: tplant =  "        tplant"
+          character (len=15) :: ptp_old = "   ptplant_old"
+          character (len=15) :: tp_old =  "    tplant_old"
+          character (len=15) :: wstress = "       wstress"
+          character (len=15) :: irr   =   "       irr_dmd"
+      end type tplant_header
+      type (tplant_header) :: tpl_hdr
+
+      type tplant_units                              
+          character (len=12) :: day =     "        ---"                                                     
+          character (len=12) :: mon =     "        ---"
+          character (len=12) :: year =    "        ---"
+          character (len=12) :: hru =     "        ---"
+          character (len=12) :: ptplant = "         mm"
+          character (len=15) :: tplant =  "            mm"
+          character (len=15) :: ptp_old = "            mm"
+          character (len=15) :: tp_old =  "            mm"
+          character (len=15) :: wstress = "      fraction"
+          character (len=15) :: irr     = "            mm"
+      end type tplant_units
+      type (tplant_units) :: tpl_uts
       !LVerdura end
       
       end module basin_module

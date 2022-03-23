@@ -6,7 +6,7 @@
       use conditional_module
       use climate_module
       use time_module
-      use hru_module, only : hru
+      use hru_module, only : hru, w_stress !LVerdura: add w_stress
       use soil_module
       use plant_module
       use reservoir_module
@@ -74,6 +74,7 @@
           else
             strs_sum = 1.
           end if
+          w_stress = strs_sum !LVerdura
 
           call cond_real (ic, strs_sum, d_tbl%cond(ic)%lim_const, idtbl)
          

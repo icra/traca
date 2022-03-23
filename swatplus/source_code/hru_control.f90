@@ -11,7 +11,7 @@
          surqsolp, sedminpa, sedminps, fertn, fertp, fixn, grazn, grazp, ipl, qp_cms, qtile,            &
          snofall, snomlt, usle, canev, ep_day, es_day, etday, inflpcp, isep, iwgen, ls_overq,           &
          nd_30, pet_day, precip_eff, qday, latqrunon, gwtranq, satexq, surf_bs, bss, bss_ex, brt,       &
-         gwtrann, gwtranp, satexn, satexq_chan !rtb gwflow
+         gwtrann, gwtranp, satexn, satexq_chan, w_stress, ep_max, dmd_mm, pltrans !LVerdura: add last four variables
       use soil_module 
       use plant_module
       use basin_module
@@ -566,6 +566,17 @@
           end if
         end select
       end do
+      
+      !LVerdura: write plant transpiration and wstress output file
+      if (pco%wb_hru%d == "y") then
+          write (2618,*) time%day_mo, time%mo, time%yrc, j, ep_max, ep_day, pltrans(j)%tplant_pot,      &
+              pltrans(j)%tplant_real, w_stress, dmd_mm
+      end if
+      pltrans(j)%tplant_pot = 0.
+      pltrans(j)%tplant_real = 0.
+      pltrans(j)%tplant_pot = ep_max
+      pltrans(j)%tplant_real = ep_day
+      !LVerdura
 
       ! output_waterbal
         hwb_d(j)%precip = w%precip

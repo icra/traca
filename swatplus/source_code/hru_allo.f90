@@ -28,6 +28,7 @@
         allocate (cs_pl(0:0))
         allocate (cs_irr(0:0))
         allocate (irrig(0:0))
+        allocate (pltrans(0:0)) !LVerdura
       else 
         allocate (hru(0:imax))
         allocate (soil(0:imax))
@@ -40,6 +41,7 @@
         allocate (cs_pl(0:imax))
         allocate (cs_irr(0:imax))
         allocate (irrig(0:imax))
+        allocate (pltrans(0:imax)) !LVerdura
         
         allocate (wet(0:imax))
         allocate (wet_om_init(0:imax))
