@@ -1,5 +1,4 @@
 import psycopg2
-import nlopt
 from numpy import *
 
 class ConnectDb:
@@ -72,8 +71,4 @@ class ConnectDb:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def calibrateContaminant(self):
 
-        opt = nlopt.opt(nlopt.LD_MMA, 3)
-        print("Show Calibration nlopt version:")
-        print(nlopt.version_major())

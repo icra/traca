@@ -1,6 +1,5 @@
 import sqlite3
 from sqlite3 import Error
-from classes.Config import Config
 
 
 class Custom_SQLite:
