@@ -19,11 +19,12 @@ removal_rate_csv = "inputs/removal_rate.csv"
 
 edars_calibrated = read_edars(swat_to_edar_code_csv, edar_compounds_csv, edar_population_csv, edar_analitiques_xlsx, edar_ptr_xlsx, edar_cabals_xlsx, removal_rate_csv)
 
-print(edars_calibrated["ES9430920002010E"]["nom"])
-print(edars_calibrated["ES9430920002011E"]["nom"])
-print(edars_calibrated["ES9171630006010E"]["nom"])
-print(edars_calibrated["ES9431450003010E"]["nom"])
-
+"""
+print(edars_calibrated["ES9430920002010E"])
+print(edars_calibrated["ES9430920002011E"])
+print(edars_calibrated["ES9171630006010E"])
+print(edars_calibrated["ES9431450003010E"])
+"""
 
 mGUI.update_table(edars_calibrated)
 
