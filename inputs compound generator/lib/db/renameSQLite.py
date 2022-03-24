@@ -45,9 +45,11 @@ class renameSQLite:
                         cabal = edar["compounds_effluent"]["cabal"]
 
 
+                        """
                         #Esborrar entrada existent del DP
                         c.execute("DELETE FROM recall_dat WHERE recall_rec_id = ("
                                   "SELECT rec_id FROM recall_con WHERE name=?)", (name,))
+                        """
 
                         #Diari
                         """
@@ -56,14 +58,22 @@ class renameSQLite:
                               'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 0, ?, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)', (dp_id, i, cabal, fosfor, dbo))
                         """
                         # Constant
-
                         c.execute(
-                            'INSERT INTO recall_dat (recall_rec_id, yr, t_step, flo, sed, ptl_n, ptl_p, no3_n, sol_p, chla, nh3_n, no2_n, cbn_bod, oxy, sand, silt, clay, sm_agg, lg_agg, gravel, tmp) '
-                            'VALUES ((SELECT rec_id FROM recall_con WHERE name = ?), 0, 0, ?, 0, ?, ?, ?, 0, 0, ?, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)',(name, cabal, ptl_n, fosfor, no3_n, nh3_n, dbo))
+                            ''' UPDATE recall_dat
+                                  SET flo = ? + flo,
+                                      ptl_n = ? ,
+                                      ptl_p = ? ,
+                                      no3_n = ? , 
+                                      nh3_n = ? , 
+                                      cbn_bod = ?
+                                  WHERE recall_rec_id = (SELECT rec_id FROM recall_con WHERE name = ?)''',
+                            (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, name,))
+
 
 
 
                 except Error as error:
+                    print(error)
                     print("No es pot afegir WWTP ", edar["eu_code"])
 
             conn.commit()
