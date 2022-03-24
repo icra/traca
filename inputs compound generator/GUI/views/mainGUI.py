@@ -16,7 +16,7 @@ class mainGUI:
             [PySimpleGUI.Menu(menu_def, tearoff=False)],
             [PySimpleGUI.Text("SWAT+ Input Generator (TRAÇA)")],
             [PySimpleGUI.Table(
-                values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
+                values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
                 headings=[
                     "EDAR EU_ID",
                     "SWAT ID",
@@ -27,11 +27,16 @@ class mainGUI:
                     "Primary",
                     "Secondary",
                     "Tertiary",
-                    "DBO",
-                    "TP",
-                    "TN"
+                    "Flow",
+                    "DBO",  # cbn_bod
+                    "Organic phosphorus",  # ptl_p
+                    "Organic nitrogen",  # ptl_n
+                    "Nitrate",  # no3_n
+                    "Ammonia"  # nh3_n
                 ],
-                num_rows=12,
+                num_rows=15,
+                auto_size_columns=False,
+                col_widths=[16, 10, 35, 10, 10, 8, 8, 8, 13, 11, 11, 11, 11, 11, 11],
                 key="dp_table",
                 expand_x=True
             )],
@@ -62,11 +67,13 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                row.append(edar["lat"])
+                lat = round(float(edar["lat"]), 5)
+                row.append(lat)
             except:
                 row.append("-")
             try:
-                row.append(edar["long"])
+                long = round(float(edar["long"]), 5)
+                row.append(long)
             except:
                 row.append("-")
             try:
@@ -82,19 +89,40 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                row.append(edar["configuration"][2])
+                if len(edar["configuration"]) > 2:
+                    row.append(edar["configuration"][2:])  # Pot tenir mes d'un tractament terciari, llistar-los tots
+                else:
+                    row.append("-")
             except:
                 row.append("-")
             try:
-                row.append(edar["compounds_effluent"]["dbo"])
+                cabal = round(float(edar["compounds_effluent"]["cabal"]), 5)
+                row.append(cabal)
             except:
                 row.append("-")
             try:
-                row.append(edar["compounds_effluent"]["nitrats"])
+                dbo = round(float(edar["compounds_effluent"]["dbo"]), 5)
+                row.append(dbo)
             except:
                 row.append("-")
             try:
-                row.append(edar["compounds_effluent"]["fosfor"])
+                fosfor = round(float(edar["compounds_effluent"]["fosfor"]), 5)
+                row.append(fosfor)
+            except:
+                row.append("-")
+            try:
+                organic = round(float(edar["compounds_effluent"]["nitrogen_org"]), 5)
+                row.append(organic)
+            except:
+                row.append("-")
+            try:
+                nitrats = round(float(edar["compounds_effluent"]["nitrats"]), 5)
+                row.append(nitrats)
+            except:
+                row.append("-")
+            try:
+                amoni = round(float(edar["compounds_effluent"]["amoni"]), 5)
+                row.append(amoni)
             except:
                 row.append("-")
 
