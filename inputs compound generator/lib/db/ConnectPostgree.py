@@ -71,4 +71,15 @@ class ConnectDb:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-
+    def getIndustriesToRiver(self, list_of_industries):
+        try:
+            cur = self.conn.cursor()
+            query = 'SELECT * FROM cens_v3_full WHERE "activitat/ubicacio" IN ('
+            for i in list_of_industries:
+                query += " '" + i.replace('\'', '\'\'') + "',"
+            query = query[:-1]
+            query += ')'
+            cur.execute(query)
+            return cur.fetchall()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)

@@ -2,6 +2,26 @@ import PySimpleGUI
 from GUI.views.mainGUI import mainGUI as mainGUI
 from lib.calibrationMainConcentration import read_edars
 from lib.db.renameSQLite import renameSQLite as rS
+from lib.db.ConnectPostgree import ConnectDb as pg
+import csv
+
+
+def readListOfIndustriesFromCSV(industrial_to_river_csv):
+    # Reads the first column of the csv file with the industrial to river mapping
+    # Returns a list of strings
+    industries = {}
+    with open(industrial_to_river_csv, encoding='utf8', newline='') as f:
+        reader = csv.reader(f, delimiter=';')
+        isFirst = True
+        for row in reader:
+            if isFirst:
+                isFirst = False
+            else:
+                industries[row[0]] = {
+                    "name": row[0],
+                    "point": row[1],
+                }
+    return industries
 
 
 mGUI = mainGUI()
@@ -14,10 +34,21 @@ edar_ptr_xlsx = "inputs/prtr_edars.xlsx"
 swat_to_edar_code_csv = "inputs/recall_ci_05.csv"
 edar_cabals_xlsx = "inputs/20017_07_008_EDAR i Cabals (rev Medi).xlsx"
 removal_rate_csv = "inputs/removal_rate.csv"
+industrial_to_river_csv = "inputs/industrial.csv"
 
 
 edars_calibrated = read_edars(swat_to_edar_code_csv, edar_compounds_csv, edar_population_csv, edar_analitiques_xlsx, edar_ptr_xlsx, edar_cabals_xlsx, removal_rate_csv)
 
+pg_url = "icra.loading.net"
+pg_user = "traca_user"
+pg_pass = "EdificiH2O!"
+pg_db = "traca_1"
+
+connection = pg(pg_url, pg_db, pg_user, pg_pass)
+
+industries_list = readListOfIndustriesFromCSV(industrial_to_river_csv)
+industries = connection.getIndustriesToRiver(industries_list)
+print(industries[0])
 mGUI.update_table(edars_calibrated)
 
 
