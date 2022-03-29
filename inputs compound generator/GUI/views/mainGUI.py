@@ -40,6 +40,24 @@ class mainGUI:
                 key="dp_table",
                 expand_x=True
             )],
+            [PySimpleGUI.Table(
+                values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
+                headings=[
+                    "SWAT ID",
+                    "Name",
+                    "Flow",
+                    "DBO",  # cbn_bod
+                    "Organic phosphorus",  # ptl_p
+                    "Organic nitrogen",  # ptl_n
+                    "Nitrate",  # no3_n
+                    "Ammonia"  # nh3_n
+                ],
+                num_rows=15,
+                auto_size_columns=False,
+                col_widths=[10, 35, 11, 11, 11, 11, 11, 11],
+                key="dp_table_in",
+                expand_x=True
+            )],
             [PySimpleGUI.Text('.SQLite location: '),
              PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
              PySimpleGUI.FileBrowse(),
@@ -129,3 +147,49 @@ class mainGUI:
             edars_table.append(row)
 
         self.window["dp_table"].update(edars_table)
+    def update_table_in(self, voluemes):
+        volumes_table = []
+        for volume in voluemes.values():
+            row = []
+            try:
+                row.append(volume["point"])
+            except:
+                row.append("-")
+            try:
+                row.append(volume["activitat"])
+            except:
+                row.append("-")
+            try:
+                q = round(float(volume["q"]), 5)
+                row.append(q)
+            except:
+                row.append("-")
+            try:
+                dbo = round(float(volume["dbo"]), 5)
+                row.append(dbo)
+            except:
+                row.append("-")
+            try:
+                fosfor = round(float(volume["phosphor"]), 5)
+                row.append(fosfor)
+            except:
+                row.append("-")
+            try:
+                organic = round(float(volume["nitrogen_org"]), 5)
+                row.append(organic)
+            except:
+                row.append("-")
+            try:
+                nitrats = round(float(volume["nitrats"]), 5)
+                row.append(nitrats)
+            except:
+                row.append("-")
+            try:
+                amoni = round(float(volume["amoni"]), 5)
+                row.append(amoni)
+            except:
+                row.append("-")
+
+            volumes_table.append(row)
+
+        self.window["dp_table_in"].update(volumes_table)

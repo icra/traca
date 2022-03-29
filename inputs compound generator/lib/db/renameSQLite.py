@@ -25,13 +25,40 @@ class renameSQLite:
             if conn:
                 conn.close()
 
-    def add_data_to_swat(self, edars_calibrated):
+    def add_data_to_swat(self, edars_calibrated, volumes):
 
         try:
             conn = sqlite3.connect(self.url)
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
+            # Insert data of volumes to swat database
+            for vol in volumes:
+                try:
+                    if(volumes[vol]['point'] != ''):
 
+                        dbo = volumes[vol]['dbo']
+                        fosfor = volumes[vol]['phosphor']
+                        ptl_n = volumes[vol]["nitrogen"]  # organic nitrogen
+                        nh3_n = volumes[vol]["amoni"]  # ammonia
+                        no3_n = 0  # nitrate
+                        cabal = volumes[vol]["q"]
+
+                        # Constant
+                        c.execute(
+                            ''' UPDATE recall_dat
+                                  SET flo = ? + flo,
+                                      ptl_n = ? + ptl_n,
+                                      ptl_p = ? + ptl_p,
+                                      no3_n = ? + no3_n,  
+                                      nh3_n = ? + nh3_n,   
+                                      cbn_bod = ? + cbn_bod
+                                  WHERE recall_rec_id = ?''',
+                            (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, volumes[vol]['id'],))
+                except Error as error:
+                    print(error)
+                    print("No es pot afegir WWTP ", volumes["activitat"])
+
+            # Insertar dades de edars_calibrated
             for edar in edars_calibrated.values():
                 try:
                     if("nom_swat" in edar and "compounds_effluent" in edar):    #Si no te key "nom_swat" es que aboca a mar
@@ -58,19 +85,16 @@ class renameSQLite:
                               'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 0, ?, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)', (dp_id, i, cabal, fosfor, dbo))
                         """
                         # Constant
-                        c.execute(
-                            ''' UPDATE recall_dat
-                                  SET flo = ? + flo,
-                                      ptl_n = ? ,
-                                      ptl_p = ? ,
-                                      no3_n = ? , 
-                                      nh3_n = ? , 
-                                      cbn_bod = ?
-                                  WHERE recall_rec_id = (SELECT rec_id FROM recall_con WHERE name = ?)''',
-                            (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, name,))
-
-
-
+                        # c.execute(
+                        #     ''' UPDATE recall_dat
+                        #           SET flo = ? + flo,
+                        #               ptl_n = ? + ptl_n,
+                        #               ptl_p = ? + ptl_p,
+                        #               no3_n = ? + no3_n,
+                        #               nh3_n = ? + nh3_n,
+                        #               cbn_bod = ? + cbn_bod
+                        #           WHERE recall_rec_id = (SELECT rec_id FROM recall_con WHERE name = ?)''',
+                        #     (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, name,))
 
                 except Error as error:
                     print(error)
@@ -79,6 +103,7 @@ class renameSQLite:
             conn.commit()
 
         except Error as e:
+            print(e)
             raise e
         finally:
             if conn:

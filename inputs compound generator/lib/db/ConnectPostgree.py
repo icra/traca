@@ -74,7 +74,7 @@ class ConnectDb:
     def getIndustriesToRiver(self, list_of_industries):
         try:
             cur = self.conn.cursor()
-            query = 'SELECT * FROM cens_v3_full WHERE "activitat/ubicacio" IN ('
+            query = 'SELECT tid, "activitat/ubicacio", nom_abocament, cod_ccae, ccae, "Tipus (LLM)", "Subtipus (LLM)", nom_variable, valor_maxim, unitats FROM cens_v3_full WHERE "activitat/ubicacio" || \' \' || "nom_abocament" IN ('
             for i in list_of_industries:
                 query += " '" + i.replace('\'', '\'\'') + "',"
             query = query[:-1]
