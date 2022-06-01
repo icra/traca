@@ -47,11 +47,11 @@ class renameSQLite:
                         c.execute(
                             ''' UPDATE recall_dat
                                   SET flo = ? + flo,
-                                      ptl_n = ? + ptl_n,
-                                      ptl_p = ? + ptl_p,
-                                      no3_n = ? + no3_n,  
-                                      nh3_n = ? + nh3_n,   
-                                      cbn_bod = ? + cbn_bod
+                                      orgn = ? + orgn,
+                                      sedp = ? + sedp,
+                                      no3 = ? + no3,  
+                                      nh3 = ? + nh3,   
+                                      cbod = ? + cbod
                                   WHERE recall_rec_id = ?''',
                             (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, volumes[vol]['id'],))
                 except Error as error:
@@ -85,16 +85,16 @@ class renameSQLite:
                               'VALUES ((SELECT id FROM recall_rec WHERE name = ?), 0, ?, ?, 0, 0, ?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0, 0)', (dp_id, i, cabal, fosfor, dbo))
                         """
                         # Constant
-                        # c.execute(
-                        #     ''' UPDATE recall_dat
-                        #           SET flo = ? + flo,
-                        #               ptl_n = ? + ptl_n,
-                        #               ptl_p = ? + ptl_p,
-                        #               no3_n = ? + no3_n,
-                        #               nh3_n = ? + nh3_n,
-                        #               cbn_bod = ? + cbn_bod
-                        #           WHERE recall_rec_id = (SELECT rec_id FROM recall_con WHERE name = ?)''',
-                        #     (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, name,))
+                        c.execute(
+                            ''' UPDATE recall_dat
+                                       SET flo = ? + flo,
+                                           orgn = ? + orgn,
+                                           sedp = ? + sedp,
+                                           no3 = ? + no3,
+                                           nh3 = ? + nh3,
+                                           cbod = ? + cbod
+                                       WHERE recall_rec_id = (SELECT rec_id FROM recall_con WHERE name = ?)''',
+                                 (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, name,))
 
                 except Error as error:
                     print(error)

@@ -14,7 +14,7 @@ class mainGUI:
         ]
         layout = [
             [PySimpleGUI.Menu(menu_def, tearoff=False)],
-            [PySimpleGUI.Text("SWAT+ Input Generator (TRAÇA)")],
+            [PySimpleGUI.Text("SWAT+ Input Generator (EESAM)")],
             [PySimpleGUI.Table(
                 values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
                 headings=[
@@ -114,32 +114,32 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                cabal = round(float(edar["compounds_effluent"]["cabal"]), 5)
+                cabal = round(float(edar["compounds_effluent"]["q"]), 5)
                 row.append(cabal)
             except:
                 row.append("-")
             try:
-                dbo = round(float(edar["compounds_effluent"]["dbo"]), 5)
+                dbo = round(float(edar["compounds_effluent"]["DBO 5 dies"]), 5)
                 row.append(dbo)
             except:
                 row.append("-")
             try:
-                fosfor = round(float(edar["compounds_effluent"]["fosfor"]), 5)
+                fosfor = round(float(edar["compounds_effluent"]["Fòsfor orgànic"]), 5)
                 row.append(fosfor)
             except:
                 row.append("-")
             try:
-                organic = round(float(edar["compounds_effluent"]["nitrogen_org"]), 5)
+                organic = round(float(edar["compounds_effluent"]["Nitrogen orgànic"]), 5)
                 row.append(organic)
             except:
                 row.append("-")
             try:
-                nitrats = round(float(edar["compounds_effluent"]["nitrats"]), 5)
+                nitrats = round(float(edar["compounds_effluent"]["Nitrats"]), 5)
                 row.append(nitrats)
             except:
                 row.append("-")
             try:
-                amoni = round(float(edar["compounds_effluent"]["amoni"]), 5)
+                amoni = round(float(edar["compounds_effluent"]["Amoniac"]), 5)
                 row.append(amoni)
             except:
                 row.append("-")
@@ -148,15 +148,19 @@ class mainGUI:
 
         self.window["dp_table"].update(edars_table)
     def update_table_in(self, voluemes):
+
+        volumes_sorted = list(voluemes.values())
+        volumes_sorted.sort(key=lambda x: x["abocament"])
+
         volumes_table = []
-        for volume in voluemes.values():
+        for volume in volumes_sorted:
             row = []
             try:
-                row.append(volume["point"])
+                row.append(volume["id"])
             except:
                 row.append("-")
             try:
-                row.append(volume["activitat"])
+                row.append(volume["abocament"])
             except:
                 row.append("-")
             try:
@@ -165,27 +169,27 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                dbo = round(float(volume["dbo"]), 5)
+                dbo = round(float(volume["DBO 5 dies"]), 5)
                 row.append(dbo)
             except:
                 row.append("-")
             try:
-                fosfor = round(float(volume["phosphor"]), 5)
+                fosfor = round(float(volume["Fòsfor"]), 5)
                 row.append(fosfor)
             except:
                 row.append("-")
             try:
-                organic = round(float(volume["nitrogen_org"]), 5)
+                organic = round(float(volume["Nitrogen"]), 5)
                 row.append(organic)
             except:
                 row.append("-")
             try:
-                nitrats = round(float(volume["nitrats"]), 5)
+                nitrats = round(float(volume["Nitrats"]), 5)
                 row.append(nitrats)
             except:
                 row.append("-")
             try:
-                amoni = round(float(volume["amoni"]), 5)
+                amoni = round(float(volume["Amoniac"]), 5)
                 row.append(amoni)
             except:
                 row.append("-")
