@@ -3,7 +3,7 @@ from lib.db.ConnectPostgree import ConnectDb as pg
 
 import csv
 import openpyxl
-
+import json
 
 def sumIgnoreNone(object, compount, reciver):
     try:
@@ -30,9 +30,15 @@ def isANumber(myVariable):
     else:
         return False
 
-# Llegeix data edar de tots els fitxers i database i retorna {dc_code: edar}, no es fa calcul dels contaminants a efluent
-def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx):
+def isfloat(num):
+    try:
+        float(num)
+        return True
+    except Exception as e:
+        return False
 
+# Llegeix data edar de tots els fitxers i database i retorna {dc_code: edar}, no es fa calcul dels contaminants a efluent
+def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx ):
 
     listOfEDARCompounds = {}
 
@@ -52,7 +58,10 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
             "nom": str(row[2].value),
             "population_real": int(row[3].value),
             "configuration": [],
-            "industriesTotalInfluent": {}
+            "industriesTotalInfluent": {},
+            "efluent": {},
+            "influent": {},
+            "cabal_observat": []
         }
         if(row[4].value is not None):
             listOfEDARCompounds[str(row[0].value)]['configuration'].append(str(row[4].value))
@@ -62,17 +71,218 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
                     listOfEDARCompounds[str(row[0].value)]['configuration'].extend(str(row[6].value).replace(' ', '').split(','))
 
         edar_id = row[0].value
+
         if edar_id in industries_to_edar:
             group_of_dicharges = industries_to_edar[edar_id]
             discharges_to_edar = {}  # Dummy per reutilitzar funcio
             discharges_to_edar[edar_id] = []
             for discharge in group_of_dicharges.values():
                 discharges_to_edar[edar_id].append(group_industries(discharge, contaminants_i_nutrients))
+
             grouped = suma_industries_abocament(discharges_to_edar, contaminants_i_nutrients, store_id=False)
+
             listOfEDARCompounds[edar_id]["industriesTotalInfluent"] = grouped[edar_id]
 
-
     return listOfEDARCompounds
+
+#Funcio per calibrar % eliminacio i cxgx
+def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx):
+    listOfEDARCompounds = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
+
+    dc_to_eu = {}
+
+    for edar in listOfEDARCompounds:
+        dc = listOfEDARCompounds[edar]["dc_code"]
+        eu = listOfEDARCompounds[edar]["eu_code"]
+        dc_to_eu[dc] = eu
+
+    # llegeix observacions influent i efluent depuradora de TN, TP i DBO del fitxer edars_analitiques_sitemes_2
+    wb_ptr = openpyxl.load_workbook(edar_analitiques_xlsx)
+    ws_ptr = wb_ptr["Hoja1"]
+    isFirst = False
+    for ptr in ws_ptr.iter_rows():
+        if not isFirst:
+            isFirst = True
+        else:
+            dc_code = ptr[0].value
+            if dc_code in dc_to_eu:
+                eu_code = dc_to_eu[dc_code]
+                if eu_code in listOfEDARCompounds:
+                    for first_line in ws_ptr.iter_rows(max_row=1):
+                        i = 0
+                        for ptr_key in first_line:
+
+                            if ptr_key.value == "cabal_diari":
+                                if isfloat(ptr[i].value):
+                                    value = float(ptr[i].value)
+                                    listOfEDARCompounds[eu_code]["cabal_observat"].append(value)
+                            else:
+
+                                pollutant = ""
+                                isEffluent = False
+                                if "effluent" in ptr_key.value:
+                                    pollutant = ptr_key.value.replace(" effluent", "")
+                                    isEffluent = True
+                                elif "influent" in ptr_key.value:
+                                    pollutant = ptr_key.value.replace(" influent", "")
+
+                                if pollutant in contaminants_i_nutrients:
+
+                                    if isfloat(ptr[i].value):
+                                        value = float(ptr[i].value)
+
+                                        if isEffluent:
+                                            if pollutant not in listOfEDARCompounds[eu_code]["efluent"]:
+                                                listOfEDARCompounds[eu_code]["efluent"][pollutant] = []
+                                            listOfEDARCompounds[eu_code]["efluent"][pollutant].append(value)
+
+                                        else:
+                                            if pollutant not in listOfEDARCompounds[eu_code]["influent"]:
+                                                listOfEDARCompounds[eu_code]["influent"][pollutant] = []
+                                            listOfEDARCompounds[eu_code]["influent"][pollutant].append(value)
+
+                            i += 1
+
+    # Llegeix fitxer prtr
+    wb_ptr = openpyxl.load_workbook(edar_prtr_xlsx)
+    ws_ptr = wb_ptr["Hoja1"]
+    isFirst = False
+    for ptr in ws_ptr.iter_rows():
+        if not isFirst:
+            isFirst = True
+        else:
+            eu_code = ptr[1].value
+            if eu_code in listOfEDARCompounds:
+                for first_line in ws_ptr.iter_rows(max_row=1):
+                    i = 0
+                    for ptr_key in first_line:
+                        if ptr_key.value in contaminants_i_nutrients:
+                            if isfloat(ptr[i].value):
+                                value = float(ptr[i].value)
+                                if ptr_key.value not in listOfEDARCompounds[eu_code]["efluent"]:
+                                    listOfEDARCompounds[eu_code]["efluent"][ptr_key.value] = [value / 1000]
+                                else:
+                                    listOfEDARCompounds[eu_code]["efluent"][ptr_key.value].append(value / 1000)
+
+                        i += 1
+
+    for wwtp in listOfEDARCompounds:
+        for compound in listOfEDARCompounds[wwtp]["efluent"]:
+            listOfEDARCompounds[wwtp]["efluent"][compound] = (sum(listOfEDARCompounds[wwtp]["efluent"][compound]) / len(listOfEDARCompounds[wwtp]["efluent"][compound]))
+
+        for compound in listOfEDARCompounds[wwtp]["influent"]:
+            listOfEDARCompounds[wwtp]["influent"][compound] = (sum(listOfEDARCompounds[wwtp]["influent"][compound]) / len(listOfEDARCompounds[wwtp]["influent"][compound]))
+
+        listOfEDARCompounds[wwtp]["cabal_observat"] = sum(listOfEDARCompounds[wwtp]["cabal_observat"]) / len(listOfEDARCompounds[wwtp]["cabal_observat"])
+
+
+    with open('json_data.json', 'w', encoding='utf8') as outfile:
+        json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
+
+#Funcio per calibrar, llegeix fitxer review
+def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
+
+    dict = {}
+
+    wb_ptr = openpyxl.load_workbook(review_xlsx, data_only=True)
+    ws_ptr = wb_ptr["All"]
+    isFirst = False
+    for ptr in ws_ptr.iter_rows():
+        if not isFirst:
+            isFirst = True
+        else:
+            for first_line in ws_ptr.iter_rows(max_row=1):
+                i = 0
+                for ptr_key in first_line:
+                    if ptr[i].value in contaminants_i_nutrients and ptr[i].value not in dict:
+                        dict[ptr[i].value] = {
+                            "cxgx": [],
+                            "excrecio": []
+                        }
+
+
+                    if ptr[i].value in contaminants_i_nutrients and ptr[i+2].value == "MEAN":
+                        if isfloat(ptr[i+24].value):
+                            dict[ptr[i].value]["UV"] = ptr[i+24].value
+                        else:
+                            dict[ptr[i].value]["UV"] = 0
+
+                        if isfloat(ptr[i+25].value):
+                            dict[ptr[i].value]["CL"] = ptr[i+25].value
+                        else:
+                            dict[ptr[i].value]["CL"] = 0
+
+                        if isfloat(ptr[i + 27].value):
+                            dict[ptr[i].value]["SF"] = ptr[i + 27].value
+                        else:
+                            dict[ptr[i].value]["SF"] = 0
+
+                        if isfloat(ptr[i + 28].value):
+                            dict[ptr[i].value]["UF"] = ptr[i + 28].value
+                        else:
+                            dict[ptr[i].value]["UF"] = 0
+
+                        if isfloat(ptr[i + 29].value):
+                            dict[ptr[i].value]["OTHER"] = ptr[i + 29].value
+                        else:
+                            dict[ptr[i].value]["OTHER"] = 0
+
+                    if ptr[i].value in contaminants_i_nutrients and isfloat(ptr[i+7].value):
+                        dict[ptr[i].value]["cxgx"].append(float(ptr[i+7].value) / 1000000)
+
+                    if ptr[i].value in contaminants_i_nutrients and isfloat(ptr[i+8].value):
+                        dict[ptr[i].value]["excrecio"].append(ptr[i+8].value)
+
+                    if ptr[i].value in contaminants_i_nutrients and ptr[i+2].value == "PROPOSED":
+
+                        if isfloat(ptr[i+10].value):
+                            dict[ptr[i].value]["P"] = ptr[i+10].value
+                        else:
+                            dict[ptr[i].value]["P"] = 0
+
+                        if isfloat(ptr[i+11].value):
+                            dict[ptr[i].value]["SC"] = ptr[i + 11].value
+                        else:
+                            dict[ptr[i].value]["SC"] = 0
+
+                        if isfloat(ptr[i+18].value):
+                            dict[ptr[i].value]["SN"] = ptr[i + 18].value
+                        else:
+                            dict[ptr[i].value]["SN"] = 0
+
+                        if isfloat(ptr[i+19].value):
+                            dict[ptr[i].value]["SP"] = ptr[i + 19].value
+                        else:
+                            dict[ptr[i].value]["SP"] = 0
+
+                    i += 1
+
+    wb_ptr = openpyxl.load_workbook(resum_eliminacio_xlsx, data_only=True)
+    for technology in ["SF", "O3", "GAC", "UV", "UF", "OI", "UV-H2O2"]:
+        ws_ptr = wb_ptr[technology]
+        isFirst = False
+        for ptr in ws_ptr.iter_rows():
+            if not isFirst:
+                isFirst = True
+            else:
+                pol_name = str(ptr[0].value)
+                if pol_name in contaminants_i_nutrients:
+                    removal_rate = ptr[2].value
+                    if isfloat(removal_rate) and pol_name in dict:
+                        if technology == 'UV':
+                            dict[pol_name]["UV"] = removal_rate
+
+                        #elif technology == 'UV':
+                        #    dict[ptr[i].value]["CL"] = removal_rate
+
+                        elif technology == 'SF':
+                            dict[pol_name]["SF"] = removal_rate
+
+                        elif technology == 'UF':
+                            dict[pol_name]["UF"] = removal_rate
+
+    with open('edars_pollutant_attenuation.json', 'w', encoding='utf8') as outfile:
+        json.dump(dict, outfile, ensure_ascii=False)
 
 # Afegeix la concentració de cada contaminant a l'efluent
 def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
@@ -111,9 +321,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
     for edar_key in listEdars.keys():
 
-        if edar_key=='ES9082130003010E':
-            print(listEdars[edar_key]["industriesTotalInfluent"])
-
         try:
             wwtp = listEdars[edar_key]
             population = float(wwtp["population_real"])
@@ -128,7 +335,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
             }
 
             for contaminant in contaminants:
-
                 load_influent_domestic = 0
                 if contaminant in calibrated_parameters:
                     load_influent_domestic = population * calibrated_parameters[contaminant][
@@ -148,15 +354,9 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
-            #Aplicar diferent separació del TN segons depuradora
-            tn = 0
-            if "Nitrogen orgànic" in compounds_effluent:
-                tn += compounds_effluent["Nitrogen orgànic"]
-            if "Nitrats" in compounds_effluent:
-                tn += compounds_effluent["Nitrats"]
-            if "Amoni" in compounds_effluent:
-                tn += compounds_effluent["Amoni"]
-            """
+
+            #Fins ara teniem TN i TP agrupant segons separacio estandard, ara separem segons tractament depuradora (mes precis)
+            tn = compounds_effluent["Nitrogen Total"]
             if 'SC' in wwtp["configuration"]:
                 compounds_effluent["Nitrogen orgànic"] = tn * 0.03
                 compounds_effluent["Nitrats"] = tn * 0
@@ -165,7 +365,11 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                 compounds_effluent["Nitrogen orgànic"] = tn * 0.03
                 compounds_effluent["Nitrats"] = tn * 0.66
                 compounds_effluent["Amoni"] = tn * 0.31
-            """
+
+            tp = compounds_effluent["Fòsfor total"]
+            compounds_effluent["Fòsfor orgànic"] = tp * 0.07
+            compounds_effluent["Fosfats"] = tp * 0.93
+
             listEdars[edar_key]['compounds_effluent'] = compounds_effluent
 
         except Exception as e:
@@ -190,7 +394,7 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
             isFirst = False
             continue
         elif row[6].value is not None:
-            edars_calibrated[row[6].value]['nom_swat'] = row[1].value
+            edars_calibrated[row[6].value]['id_swat'] = row[0].value
             edars_calibrated[row[6].value]['lat'] = float(row[3].value)
             edars_calibrated[row[6].value]['long'] = float(row[4].value)
 
@@ -266,24 +470,83 @@ def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrie
 
 
     if "Nitrats" not in aux_point:
-        if "Nitrogen Total" in aux_point:
+        if "Nitrogen Total" in aux_point and "Amoni" in aux_point and "Nitrogen orgànic" in aux_point:
+            nitrats = aux_point["Nitrogen Total"] - aux_point["Amoni"] - aux_point["Nitrogen orgànic"]
+            if nitrats < 0:
+                nitrats = 0
+            aux_point["Nitrats"] = nitrats
+
+        elif "Nitrogen Total" in aux_point:
             aux_point["Nitrats"] = aux_point["Nitrogen Total"]*0.1
     if "Amoni" not in aux_point:
-        if "Nitrogen Total" in aux_point:
+
+        if "Nitrogen Total" in aux_point and "Nitrats" in aux_point and "Nitrogen orgànic" in aux_point:
+            amoni = aux_point["Nitrogen Total"] - aux_point["Nitrats"] - aux_point["Nitrogen orgànic"]
+            if amoni < 0:
+                amoni = 0
+            aux_point["Amoni"] = amoni
+        elif "Nitrogen Kjeldahl" in aux_point and "Nitrogen orgànic" in aux_point:
+            amoni = aux_point["Nitrogen Kjeldahl"] - aux_point["Nitrogen orgànic"]
+            if amoni < 0:
+                amoni = 0
+            aux_point["Amoni"] = amoni
+
+        elif "Nitrogen Total" in aux_point:
             aux_point["Amoni"] = aux_point["Nitrogen Total"]*0.87
         elif "Nitrogen Kjeldahl" in aux_point:
             aux_point["Amoni"] = aux_point["Nitrogen Kjeldahl"]*0.9
     if "Nitrogen orgànic" not in aux_point:
-        if "Nitrogen Total" in aux_point:
+        if "Nitrogen Total" in aux_point and "Nitrats" in aux_point and "Amoni" in aux_point:
+            n_org = aux_point["Nitrogen Total"] - aux_point["Nitrats"] - aux_point["Amoni"]
+            if n_org < 0:
+                n_org = 0
+            aux_point["Nitrogen orgànic"] = n_org
+        elif "Nitrogen Kjeldahl" in aux_point and "Amoni" in aux_point:
+            n_org = aux_point["Nitrogen Kjeldahl"] - aux_point["Amoni"]
+            if n_org < 0:
+                n_org = 0
+            aux_point["Nitrogen orgànic"] = n_org
+
+        elif "Nitrogen Total" in aux_point:
             aux_point["Nitrogen orgànic"] = aux_point["Nitrogen Total"]*0.03
         elif "Nitrogen Kjeldahl" in aux_point:
             aux_point["Nitrogen orgànic"] = aux_point["Nitrogen Kjeldahl"]*0.1
     if "Fosfats" not in aux_point:
-        if "Fòsfor Total" in aux_point:
+        if "Fòsfor Total" in aux_point and "Fòsfor orgànic" in aux_point:
+
+            po3 = aux_point["Fòsfor Total"] - aux_point["Fòsfor orgànic"]
+            if po3 < 0:
+                po3 = 0
+            aux_point["Fosfats"] = po3
+
+        elif "Fòsfor Total" in aux_point:
             aux_point["Fosfats"] = aux_point["Fòsfor Total"]*0.93
     if "Fòsfor orgànic" not in aux_point:
-        if "Fòsfor Total" in aux_point:
+        if "Fòsfor Total" in aux_point and "Fosfats" in aux_point:
+
+            p_org = aux_point["Fòsfor Total"] - aux_point["Fosfats"]
+            if p_org < 0:
+                p_org = 0
+            aux_point["Fòsfor orgànic"] = p_org
+
+        elif "Fòsfor Total" in aux_point:
             aux_point["Fòsfor orgànic"] = aux_point["Fòsfor Total"]*0.07
+    if "Nitrogen Total" not in aux_point:
+        nitrogen_total = 0
+        if "Nitrats" in aux_point:
+            nitrogen_total += aux_point["Nitrats"]
+        if "Nitrogen orgànic" in aux_point:
+            nitrogen_total += aux_point["Nitrogen orgànic"]
+        if "Amoni" in aux_point:
+            nitrogen_total += aux_point["Amoni"]
+        aux_point["Nitrogen Total"] = nitrogen_total
+    if "Fòsfor Total" not in aux_point:
+        fosfor_total = 0
+        if "Fosfats" in aux_point:
+            fosfor_total += aux_point["Fosfats"]
+        if "Fòsfor orgànic" in aux_point:
+            fosfor_total += aux_point["Fòsfor orgànic"]
+        aux_point["Fòsfor Total"] = fosfor_total
 
     return aux_point
 
@@ -323,7 +586,7 @@ def nom_abocament_a_id(industrial_data_file, recall_points_file):
     return discharge_point_to_id
 
 def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = True):
-    compounds = contaminants_i_nutrients
+    compounds = contaminants_i_nutrients.copy()
     compounds.append("q")   #Sumem càrregues d'abocaments + cabal
     abocaments_sumat = {}
     for id_abocament, abocament in abocaments.items():
@@ -342,14 +605,12 @@ def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = T
                         aux[compound] = 0
                     aux[compound] += industry[compound]
 
-
         abocaments_sumat[id_abocament] = aux
     return abocaments_sumat
 
 def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients):
 
     industries_grouped = {}
-
 
     # industries_to_river[activitat + abocament]: {dades abocament complert}
     for key, industry in industries_to_river.items():
@@ -370,5 +631,11 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
             discharge_points[id_abocament].append(industry)
 
     contaminants_per_punt_abocament = suma_industries_abocament(discharge_points, contaminants_i_nutrients)
+
+    for contaminant in contaminants_i_nutrients:
+        for abocament in  contaminants_per_punt_abocament:
+            if contaminant in contaminants_per_punt_abocament[abocament]:
+                contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg
+
 
     return contaminants_per_punt_abocament

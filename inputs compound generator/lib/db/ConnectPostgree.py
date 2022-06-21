@@ -94,10 +94,10 @@ class ConnectDb:
         components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
         return components
 
-    def getIndustries(self):
+    def getIndustries(self, table='cens_v4_1_prova'):
         try:
             cur = self.conn.cursor()
-            query = 'SELECT * FROM cens_v4'
+            query = 'SELECT * FROM ' + table
             cur.execute(query)
             return cur.fetchall()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -126,6 +126,12 @@ class ConnectDb:
         contaminants_per_tipologia_mitjanes = {}
         isic_to_ccae = {}
 
+        step_0 = 0
+        step_1 = 0
+        step_2 = 0
+        step_3 = 0
+
+
         # Agrupar per contaminant i codi de cens
         cens_filtrat.sort(key=lambda x: (x[0], x[4]))
         for key, group in groupby(cens_filtrat, lambda x: (x[0], x[4])):
@@ -153,6 +159,7 @@ class ConnectDb:
                     contaminants_per_tipologia[ccae_l][contaminant] = []
                     contaminants_per_tipologia_mitjanes[ccae_l][contaminant] = None
                 contaminants_per_tipologia[ccae_l][contaminant].append(valor_mitja)
+                step_0 += 1
 
         for ccae_l in contaminants_per_tipologia:
             for compound in contaminants_per_tipologia[ccae_l]:
@@ -163,8 +170,9 @@ class ConnectDb:
                     cv = sd / mitjana
                     if (cv <= 1.5):
                         contaminants_per_tipologia_mitjanes[ccae_l][compound] = mitjana
+                        step_1 += 1
 
-        """
+
         #Info Nils
         wb_ptr = openpyxl.load_workbook("inputs/means&stds.xlsx")
         ws_ptr = wb_ptr["Sheet 1"]
@@ -176,6 +184,7 @@ class ConnectDb:
                 continue
             isic = row[0].value
             compound = row[1].value
+            if row[2].value is None: break
             mean = float(row[2].value)
             sd = float(row[3].value)
             if isic in isic_to_ccae:
@@ -187,10 +196,9 @@ class ConnectDb:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = None
                     if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = mean/1000000  #ng/L a mg/L
-                        print(cod_ccae, compound, mean)
+                        step_2 += 1
 
-        print("'----------------------")
-        """
+
         #DB francesa
 
         cur.execute('SELECT valor, variable, cod_ccae FROM bd_francesa')
@@ -203,8 +211,9 @@ class ConnectDb:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound] = None
             if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound] = valor / 1000  #Passem de µg/l a mg/l
+                step_3 += 1
 
-
+        print(step_0, step_1, step_2, step_3)
         return contaminants_per_tipologia_mitjanes
 
     def add_industry_to_edar(self, industries_to_edar, industry):
@@ -266,60 +275,8 @@ class ConnectDb:
 
     #funcions auxiliars
 
-    def dades_lluis(self):
-        industries = self.getIndustries()
-        dict = {}
-        for industry in industries:
-            tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
-
-            if activitat_ubicacio + ' ' + nom_abocament not in dict:
-                dict[activitat_ubicacio + ' ' + nom_abocament] = []
-
-            obj_aux = {
-                "nom_variable": nom_variable,
-                "valor": valor_maxim
-            }
-            dict[activitat_ubicacio + ' ' + nom_abocament].append(obj_aux)
-
-        tkn_nitrats = []
-        tn_nitrats = []
-        amoni_nitrats = []
-
-
-        for key, industry in dict.items():
-
-            tkn = -1
-            nitrats = -1
-            tn = -1
-            amoni = -1
-
-
-            for compound in industry:
-                value = compound['valor']
-                if compound['nom_variable'] == 'Nitrats':
-                    nitrats = float(value)
-                elif compound['nom_variable'] == 'Nitrogen total':
-                    tn = float(value)
-                elif compound['nom_variable'] == 'Nitrogen Kjeldahl':
-                    tkn = float(value)
-                elif compound['nom_variable'] == 'Amoni':
-                    amoni = float(value)
-
-
-            if nitrats >= 0 and tn >= 0:
-                tn_nitrats.append(tn/nitrats)
-            if nitrats >= 0 and tkn >= 0:
-                tkn_nitrats.append(tkn/nitrats)
-            if nitrats >= 0 and amoni >= 0:
-                amoni_nitrats.append(amoni/nitrats)
-
-        print('ABOCAMENTS -------', len(dict))
-        print('TKN i nitrats ----------- ', len(tkn_nitrats),  '------------------', sum(tkn_nitrats)/len(tkn_nitrats))
-        print('TN i nitrats ----------- ', len(tn_nitrats),  '------------------', sum(tn_nitrats)/len(tn_nitrats))
-        print('Amoni i nitrats ----------- ', len(amoni_nitrats),  '------------------', sum(amoni_nitrats)/len(amoni_nitrats))
-
-    def read_all_data(self):
-        industries = self.getIndustries()
+    def read_all_data(self, table='cens_v4_1_prova'):
+        industries = self.getIndustries(table)
         industries_to_river = {}
         industries_grouped = {}
 
@@ -367,7 +324,6 @@ class ConnectDb:
             }
 
             for compound in industry:
-
                 if compound["valor_minim"] is not None or compound["valor_maxim"] is not None:
                     if compound["valor_minim"] is not None and compound["valor_maxim"] is not None:
                         valor_mitja = (float(compound["valor_minim"]) + float(compound["valor_maxim"])) / 2
@@ -396,7 +352,7 @@ class ConnectDb:
     def upload_data(self, industries_grouped, contaminants_i_nutrients, estimacions):
 
         tid = 0
-        compounds = contaminants_i_nutrients
+        compounds = contaminants_i_nutrients.copy()
         compounds.append("Cabal diari")
         compounds.append("Cabal anual")
         c = self.conn.cursor()
@@ -417,13 +373,12 @@ class ConnectDb:
             cod_ccae_xs = industry["cod_ccae_xs"]
             uwwCode = industry["uwwCode"]
 
-
             for contaminant in compounds:
-
                 estimation = None
                 if ccae_l in estimacions:
                     if contaminant in estimacions[ccae_l]:
                         estimation = estimacions[ccae_l][contaminant]
+
 
                 if contaminant in industry or estimation is not None:
 
@@ -449,5 +404,6 @@ class ConnectDb:
                     params = (tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, None, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode)
 
                     c.execute(query, params)
+                    print(tid)
 
         self.conn.commit()
