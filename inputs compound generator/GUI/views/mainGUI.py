@@ -5,58 +5,48 @@ class mainGUI:
     global list_configs
     list_configs = []
 
-    def __init__(self):
+    def __init__(self, contaminants_i_nutrients):
+        self.contaminants_i_nutrients = contaminants_i_nutrients
         self.window = PySimpleGUI.Window("IG+", self.init_GUI(), finalize=True, location=(0, 0))
 
     def init_GUI(self):
         menu_def = [
             ['Settings', ['File properties']]
         ]
+
+        values = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+        headings = ["EDAR EU_ID", "SWAT ID", "Name", "Population", "Primary", "Secondary", "Tertiary", "Flow", "DBO 5 dies",
+                    "Fòsfor orgànic",  "Nitrogen orgànic",  "Nitrats",  "Amoni"]
+
+
+        values_industries = ["-", "-", "-", "-", "-", "-", "-", "-"]
+        headings_industries = ["SWAT ID", "Name", "Flow", "DBO 5 dies",
+                    "Fòsfor orgànic",  "Nitrogen orgànic",  "Nitrats",  "Amoni"]
+
+        for contaminant in self.contaminants_i_nutrients:
+            if contaminant not in headings:
+                headings.append(contaminant)
+                headings_industries.append(contaminant)
+
+
         layout = [
             [PySimpleGUI.Menu(menu_def, tearoff=False)],
             [PySimpleGUI.Text("SWAT+ Input Generator (EESAM)")],
             [PySimpleGUI.Table(
-                values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
-                headings=[
-                    "EDAR EU_ID",
-                    "SWAT ID",
-                    "Name",
-                    "Latitude",
-                    "Longitude",
-                    "Population",
-                    "Primary",
-                    "Secondary",
-                    "Tertiary",
-                    "Flow",
-                    "DBO",  # cbn_bod
-                    "Organic phosphorus",  # ptl_p
-                    "Organic nitrogen",  # ptl_n
-                    "Nitrate",  # no3_n
-                    "Ammonia"  # nh3_n
-                ],
-                num_rows=15,
+                values=[values],
+                headings=headings,
                 auto_size_columns=False,
-                col_widths=[16, 10, 35, 10, 10, 8, 8, 8, 13, 11, 11, 11, 11, 11, 11],
+                col_widths=[16, 10, 35, 8, 8, 8, 13, 11, 11, 11, 11, 11, 11],
                 key="dp_table",
-                expand_x=True
+                vertical_scroll_only=False
             )],
             [PySimpleGUI.Table(
-                values=[["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]],
-                headings=[
-                    "SWAT ID",
-                    "Name",
-                    "Flow",
-                    "DBO",  # cbn_bod
-                    "Organic phosphorus",  # ptl_p
-                    "Organic nitrogen",  # ptl_n
-                    "Nitrate",  # no3_n
-                    "Ammonia"  # nh3_n
-                ],
-                num_rows=15,
+                values=[values_industries],
+                headings=headings_industries,
                 auto_size_columns=False,
                 col_widths=[10, 35, 11, 11, 11, 11, 11, 11],
                 key="dp_table_in",
-                expand_x=True
+                vertical_scroll_only=False
             )],
             [PySimpleGUI.Text('.SQLite location: '),
              PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
@@ -77,21 +67,11 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                row.append(edar["nom_swat"])
+                row.append(edar["id_swat"])
             except:
                 row.append("-")
             try:
                 row.append(edar["nom"])
-            except:
-                row.append("-")
-            try:
-                lat = round(float(edar["lat"]), 5)
-                row.append(lat)
-            except:
-                row.append("-")
-            try:
-                long = round(float(edar["long"]), 5)
-                row.append(long)
             except:
                 row.append("-")
             try:
@@ -139,10 +119,17 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                amoni = round(float(edar["compounds_effluent"]["Amoniac"]), 5)
+                amoni = round(float(edar["compounds_effluent"]["Amoni"]), 5)
                 row.append(amoni)
             except:
                 row.append("-")
+
+            for contaminant in self.contaminants_i_nutrients:
+                if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Nitrats", "Amoni"]:
+                    valor = '-'
+                    if contaminant in edar["compounds_effluent"]:
+                        valor = round(float(edar["compounds_effluent"][contaminant]), 3)
+                    row.append(valor)
 
             edars_table.append(row)
 
@@ -193,6 +180,13 @@ class mainGUI:
                 row.append(amoni)
             except:
                 row.append("-")
+
+            for contaminant in self.contaminants_i_nutrients:
+                if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Nitrats", "Amoni"]:
+                    valor = '-'
+                    if contaminant in volume:
+                        valor = round(float(volume[contaminant]), 3)
+                    row.append(valor)
 
             volumes_table.append(row)
 

@@ -40,7 +40,6 @@ id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, 
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)
 
 
-
 #Calibrar
 """
 exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection)
@@ -55,7 +54,7 @@ if len(sys.argv) > 2:
 
 #gui
 else:
-    mGUI = mainGUI()
+    mGUI = mainGUI(contaminants_i_nutrients)
     sGUI = settingsGUI()
     mGUI.update_table(edars_calibrated)
     mGUI.update_table_in(id_discharge_to_volumes)
