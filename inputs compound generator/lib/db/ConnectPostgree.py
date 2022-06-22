@@ -273,6 +273,54 @@ class ConnectDb:
                 self.add_industry_to_river(industries_to_river, industry)
         return industries_to_edar, industries_to_river
 
+    def get_edar_scarce(self):
+        cur = self.conn.cursor()
+        cur.execute('SELECT * FROM edar_scarce_2')
+
+        rows = cur.fetchall()
+
+        dict = {
+            'ES9080010001010E': {}, #Abrera
+            'ES9083020001010E': {}, #Igualada
+            'ES9081130006010E': {}, #Manresa
+        }
+
+        for row in rows:
+            wwtp = row[13]
+            contaminant = row[3]
+            valor = row[4]
+
+            if wwtp == 'DEPABR-I':
+                if contaminant not in dict['ES9080010001010E']:
+                    dict['ES9080010001010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9080010001010E'][contaminant]['influent'].append(valor / 1000)
+            elif wwtp == 'DEPABR-O':
+                if contaminant not in dict['ES9080010001010E']:
+                    dict['ES9080010001010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9080010001010E'][contaminant]['efluent'].append(valor / 1000)
+
+            if wwtp == 'DEPIGU-I':
+                if contaminant not in dict['ES9083020001010E']:
+                    dict['ES9083020001010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9083020001010E'][contaminant]['influent'].append(valor / 1000)
+            elif wwtp == 'DEPIGU-O':
+                if contaminant not in dict['ES9083020001010E']:
+                    dict['ES9083020001010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9083020001010E'][contaminant]['efluent'].append(valor / 1000)
+
+
+            if wwtp == 'DEPMAN-I':
+                if contaminant not in dict['ES9081130006010E']:
+                    dict['ES9081130006010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9081130006010E'][contaminant]['influent'].append(valor / 1000)
+            elif wwtp == 'DEPMAN-O':
+                if contaminant not in dict['ES9081130006010E']:
+                    dict['ES9081130006010E'][contaminant] = {'influent': [], 'efluent': []}
+                dict['ES9081130006010E'][contaminant]['efluent'].append(valor / 1000)
+
+
+        return dict
+
     #funcions auxiliars
 
     def read_all_data(self, table='cens_v4_1_prova'):

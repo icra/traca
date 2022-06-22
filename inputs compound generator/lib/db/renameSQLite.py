@@ -7,24 +7,6 @@ class renameSQLite:
     def __init__(self, url):
         self.url = url
 
-    def __read_table(self, table_name):
-        """ Llegir taula table i retornar-la en forma de diccionari """
-        conn = None
-        try:
-            conn = sqlite3.connect(self.url)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-            query = 'SELECT * FROM ' + table_name
-            c.execute(query)
-            result = [dict(row) for row in c.fetchall()]
-
-            return result
-        except Error as e:
-            raise(e)
-        finally:
-            if conn:
-                conn.close()
-
     def add_data_to_swat(self, edars_calibrated, volumes, contaminants_i_nutrients):
 
         try:
@@ -73,8 +55,7 @@ class renameSQLite:
 
                     #Per cadascun dels contaminants que no va a recall_dat, posar-lo a recall_pollutants_dat
                     for contaminant in contaminants_i_nutrients:
-                        #if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in volumes[point]:
-                        if contaminant not in ["Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in volumes[point]:
+                        if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in volumes[point]:
 
                             #Mirem que el contaminant estigui creat a db
                             c.execute(
@@ -93,10 +74,10 @@ class renameSQLite:
                                 #En cas que no existeixi entrada, la creem
                                 if len(rows) > 0:
                                     c.execute(
-                                        ''' UPDATE recall_dat
-                                              SET load = ? + load,
+                                        ''' UPDATE recall_pollutants_dat
+                                              SET load = ? + load
                                               WHERE (recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
-                                        (cabal, point, contaminant))
+                                        (volumes[point][contaminant], point, contaminant))
                                 else:
                                     c.execute(
                                         ''' INSERT INTO recall_pollutants_dat (recall_rec_id, pollutants_pth_id, jday, mo, day_mo, yr, load) VALUES 
@@ -110,7 +91,7 @@ class renameSQLite:
             # Insertar dades de edars_calibrated
             for edar in edars_calibrated.values():
                 try:
-                    if "id_swat" in edar and "compounds_effluent" in edar:    #Si no te key "nom_swat" es que aboca a mar
+                    if "id_swat" in edar and "compounds_effluent" in edar:    #Si no te key "id_swat" es que aboca a mar
 
                         dbo = 0
                         fosfor = 0
@@ -147,7 +128,38 @@ class renameSQLite:
                                            cbod = ? + cbod,
                                            solp = ? + solp
                                        WHERE recall_rec_id = ?''',
-                                 (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, fosfats, edar["id_swat"],))
+                                 (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, fosfats, edar["id_swat"]))
+
+                        #Per cadascun dels contaminants que no va a recall_dat, posar-lo a recall_pollutants_dat
+                        for contaminant in contaminants_i_nutrients:
+                            if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in volumes[point]:
+
+                                #Mirem que el contaminant estigui creat a db
+                                c.execute(
+                                    ''' SELECT id FROM pollutants_pth WHERE name = ?''',
+                                    (contaminant, ))
+
+                                rows = c.fetchall()
+                                if len(rows) > 0:
+
+                                    c.execute(
+                                        ''' SELECT * FROM recall_pollutants_dat WHERE recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?)''',
+                                        (edar["id_swat"], contaminant,))
+
+                                    rows = c.fetchall()
+
+                                    #En cas que no existeixi entrada, la creem
+                                    if len(rows) > 0:
+                                        c.execute(
+                                            ''' UPDATE recall_pollutants_dat
+                                                  SET load = ? + load
+                                                  WHERE (recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
+                                            (edar["compounds_effluent"][contaminant], edar["id_swat"], contaminant))
+                                    else:
+                                        c.execute(
+                                            ''' INSERT INTO recall_pollutants_dat (recall_rec_id, pollutants_pth_id, jday, mo, day_mo, yr, load) VALUES 
+                                                      (?, (SELECT id FROM pollutants_pth WHERE name=?), ?, ?, ?, ?, ?)''',
+                                            (edar["id_swat"], contaminant, 1, 1, 1, 1, edar["compounds_effluent"][contaminant]))
 
                 except Error as error:
                     print(error)

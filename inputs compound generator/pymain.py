@@ -40,9 +40,10 @@ id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, 
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)
 
 
+
 #Calibrar
 """
-exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr)
+exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection)
 wwtp_info(review, contaminants_i_nutrients, resum_eliminacio)
 """
 

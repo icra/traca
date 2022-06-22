@@ -1,5 +1,3 @@
-from lib.db.Custom_SQLite import Custom_SQLite as cS
-from lib.db.ConnectPostgree import ConnectDb as pg
 
 import csv
 import openpyxl
@@ -86,7 +84,7 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
     return listOfEDARCompounds
 
 #Funcio per calibrar % eliminacio i cxgx
-def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx):
+def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx, connection):
     listOfEDARCompounds = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
 
     dc_to_eu = {}
@@ -165,6 +163,21 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
                                     listOfEDARCompounds[eu_code]["efluent"][ptr_key.value].append(value / 1000)
 
                         i += 1
+
+    # Edar scarce
+    edar_scarce = connection.get_edar_scarce()
+    for wwtp in edar_scarce:
+        for contaminant in edar_scarce[wwtp]:
+            if contaminant in contaminants_i_nutrients:
+
+
+                if contaminant not in listOfEDARCompounds[wwtp]['efluent']:
+                    listOfEDARCompounds[wwtp]["efluent"][contaminant] = []
+                listOfEDARCompounds[wwtp]["efluent"][contaminant].extend(edar_scarce[wwtp][contaminant]['efluent'])
+
+                if contaminant not in listOfEDARCompounds[wwtp]['influent']:
+                    listOfEDARCompounds[wwtp]["influent"][contaminant] = []
+                listOfEDARCompounds[wwtp]["influent"][contaminant].extend(edar_scarce[wwtp][contaminant]['influent'])
 
     for wwtp in listOfEDARCompounds:
         for compound in listOfEDARCompounds[wwtp]["efluent"]:
