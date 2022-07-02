@@ -157,14 +157,14 @@ class ConnectDb:
                     contaminants_per_tipologia_mitjanes[ccae_l] = {}
                 if contaminant not in contaminants_per_tipologia[ccae_l]:
                     contaminants_per_tipologia[ccae_l][contaminant] = []
-                    contaminants_per_tipologia_mitjanes[ccae_l][contaminant] = None
+                    #contaminants_per_tipologia_mitjanes[ccae_l][contaminant] = None
                 contaminants_per_tipologia[ccae_l][contaminant].append(valor_mitja)
                 step_0 += 1
 
         for ccae_l in contaminants_per_tipologia:
             for compound in contaminants_per_tipologia[ccae_l]:
                 valors = contaminants_per_tipologia[ccae_l][compound]
-                if len(valors) >= 5:
+                if len(valors) >= 4:
                     mitjana = statistics.mean(valors)
                     sd = statistics.stdev(valors)
                     cv = sd / mitjana
@@ -198,7 +198,6 @@ class ConnectDb:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = mean/1000000  #ng/L a mg/L
                         step_2 += 1
 
-
         #DB francesa
 
         cur.execute('SELECT valor, variable, cod_ccae FROM bd_francesa')
@@ -213,7 +212,6 @@ class ConnectDb:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound] = valor / 1000  #Passem de µg/l a mg/l
                 step_3 += 1
 
-        print(step_0, step_1, step_2, step_3)
         return contaminants_per_tipologia_mitjanes
 
     def add_industry_to_edar(self, industries_to_edar, industry):

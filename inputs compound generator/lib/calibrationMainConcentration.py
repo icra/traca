@@ -491,8 +491,8 @@ def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrie
 
         elif "Nitrogen Total" in aux_point:
             aux_point["Nitrats"] = aux_point["Nitrogen Total"]*0.1
-    if "Amoni" not in aux_point:
 
+    if "Amoni" not in aux_point:
         if "Nitrogen Total" in aux_point and "Nitrats" in aux_point and "Nitrogen orgànic" in aux_point:
             amoni = aux_point["Nitrogen Total"] - aux_point["Nitrats"] - aux_point["Nitrogen orgànic"]
             if amoni < 0:

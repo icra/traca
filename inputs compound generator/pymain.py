@@ -26,6 +26,7 @@ resum_eliminacio = "inputs/resum_eliminacio.xlsx"
 
 
 #Generar concentracions i penjar-les a DB
+
 """
 contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics()
 estimations = connection.generate_industrial_data()
@@ -41,10 +42,9 @@ edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar
 
 
 #Calibrar
-"""
 exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection)
 wwtp_info(review, contaminants_i_nutrients, resum_eliminacio)
-"""
+
 
 #cli
 if len(sys.argv) > 2:
