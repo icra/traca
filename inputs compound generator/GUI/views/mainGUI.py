@@ -31,7 +31,7 @@ class mainGUI:
 
         layout = [
             [PySimpleGUI.Menu(menu_def, tearoff=False)],
-            [PySimpleGUI.Text("SWAT+ Input Generator (EESAM)")],
+            [PySimpleGUI.Text("SWAT+ Input Generator (TRAÇA)")],
             [PySimpleGUI.Table(
                 values=[values],
                 headings=headings,

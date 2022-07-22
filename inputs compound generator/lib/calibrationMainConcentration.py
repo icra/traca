@@ -155,8 +155,10 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
                     i = 0
                     for ptr_key in first_line:
                         if ptr_key.value in contaminants_i_nutrients:
+
                             if isfloat(ptr[i].value):
                                 value = float(ptr[i].value)
+
                                 if ptr_key.value not in listOfEDARCompounds[eu_code]["efluent"]:
                                     listOfEDARCompounds[eu_code]["efluent"][ptr_key.value] = [value / 1000]
                                 else:
@@ -170,14 +172,17 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
         for contaminant in edar_scarce[wwtp]:
             if contaminant in contaminants_i_nutrients:
 
+                values_o = edar_scarce[wwtp][contaminant]['efluent']
+                if len(values_o) > 0:
+                    if contaminant not in listOfEDARCompounds[wwtp]['efluent']:
+                        listOfEDARCompounds[wwtp]["efluent"][contaminant] = []
+                    listOfEDARCompounds[wwtp]["efluent"][contaminant].extend(values_o)
 
-                if contaminant not in listOfEDARCompounds[wwtp]['efluent']:
-                    listOfEDARCompounds[wwtp]["efluent"][contaminant] = []
-                listOfEDARCompounds[wwtp]["efluent"][contaminant].extend(edar_scarce[wwtp][contaminant]['efluent'])
-
-                if contaminant not in listOfEDARCompounds[wwtp]['influent']:
-                    listOfEDARCompounds[wwtp]["influent"][contaminant] = []
-                listOfEDARCompounds[wwtp]["influent"][contaminant].extend(edar_scarce[wwtp][contaminant]['influent'])
+                values_i = edar_scarce[wwtp][contaminant]['influent']
+                if len(values_i) > 0:
+                    if contaminant not in listOfEDARCompounds[wwtp]['influent']:
+                        listOfEDARCompounds[wwtp]["influent"][contaminant] = []
+                    listOfEDARCompounds[wwtp]["influent"][contaminant].extend(values_i)
 
     for wwtp in listOfEDARCompounds:
         for compound in listOfEDARCompounds[wwtp]["efluent"]:
@@ -191,6 +196,8 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
 
     with open('json_data.json', 'w', encoding='utf8') as outfile:
         json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
+
+
 
 #Funcio per calibrar, llegeix fitxer review
 def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
@@ -279,9 +286,16 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
                 isFirst = True
             else:
                 pol_name = str(ptr[0].value)
+
+
+
                 if pol_name in contaminants_i_nutrients:
                     removal_rate = ptr[2].value
-                    if isfloat(removal_rate) and pol_name in dict:
+
+                    if pol_name not in dict:
+                        dict[pol_name] = {}
+
+                    if isfloat(removal_rate):
                         if technology == 'UV':
                             dict[pol_name]["UV"] = removal_rate
 
@@ -303,7 +317,7 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
     # Llegim paràmetres calibrats
     calibrated_parameters = {}
 
-    wb_ptr = openpyxl.load_workbook(removal_rate)
+    wb_ptr = openpyxl.load_workbook(removal_rate, data_only=True)
     ws_ptr = wb_ptr["Sheet1"]
     isFirst = True
 
@@ -316,21 +330,27 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
         if row[0].value is not None:
             calibrated_parameters[str(row[0].value)] = {
-            "name": str(row[1].value),
-            "generation_per_capita": float(row[2].value),
-            "P": float(row[3].value),
-            "SP": float(row[4].value),
-            "SN": float(row[5].value),
-            "SC": float(row[6].value),
-            "UF": float(row[7].value),
-            "CL": float(row[8].value),
-            "UV": float(row[9].value),
-            "OTHER": float(row[10].value),
-            "SF": float(row[11].value),
+
+            "name": str(row[0].value),
+            "UV": float(row[1].value),
+            "CL": float(row[2].value),
+            "SF": float(row[3].value),
+            "UF": float(row[4].value),
+            "GAC": float(row[5].value),
+            "RO": float(row[6].value),
+            "AOP": float(row[7].value),
+            "O3": float(row[8].value),
+            "OTHER": float(row[9].value),
+            "P": float(row[10].value),
+            "SC": float(row[11].value),
+            "SN": float(row[12].value),
+            "SP": float(row[13].value),
+            "generation_per_capita": float(row[14].value),
+            "error_industrial": float(row[15].value),
         }
 
     q_per_capita = 0.242  # m3/dia/habitant
-    contaminants = ["DBO 5 dies", "Nitrogen Total", "Amoni", "Amoniac", "Nitrats", "Nitrogen orgànic", "Fòsfor total", "Fòsfor orgànic", "Fosfats"]
+    contaminants = contaminants_i_nutrients
 
     for edar_key in listEdars.keys():
 
@@ -355,7 +375,7 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                 load_influent_industrial = 0
                 if contaminant in wwtp["industriesTotalInfluent"]:
-                    load_influent_industrial = wwtp["industriesTotalInfluent"][
+                    load_influent_industrial = calibrated_parameters[contaminant]["error_industrial"] * wwtp["industriesTotalInfluent"][
                                                    contaminant] / 1000  # kg/dia
 
                 load_influent_filtered = load_influent_industrial + load_influent_domestic
@@ -364,25 +384,62 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                     for configuration in wwtp["configuration"]:
                         load_influent_filtered *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
 
+                        #load_influent_domestic *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
+                        #load_influent_industrial *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
+
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
+                """
+                compounds_effluent[contaminant] = {
+                    "domestic": load_influent_domestic,
+                    "industrial": load_influent_industrial
+                }
+                """
 
             #Fins ara teniem TN i TP agrupant segons separacio estandard, ara separem segons tractament depuradora (mes precis)
-            tn = compounds_effluent["Nitrogen Total"]
-            if 'SC' in wwtp["configuration"]:
-                compounds_effluent["Nitrogen orgànic"] = tn * 0.03
-                compounds_effluent["Nitrats"] = tn * 0
-                compounds_effluent["Amoni"] = tn * 0.97
-            elif 'SN' in wwtp["configuration"] or 'SP' in wwtp["configuration"]:
-                compounds_effluent["Nitrogen orgànic"] = tn * 0.03
-                compounds_effluent["Nitrats"] = tn * 0.66
-                compounds_effluent["Amoni"] = tn * 0.31
 
-            tp = compounds_effluent["Fòsfor total"]
-            compounds_effluent["Fòsfor orgànic"] = tp * 0.07
-            compounds_effluent["Fosfats"] = tp * 0.93
 
+            if "Nitrogen Total" in contaminants_i_nutrients:
+                tn = compounds_effluent["Nitrogen Total"]
+                if 'SC' in wwtp["configuration"]:
+                    compounds_effluent["Nitrogen orgànic"] = tn * 0.03
+                    compounds_effluent["Nitrats"] = tn * 0
+                    compounds_effluent["Amoni"] = tn * 0.97
+                elif 'SN' in wwtp["configuration"] or 'SP' in wwtp["configuration"]:
+                    compounds_effluent["Nitrogen orgànic"] = tn * 0.03
+                    compounds_effluent["Nitrats"] = tn * 0.66
+                    compounds_effluent["Amoni"] = tn * 0.31
+            if "Fòsfor total" in contaminants_i_nutrients:
+                tp = compounds_effluent["Fòsfor total"]
+                compounds_effluent["Fòsfor orgànic"] = tp * 0.07
+                compounds_effluent["Fosfats"] = tp * 0.93
+
+
+
+            """
+            for dom_ind in ["domestic", "industrial"]:
+                try:
+                    if "Nitrogen Total" in contaminants_i_nutrients:
+                        tn = compounds_effluent["Nitrogen Total"][dom_ind]
+                        if 'SC' in wwtp["configuration"]:
+                            compounds_effluent["Nitrogen orgànic"][dom_ind] = tn * 0.03
+                            compounds_effluent["Nitrats"][dom_ind] = tn * 0
+                            compounds_effluent["Amoni"][dom_ind] = tn * 0.97
+                        elif 'SN' in wwtp["configuration"] or 'SP' in wwtp["configuration"]:
+                            compounds_effluent["Nitrogen orgànic"][dom_ind] = tn * 0.03
+                            compounds_effluent["Nitrats"][dom_ind] = tn * 0.66
+                            compounds_effluent["Amoni"][dom_ind] = tn * 0.31
+                except Exception as e:
+                    pass
+                try:
+                    if "Fòsfor total" in contaminants_i_nutrients:
+                        tp = compounds_effluent["Fòsfor total"][dom_ind]
+                        compounds_effluent["Fòsfor orgànic"][dom_ind] = tp * 0.07
+                        compounds_effluent["Fosfats"][dom_ind] = tp * 0.93
+                except Exception as e:
+                    pass
+            """
             listEdars[edar_key]['compounds_effluent'] = compounds_effluent
 
         except Exception as e:
@@ -621,7 +678,7 @@ def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = T
         abocaments_sumat[id_abocament] = aux
     return abocaments_sumat
 
-def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients):
+def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection):
 
     industries_grouped = {}
 
@@ -645,8 +702,15 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
 
     contaminants_per_punt_abocament = suma_industries_abocament(discharge_points, contaminants_i_nutrients)
 
+    #concentracions_avg = {}
+    #for contaminant in contaminants_i_nutrients:
+    #    concentracions_avg[contaminant] = connection.avg_estacions_riu(contaminant)
+
     for contaminant in contaminants_i_nutrients:
-        for abocament in  contaminants_per_punt_abocament:
+        for abocament in contaminants_per_punt_abocament:
+            #contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament]["q"] * concentracions_avg[contaminant] * 10 / 1000  # Passem a kg
+
+
             if contaminant in contaminants_per_punt_abocament[abocament]:
                 contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg
 

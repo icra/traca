@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
-
+import pandas as pd
+from math import radians, cos, sin, asin, sqrt
+import time
 
 class renameSQLite:
 
@@ -174,3 +176,134 @@ class renameSQLite:
             if conn:
                 conn.close()
 
+    def dist(self, lat1, long1, lat2, long2):
+        """
+        Calculate the great circle distance between two points
+        on the earth (specified in decimal degrees)
+        """
+        # convert decimal degrees to radians
+        lat1, long1, lat2, long2 = map(radians, [lat1, long1, lat2, long2])
+        # haversine formula
+        dlon = long2 - long1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * asin(sqrt(a))
+        # Radius of earth in kilometers is 6371
+        km = 6371 * c
+        return km
+
+    def shortest_dist(self, points, point):
+
+        def f(point1, point2):
+            return self.dist(point1[0], point1[1], point2[0], point2[1])
+
+        return min(points, key = lambda x: f(x, point))
+
+    def add_data_to_graph(self, edars_calibrated, volumes, contaminants_i_nutrients):
+
+        recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
+        coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
+        pixel_to_poll = pd.read_csv("inputs/AGG_WWTP_df_no_treatment.csv", index_col=1)
+        pixel_to_poll.drop(pixel_to_poll.columns[pixel_to_poll.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+
+        contaminants_aux = []
+
+        """
+        for pollutant in contaminants_i_nutrients:
+            contaminants_aux.append(pollutant+"_industrial")
+            contaminants_aux.append(pollutant + "_domestic")
+        pixel_to_poll.loc[:, contaminants_aux] = 0
+        """
+
+
+        pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
+
+        for edar in edars_calibrated:
+            id = int(edars_calibrated[edar]["id_swat"])
+            point = [recall[id]['lat'], recall[id]['lon']]
+            id_pixel = (self.shortest_dist(coord_index, point))[2]
+
+            for pollutant in contaminants_i_nutrients:
+                load = 0
+                #load_industrial = 0
+                #load_domestic = 0
+                if pollutant in edars_calibrated[edar]["compounds_effluent"]:
+                    load = (edars_calibrated[edar]["compounds_effluent"][pollutant] * 1000000000 / 24) #kg/dia a micro/h
+                    #load_domestic = (edars_calibrated[edar]["compounds_effluent"][pollutant]["domestic"] * 1000000000 / 24) #kg/dia a micro/h
+                    #load_industrial = (edars_calibrated[edar]["compounds_effluent"][pollutant]["industrial"] * 1000000000 / 24) #kg/dia a micro/h
+
+
+                pixel_to_poll.at[id_pixel, pollutant] += load
+                #pixel_to_poll.loc[id_pixel, pollutant+"_industrial"] += load_industrial
+                #pixel_to_poll.loc[id_pixel, pollutant+"_domestic"] += load_domestic
+
+
+        #Repetir per industries
+
+
+        for industry in volumes:
+            id = int(volumes[industry]["id"])
+            point = [recall[id]['lat'], recall[id]['lon']]
+            id_pixel = (self.shortest_dist(coord_index, point))[2]
+
+            for pollutant in contaminants_i_nutrients:
+                load = 0
+                if pollutant in volumes[industry]:
+                    load = (volumes[industry][pollutant] * 1000000000 / 24) #kg/dia a micro/h
+
+                pixel_to_poll.at[id_pixel, pollutant] += load
+                #pixel_to_poll.loc[id_pixel, pollutant+"_industrial"] += load
+
+            end = time.time()
+        #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_industrial', '')
+        #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_domestic', '')
+
+
+        pixel_to_poll.to_csv('cloroalcans_calibrar.csv')
+        return pixel_to_poll
+
+    def add_data_industry_to_graph(self, volumes, contaminants_i_nutrients):
+
+        recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
+        coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
+        pixel_to_poll = pd.read_csv("inputs/AGG_WWTP_df_no_treatment.csv", index_col=1)
+        pixel_to_poll.drop(pixel_to_poll.columns[pixel_to_poll.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
+
+
+        pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
+
+
+        for industry in volumes:
+            id = int(volumes[industry]["id"])
+            point = [recall[id]['lat'], recall[id]['lon']]
+            id_pixel = (self.shortest_dist(coord_index, point))[2]
+
+            for pollutant in contaminants_i_nutrients:
+                load = 0
+                if pollutant in volumes[industry]:
+                    load = (volumes[industry][pollutant] * 1000000000 / 24) #kg/dia a micro/h
+
+                pixel_to_poll.at[id_pixel, pollutant] += load
+
+        return pixel_to_poll
+
+    def add_data_edar_to_graph(self, edars_calibrated, contaminants_i_nutrients, pixel_to_poll):
+
+        recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
+        coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
+
+
+        for edar in edars_calibrated:
+            id = int(edars_calibrated[edar]["id_swat"])
+            point = [recall[id]['lat'], recall[id]['lon']]
+            id_pixel = (self.shortest_dist(coord_index, point))[2]
+
+            for pollutant in contaminants_i_nutrients:
+                load = 0
+                if pollutant in edars_calibrated[edar]["compounds_effluent"]:
+                    load = (edars_calibrated[edar]["compounds_effluent"][pollutant] * 1000000000 / 24) #kg/dia a micro/h
+
+                pixel_to_poll.at[id_pixel, pollutant] += load
+        
+
+        return pixel_to_poll
