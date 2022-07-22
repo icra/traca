@@ -3,6 +3,8 @@ from numpy import *
 from itertools import groupby
 import statistics
 import openpyxl
+import pandas as pd
+from sqlalchemy import create_engine
 
 
 class ConnectDb:
@@ -14,6 +16,9 @@ class ConnectDb:
             database=database,
             user=user,
             password=password)
+
+        self.engine = create_engine('postgresql://traca_user:EdificiH2O!@217.61.208.188:5432/traca_1')
+
         try:
             # create a cursor
             cur = self.conn.cursor()
@@ -90,9 +95,16 @@ class ConnectDb:
 
     def get_contaminants_i_nutrients_tipics(self):
         cur = self.conn.cursor()
-        cur.execute('SELECT component FROM tipus_components')
+        cur.execute('SELECT component FROM tipus_components_no_calibrar')
         components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
         return components
+
+    def get_contaminants_i_nutrients_puntuals(self):
+        cur = self.conn.cursor()
+        cur.execute('SELECT component FROM tipus_components_calibrar')
+        components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
+        return components
+
 
     def getIndustries(self, table='cens_v4_1_prova'):
         try:
@@ -102,6 +114,12 @@ class ConnectDb:
             return cur.fetchall()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+
+    def ccae_remove_category(self, code, level):
+        if len(code) < 5:
+            return code
+        else:
+            return code[:-level]
 
     def generate_industrial_data(self):
         cur = self.conn.cursor()
@@ -152,13 +170,16 @@ class ConnectDb:
                 elif "ng/l" in unitats:
                     valor_mitja = valor_mitja / 1000000
 
-                if ccae_l not in contaminants_per_tipologia:
-                    contaminants_per_tipologia[ccae_l] = {}
-                    contaminants_per_tipologia_mitjanes[ccae_l] = {}
-                if contaminant not in contaminants_per_tipologia[ccae_l]:
-                    contaminants_per_tipologia[ccae_l][contaminant] = []
-                    #contaminants_per_tipologia_mitjanes[ccae_l][contaminant] = None
-                contaminants_per_tipologia[ccae_l][contaminant].append(valor_mitja)
+                new_ccae_l = self.ccae_remove_category(ccae_l, 1)
+
+                if new_ccae_l not in contaminants_per_tipologia:
+                    contaminants_per_tipologia[new_ccae_l] = {}
+                    contaminants_per_tipologia_mitjanes[new_ccae_l] = {}
+                if contaminant not in contaminants_per_tipologia[new_ccae_l]:
+                    contaminants_per_tipologia[new_ccae_l][contaminant] = []
+                    #contaminants_per_tipologia_mitjanes[new_ccae_l][contaminant] = None
+
+                contaminants_per_tipologia[new_ccae_l][contaminant].append(valor_mitja)
                 step_0 += 1
 
         for ccae_l in contaminants_per_tipologia:
@@ -188,15 +209,23 @@ class ConnectDb:
             mean = float(row[2].value)
             sd = float(row[3].value)
             if isic in isic_to_ccae:
-                cod_ccae = isic_to_ccae[isic]
+                cod_ccae = self.ccae_remove_category(isic_to_ccae[isic], 1)
                 if compound in components:
                     if cod_ccae not in contaminants_per_tipologia_mitjanes:
                         contaminants_per_tipologia_mitjanes[cod_ccae] = {}
                     if compound not in contaminants_per_tipologia_mitjanes[cod_ccae]:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = None
                     if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
-                        contaminants_per_tipologia_mitjanes[cod_ccae][compound] = mean/1000000  #ng/L a mg/L
+                        contaminants_per_tipologia_mitjanes[cod_ccae][compound] = [mean/1000000]  #ng/L a mg/L
                         step_2 += 1
+                    elif type(contaminants_per_tipologia_mitjanes[cod_ccae][compound]) == list:
+                        contaminants_per_tipologia_mitjanes[cod_ccae][compound].append(mean/1000000)  #ng/L a mg/L
+                        step_2 += 1
+
+        for ccae in contaminants_per_tipologia_mitjanes:
+            for compound in contaminants_per_tipologia_mitjanes[ccae]:
+                if type(contaminants_per_tipologia_mitjanes[ccae][compound]) == list:
+                    contaminants_per_tipologia_mitjanes[ccae][compound] = sum(contaminants_per_tipologia_mitjanes[ccae][compound]) / len(contaminants_per_tipologia_mitjanes[ccae][compound])
 
         #DB francesa
 
@@ -204,6 +233,7 @@ class ConnectDb:
         db = list(cur.fetchall())
         db_filtrat = list(filter(lambda x: x[1] in components, db))
         for (valor, compound, cod_ccae) in db_filtrat:
+            cod_ccae = self.ccae_remove_category(cod_ccae, 1)
             if cod_ccae not in contaminants_per_tipologia_mitjanes:
                 contaminants_per_tipologia_mitjanes[cod_ccae] = {}
             if compound not in contaminants_per_tipologia_mitjanes[cod_ccae]:
@@ -211,6 +241,14 @@ class ConnectDb:
             if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound] = valor / 1000  #Passem de µg/l a mg/l
                 step_3 += 1
+            elif type(contaminants_per_tipologia_mitjanes[cod_ccae][compound]) == list:
+                contaminants_per_tipologia_mitjanes[cod_ccae][compound].append(valor / 1000)  #Passem de µg/l a mg/l
+                step_3 += 1
+
+        for ccae in contaminants_per_tipologia_mitjanes:
+            for compound in contaminants_per_tipologia_mitjanes[ccae]:
+                if type(contaminants_per_tipologia_mitjanes[ccae][compound]) == list:
+                    contaminants_per_tipologia_mitjanes[ccae][compound] = sum(contaminants_per_tipologia_mitjanes[ccae][compound]) / len(contaminants_per_tipologia_mitjanes[ccae][compound])
 
         return contaminants_per_tipologia_mitjanes
 
@@ -260,15 +298,31 @@ class ConnectDb:
         industries_to_river = {}
 
         for industry in industries:
+
+
             tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
 
-            if uwwCode is not None:     #industria aboca a depuradora
-                if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
-                    self.add_industry_to_edar(industries_to_edar, industry)
-                else:   #No passa per depuradora
+            """
+            if subtipus_llm != "Directe a Terreny" and subtipus_llm != "Indirecte a Terreny" and subtipus_llm != "Directe a Mar" and subtipus_llm != "Indirecte a Mar":
+                if uwwCode is not None:     #industria aboca a depuradora
+                    #if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
+                    if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"] and subtipus_llm not in ["Directe a Riu", "Indirecte a Riu"]:  # Influent depuradora
+                        self.add_industry_to_edar(industries_to_edar, industry)
+                    else:   #No passa per depuradora
+                        self.add_industry_to_river(industries_to_river, industry)
+                else:    #No passa per depuradora
                     self.add_industry_to_river(industries_to_river, industry)
-            else:    #No passa per depuradora
+            """
+
+            if uwwCode is not None:  # industria aboca a depuradora
+                # if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
+                if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:
+                    self.add_industry_to_edar(industries_to_edar, industry)
+                else:  # No passa per depuradora
+                    self.add_industry_to_river(industries_to_river, industry)
+            else:  # No passa per depuradora
                 self.add_industry_to_river(industries_to_river, industry)
+
         return industries_to_edar, industries_to_river
 
     def get_edar_scarce(self):
@@ -409,8 +463,8 @@ class ConnectDb:
             tipus_activitat = industry["tipus_activitat"]
             cod_ccae = industry["cod_ccae"]
             tipus_llm = industry["Tipus (LLM)"]
-            subtipus_llm =  industry["Subtipus (LLM)"]
-            nom_abocament =  industry["nom_abocament"]
+            subtipus_llm = industry["Subtipus (LLM)"]
+            nom_abocament = industry["nom_abocament"]
             ccae_l = industry["ccae_l"]
             nace_l = industry["nace_l"]
             isic_l = industry["isic_l"]
@@ -421,14 +475,12 @@ class ConnectDb:
 
             for contaminant in compounds:
                 estimation = None
-                if ccae_l in estimacions:
-                    if contaminant in estimacions[ccae_l]:
-                        estimation = estimacions[ccae_l][contaminant]
-
+                new_ccae = self.ccae_remove_category(ccae_l, 1)
+                if new_ccae in estimacions:
+                    if contaminant in estimacions[new_ccae]:
+                        estimation = estimacions[new_ccae][contaminant]
 
                 if contaminant in industry or estimation is not None:
-
-                    tid += 1
 
                     nom_variable = contaminant
 
@@ -438,13 +490,15 @@ class ConnectDb:
                         unitats = "m3/any"
                     else:
                         unitats = "mg/l"
-
                     if contaminant in industry:
                         valor_maxim = industry[contaminant]
                         origen = "ACA"
                     elif estimation is not None:
                         valor_maxim = estimation
                         origen = "ICRA"
+
+                    if valor_maxim > 0:
+                        tid += 1
 
                     query = """INSERT INTO cens_v4_1_prova (tid, "activitat/ubicacio", "Tipus Activitat/Ubicació (A/U)", cod_ccae, "Tipus (LLM)", "Subtipus (LLM)", nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, "uwwCode") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
                     params = (tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, None, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode)
@@ -453,3 +507,99 @@ class ConnectDb:
                     print(tid)
 
         self.conn.commit()
+
+    def matrix_size(self):
+        pollutant_per_ccae = {}
+        industries = self.read_all_data()
+        contaminants = self.get_contaminants_i_nutrients_tipics()
+        for industry in industries:
+            for contaminant in contaminants:
+                if contaminant in industries[industry] and industries[industry][contaminant] > 0:
+                    new_ccae = self.ccae_remove_category(industries[industry]["cod_ccae"], 1)
+                    if new_ccae not in pollutant_per_ccae:
+                        pollutant_per_ccae[new_ccae] = set()
+                    pollutant_per_ccae[new_ccae].add(contaminant)
+        return pollutant_per_ccae
+
+
+        n_cell = 0
+        for industry in industries:
+            new_ccae = self.ccae_remove_category(industries[industry]["cod_ccae"], 1)
+            if new_ccae in pollutant_per_ccae:
+                n_cell += len(pollutant_per_ccae[new_ccae])
+
+        print('---------', n_cell)
+
+    def avg_estacions_riu(self, contaminant):
+
+        def f(unit, value):
+            if "µg" in unit:
+                return float(value) / 1000
+            elif "ng" in unit:
+                return float(value) / 1000000
+            else:
+                return float(value)
+
+        try:
+            concentracions_estacions_pd = pd.read_sql(
+                "SELECT valor, unidad_med FROM estacions_full where variable = '" + contaminant + "'", self.engine)
+
+            concentracions_estacions_list = list(
+                concentracions_estacions_pd.apply(lambda row: f(row['unidad_med'], row['valor']), axis=1))
+
+            avg_concentracions_estacions = sum(concentracions_estacions_list) / len(concentracions_estacions_list)
+
+            return avg_concentracions_estacions
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+
+
+    def estadistiques_final(self):
+
+        ind_origen = set()
+        ind_code = set()
+        industries_location = pd.read_csv('inputs/industries_location.csv', index_col=0).to_dict(orient = 'index')
+
+
+        industries = self.getIndustries()
+        industries_to_edar = {}
+        industries_to_river = {}
+
+        n_1 = set()
+        n_2 = set()
+        n_3 = set()
+
+        for industry in industries:
+            tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
+
+            ind_code.add((industries_location[activitat_ubicacio + ' ' + nom_abocament]['x'],
+                               industries_location[activitat_ubicacio + ' ' + nom_abocament]['y'], self.ccae_remove_category(ccae_l, 1)))
+
+            if uwwCode is not None:     #industria aboca a depuradora
+                if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
+                    self.add_industry_to_edar(industries_to_edar, industry)
+                    ind_origen.add((industries_location[activitat_ubicacio+' '+nom_abocament]['x'], industries_location[activitat_ubicacio+' '+nom_abocament]['y'], 1))
+                    n_1.add((industries_location[activitat_ubicacio+' '+nom_abocament]['x'], industries_location[activitat_ubicacio+' '+nom_abocament]['y'], 1))
+
+                else:   #No passa per depuradora
+                    self.add_industry_to_river(industries_to_river, industry)
+                    ind_origen.add((industries_location[activitat_ubicacio+' '+nom_abocament]['x'], industries_location[activitat_ubicacio+' '+nom_abocament]['y'], 2))
+                    n_2.add((industries_location[activitat_ubicacio+' '+nom_abocament]['x'], industries_location[activitat_ubicacio+' '+nom_abocament]['y'], 1))
+
+            else:    #No passa per depuradora
+                self.add_industry_to_river(industries_to_river, industry)
+                ind_origen.add((industries_location[activitat_ubicacio + ' ' + nom_abocament]['x'],
+                                    industries_location[activitat_ubicacio + ' ' + nom_abocament]['y'], 3))
+                n_3.add((industries_location[activitat_ubicacio + ' ' + nom_abocament]['x'],
+                         industries_location[activitat_ubicacio + ' ' + nom_abocament]['y'], 1))
+
+        df = pd.DataFrame(ind_origen, columns=['x', 'y', 'origen'])
+        df_2 = pd.DataFrame(ind_code, columns=['x', 'y', 'ccae'])
+        print(len(n_1), len(n_2), len(n_3))
+        df.to_csv("industries_origen.csv")
+        df_2.to_csv("industries_ccae.csv")
+
+        return industries_to_edar, industries_to_river
+
+
