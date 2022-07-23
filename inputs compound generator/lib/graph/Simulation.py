@@ -11,6 +11,7 @@ import pickle
 import networkx
 import math
 import pickle
+from osgeo import gdal
 
 class Simulation:
     def __init__(self):
@@ -73,6 +74,98 @@ class Simulation:
 
         return graph_df
 
+    def print_graph(self, graph_location: str, attribute_list: list, reference_raster_location: str, output_name: str,
+                    datatype=gdal.GDT_Float32):
+        """
+        This function takes in a graph, and converts it to a raster
+        :rtype: gdal raster
+        :graph_location: str: location of the raster
+        :attribute_list: list: list of strings that specify the attributes to be copied
+        :reference_raster_location: str: location of the reference raster
+        :output_name: str: the location name that the output raster should have
+        :datatype: gdal.Datatype: the datatype of the raster
+        """
+
+        print(str)
+        if isinstance(graph_location, str):
+            open_graph = open(graph_location, "rb")
+            graph = pickle.load(open_graph)
+            open_graph.close()
+        elif isinstance(graph_location, networkx.DiGraph):
+            graph = graph_location
+        else:
+            raise TypeError('Pass either a Digraph or a string. your input was ' + str(type(graph_location)))
+        reference_raster = gdal.Open(reference_raster_location)
+        count = len(attribute_list)
+        indicator = False
+
+        if count == 0:
+            count = 1
+            indicator = True
+
+        no_data_val = -523521
+        raster_matrix = numpy.zeros([reference_raster.RasterYSize, reference_raster.RasterXSize, count]) + no_data_val
+        iterations_number = 0
+        tot = graph.number_of_nodes()
+        if indicator:
+            for node_id in graph:
+                [i, j] = [graph.nodes[node_id]["x"], graph.nodes[node_id]["y"]]
+                raster_matrix[i, j] = 1
+        else:
+            for node_id in graph:
+                iterations_number += 1
+                for index in range(count):
+                    [i, j] = [graph.nodes[node_id]["x"],
+                              graph.nodes[node_id]["y"]]  # recover pixel coordinates from node
+                    raster_matrix[i, j, index] = graph.nodes[node_id][attribute_list[index]]
+
+        gtiff_driver = gdal.GetDriverByName('GTiff')
+        if not output_name.endswith('.tif'):
+            output_name += '.tif'
+        out_ds = gtiff_driver.Create(output_name, reference_raster.RasterXSize, reference_raster.RasterYSize,
+                                     count, datatype)  # this creates a raster document with dimensions, bands, datatype
+
+        out_ds.SetProjection(reference_raster.GetProjection())  # copy direction projection to output raster
+        out_ds.SetGeoTransform(
+            reference_raster.GetGeoTransform())  # copy direction resolution/location to output raster
+
+        for index in range(1, count + 1):
+            out_ds.GetRasterBand(index).WriteArray(raster_matrix[:, :, index - 1])
+            try:
+                out_ds.GetRasterBand(index).SetDescription(attribute_list[index - 1])
+            except IndexError:
+                out_ds.GetRasterBand(index).SetDescription('indicator')
+
+            out_ds.GetRasterBand(index).SetNoDataValue(no_data_val)
+        out_ds = None
+        pass
+
+    def give_pixel(self, coord: list, reference_raster_location: object, return_scalar: bool = False, reverse: bool = False):
+        """
+        This function gives the pixel of a coordinate (row/latitude, column/longitude). If reverse is specified, the function returns a coordinate for a
+        pixel number.
+        :rtype: location of the pixel as a list or as the pixel number. If reverse is specified, gives coordenates as a list
+        :coord: list: The coordinations of the point. If reverse is specified, this needs to be the pixel number
+        :reference_raster: object: A raster with the desired dimensions
+        :return_scalar: bool: if true, the output is returned as a scalar (pixel number)
+        :reverse: bool: if true, the function takes in a pixel number and returns a coordinate
+        """
+        reference_raster = gdal.Open(reference_raster_location)
+        transformation = reference_raster.GetGeoTransform()
+        if not reverse:
+            inverse_transform = gdal.InvGeoTransform(transformation)  # coordinate to pixel instructions
+            long_location, lat_location = map(int, gdal.ApplyGeoTransform(inverse_transform, coord[1], coord[0]))
+
+            if return_scalar:
+                pixel_number = lat_location * reference_raster.RasterXSize + long_location
+                return pixel_number
+            return [lat_location, long_location]
+        i = int(coord / reference_raster.RasterXSize)
+        j = coord - reference_raster.RasterXSize * i
+        long_location, lat_location = gdal.ApplyGeoTransform(transformation, int(j), i)
+        return [lat_location, long_location]
+
+
     def run_graph(self, contamination_df):
 
 
@@ -86,6 +179,9 @@ class Simulation:
         dis = 'flow_HR'
 
         for contaminant in contaminant_names:
+
+            networkx.set_node_attributes(g, 0, name=contaminant)
+
             attenuation = self.attenuation_df.at[contaminant, '% eliminació per hora'] / 100
             multiplicador = self.attenuation_df.at[contaminant, 'Multiplicador']
 
@@ -99,6 +195,11 @@ class Simulation:
                 if n in contamination_df.index:
                     g.nodes[n][contaminant] = contamination_df.at[n, contaminant] * multiplicador
 
+                    """
+                    if n == 117433900 and contaminant == 'Tetracloroetilè':
+                        print(g.nodes[n][contaminant] / g.nodes[n][dis])
+                    """
+
                 else:
                     g.nodes[n][contaminant] = 0
 
@@ -106,15 +207,19 @@ class Simulation:
                 # Add the contamination of the parent cells
                 parents = list(g.predecessors(n))
                 for k in parents:
-                    if k in contamination_df:
-                        g.nodes[n][contaminant] += g.nodes[k][contaminant]
+                    """
+                    if k == 117433900:
+                        print(n)
+                    """
+
+                    g.nodes[n][contaminant] += g.nodes[k][contaminant]
 
                 g.nodes[n][contaminant] *= math.exp(-attenuation * g.nodes[n][RT])
-
 
                 #self.river_graph.nodes[n][rel_cont] = self.river_graph.nodes[n][contam] / self.river_graph.nodes[n][dis]
 
 
-        #output_name = os.path.join(os.getcwd(), 'no_calibrar_tots', name +'.tif')
-        #self.print_graph(g, ["Trimetoprim", dis], 'inputs/reference_raster.tif', "trimetoprim.tif")
+        #self.print_graph(g, ["pixel_number"], "inputs/reference_raster.tif", "Venlafaxina.tif")
+
+
         return g

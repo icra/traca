@@ -302,7 +302,7 @@ class ConnectDb:
 
             tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
 
-            """
+
             if subtipus_llm != "Directe a Terreny" and subtipus_llm != "Indirecte a Terreny" and subtipus_llm != "Directe a Mar" and subtipus_llm != "Indirecte a Mar":
                 if uwwCode is not None:     #industria aboca a depuradora
                     #if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
@@ -313,7 +313,6 @@ class ConnectDb:
                 else:    #No passa per depuradora
                     self.add_industry_to_river(industries_to_river, industry)
             """
-
             if uwwCode is not None:  # industria aboca a depuradora
                 # if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
                 if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:
@@ -322,6 +321,7 @@ class ConnectDb:
                     self.add_industry_to_river(industries_to_river, industry)
             else:  # No passa per depuradora
                 self.add_industry_to_river(industries_to_river, industry)
+            """
 
         return industries_to_edar, industries_to_river
 

@@ -43,7 +43,6 @@ for industry in industries:
                 n_cells += 1
 print(n_cells)
 """
-
 #connection.estadistiques_final()
 
 #Posar info a fitxer .sqlite
@@ -55,7 +54,7 @@ edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()
 
 
-scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris)
+scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated)
 
 
 #Calibrar
