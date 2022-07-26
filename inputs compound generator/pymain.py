@@ -1,10 +1,13 @@
 import PySimpleGUI
+import pandas
+
 from GUI.views.mainGUI import mainGUI as mainGUI
 from lib.calibrationMainConcentration import read_industries, read_edars
 from lib.db.renameSQLite import renameSQLite as rS
 from GUI.views.settingsGUI import settingsGUI as settingsGUI
 from lib.db.ConnectPostgree import ConnectDb as pg
 import sys
+import pandas as pd
 import lib.scenarios as scenarios
 
 pg_url = "icra.loading.net"
@@ -46,13 +49,44 @@ print(n_cells)
 #connection.estadistiques_final()
 
 #Posar info a fitxer .sqlite
-contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics()
+contaminants_i_nutrients = connection.get_contaminants_i_nutrients_puntuals()
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated()
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection)
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)
 
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()
 
+"""
+contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
+edars_incloses = ["ES9080010001010E", "ES9080910001010E","ES9083020001010E","ES9081130006010E","ES9081140002010E","ES9081270001010E", "ES9081840001010E","ES9082110001010E","ES9082790004050E"]
+edars_excloses = [
+    "ES9080480001010E",
+	"ES9083000004010E",
+	"ES9082910001010E",
+    "ES9081620002010E",
+    "ES9081610008010E",
+    "ES9082400005010E",
+    "ES9082220003010E",
+    "ES9081190002010E",
+    "ES9082050005010E",
+    "ES9082870007010E",
+    "ES9080440001010E",
+    "ES9080530002010E",
+    "ES9080980004010E"
+]
+for contaminant in contaminants:
+    total = 0
+    for edar in edars_excloses:
+        total += edars_calibrated[edar]["compounds_effluent"][contaminant]
+a = pandas.read_csv("recall_points_baix_llob.csv", index_col=0)
+for contaminant in contaminants:
+    total = 0
+    for index in a.index:
+        index_str = str(index)
+        if index_str in id_discharge_to_volumes and contaminant in id_discharge_to_volumes[index_str]:
+            total += id_discharge_to_volumes[index_str][contaminant]
+    print(contaminant, total*1000)
+"""
 
 scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated)
 
