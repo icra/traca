@@ -15,12 +15,12 @@ class mainGUI:
         ]
 
         values = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
-        headings = ["EDAR EU_ID", "SWAT ID", "Name", "Population", "Primary", "Secondary", "Tertiary", "Flow", "DBO 5 dies",
+        headings = ["EDAR EU_ID", "SWAT ID", "Nom", "Població", "Primari", "Secundari", "Terciari", "Cabal", "DBO 5 dies",
                     "Fòsfor orgànic",  "Nitrogen orgànic",  "Nitrats",  "Amoni"]
 
 
         values_industries = ["-", "-", "-", "-", "-", "-", "-", "-"]
-        headings_industries = ["SWAT ID", "Name", "Flow", "DBO 5 dies",
+        headings_industries = ["SWAT ID", "Nom", "Cabal", "DBO 5 dies",
                     "Fòsfor orgànic",  "Nitrogen orgànic",  "Nitrats",  "Amoni"]
 
         for contaminant in self.contaminants_i_nutrients:
@@ -30,7 +30,7 @@ class mainGUI:
 
 
         layout = [
-            [PySimpleGUI.Menu(menu_def, tearoff=False)],
+            #[PySimpleGUI.Menu(menu_def, tearoff=False)],
             [PySimpleGUI.Text("SWAT+ Input Generator (TRAÇA)")],
             [PySimpleGUI.Table(
                 values=[values],
@@ -48,11 +48,18 @@ class mainGUI:
                 key="dp_table_in",
                 vertical_scroll_only=False
             )],
-            [PySimpleGUI.Text('.SQLite location: '),
-             PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
-             PySimpleGUI.FileBrowse(),
-             PySimpleGUI.Button("Add data from the point of discharge", key="add_dp_data")
-             ],
+
+            #[PySimpleGUI.Text('.SQLite location: '),
+            #PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
+            #PySimpleGUI.FileBrowse(),
+            #PySimpleGUI.Button("Add data from the point of discharge", key="add_dp_data")
+            #],
+
+            [
+                PySimpleGUI.Button("Guardar generació de contaminants", key="pollutants_generator"),
+                PySimpleGUI.Button("Generació d'escenaris", key="scenarios_generator")
+            ],
+
 
         ]
 
@@ -94,32 +101,32 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                cabal = round(float(edar["compounds_effluent"]["q"]), 5)
+                cabal = round(float(edar["compounds_effluent"]["q"]), 3)
                 row.append(cabal)
             except:
                 row.append("-")
             try:
-                dbo = round(float(edar["compounds_effluent"]["DBO 5 dies"]), 5)
+                dbo = round(float(edar["compounds_effluent"]["DBO 5 dies"] * 1000), 3)
                 row.append(dbo)
             except:
                 row.append("-")
             try:
-                fosfor = round(float(edar["compounds_effluent"]["Fòsfor orgànic"]), 5)
+                fosfor = round(float(edar["compounds_effluent"]["Fòsfor orgànic"] * 1000), 3)
                 row.append(fosfor)
             except:
                 row.append("-")
             try:
-                organic = round(float(edar["compounds_effluent"]["Nitrogen orgànic"]), 5)
+                organic = round(float(edar["compounds_effluent"]["Nitrogen orgànic"] * 1000), 3)
                 row.append(organic)
             except:
                 row.append("-")
             try:
-                nitrats = round(float(edar["compounds_effluent"]["Nitrats"]), 5)
+                nitrats = round(float(edar["compounds_effluent"]["Nitrats"] * 1000), 3)
                 row.append(nitrats)
             except:
                 row.append("-")
             try:
-                amoni = round(float(edar["compounds_effluent"]["Amoni"]), 5)
+                amoni = round(float(edar["compounds_effluent"]["Amoni"] * 1000), 3)
                 row.append(amoni)
             except:
                 row.append("-")
@@ -128,7 +135,7 @@ class mainGUI:
                 if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Nitrats", "Amoni"]:
                     valor = '-'
                     if contaminant in edar["compounds_effluent"]:
-                        valor = round(float(edar["compounds_effluent"][contaminant]), 3)
+                        valor = round(float(edar["compounds_effluent"][contaminant] * 1000), 3)
                     row.append(valor)
 
             edars_table.append(row)
@@ -156,27 +163,27 @@ class mainGUI:
             except:
                 row.append("-")
             try:
-                dbo = round(float(volume["DBO 5 dies"]), 5)
+                dbo = round(float(volume["DBO 5 dies"] * 1000), 5)
                 row.append(dbo)
             except:
                 row.append("-")
             try:
-                fosfor = round(float(volume["Fòsfor"]), 5)
+                fosfor = round(float(volume["Fòsfor"] * 1000), 5)
                 row.append(fosfor)
             except:
                 row.append("-")
             try:
-                organic = round(float(volume["Nitrogen"]), 5)
+                organic = round(float(volume["Nitrogen"] * 1000), 5)
                 row.append(organic)
             except:
                 row.append("-")
             try:
-                nitrats = round(float(volume["Nitrats"]), 5)
+                nitrats = round(float(volume["Nitrats"] * 1000), 5)
                 row.append(nitrats)
             except:
                 row.append("-")
             try:
-                amoni = round(float(volume["Amoniac"]), 5)
+                amoni = round(float(volume["Amoniac"] * 1000), 5)
                 row.append(amoni)
             except:
                 row.append("-")
@@ -185,7 +192,7 @@ class mainGUI:
                 if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Nitrats", "Amoni"]:
                     valor = '-'
                     if contaminant in volume:
-                        valor = round(float(volume[contaminant]), 3)
+                        valor = round(float(volume[contaminant] * 1000), 3)
                     row.append(valor)
 
             volumes_table.append(row)

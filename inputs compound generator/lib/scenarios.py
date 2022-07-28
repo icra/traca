@@ -1,15 +1,14 @@
 import pandas
 from lib.calibrationMainConcentration import read_industries, read_edars, exportDataForNils, wwtp_info
 from lib.db.renameSQLite import renameSQLite as rS
-import csv
-import sys
 import json
-import collections
 import itertools
 import lib.graph.Simulation as Simulation
 import pandas as pd
-import time
 import random
+import csv
+import time
+from dask import dataframe as dd
 
 def calculate_price(terciaris, cabal):
 
@@ -40,8 +39,9 @@ def calculate_price(terciaris, cabal):
 
 def all_scenarios(edars_escenaris, edars_calibrated_init):
 
-    configuracions_edars = pd.read_excel(edars_escenaris, index_col=0).to_dict(
+    configuracions_edars = edars_escenaris.to_dict(
         orient='index')
+
     escenaris_total = []
 
 
@@ -64,7 +64,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
         cabal = edars_cabal[edar]
         preu_inicial += calculate_price(terciaris, cabal)
 
-        """
+
         if secundari is not None:
             if secundari == "SP" or secundari == "SN":
                 secundari = [secundari]
@@ -88,21 +88,9 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                         ]
                     elif cabal < 20000:
                         escenaris = [
-
-                            {
-                                'secundari': secundari_aux,
-                                'terciaris': ["O3","SF"],
-                                'wwtp': edar
-                            },
                             {
                                 'secundari': secundari_aux,
                                 'terciaris': ["SF","UV"],
-                                'wwtp': edar
-                            },
-
-                            {
-                                'secundari': secundari_aux,
-                                'terciaris': ["O3","SF","UV"],
                                 'wwtp': edar
                             },
                             {
@@ -116,6 +104,18 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'wwtp': edar
                             },
                         ]
+                        if edar not in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
+                            escenaris.append({
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3", "SF"],
+                                'wwtp': edar
+                            })
+                            escenaris.append({
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3","SF","UV"],
+                                'wwtp': edar
+                            })
+
                     else:
                         escenaris = [
                             {
@@ -125,22 +125,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                             },
                             {
                                 'secundari': secundari_aux,
-                                'terciaris': ["O3","SF"],
-                                'wwtp': edar
-                            },
-                            {
-                                'secundari': secundari_aux,
-                                'terciaris': ["O3","SF","UV"],
-                                'wwtp': edar
-                            },
-                            {
-                                'secundari': secundari_aux,
                                 'terciaris': ["GAC"],
-                                'wwtp': edar
-                            },
-                            {
-                                'secundari': secundari_aux,
-                                'terciaris': ["O3","GAC","UV"],
                                 'wwtp': edar
                             },
                             {
@@ -148,7 +133,6 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'terciaris': ["UF","RO","AOP"],
                                 'wwtp': edar
                             },
-
                             {
                                 'secundari': secundari_aux,
                                 'terciaris': ["UF","UV"],
@@ -160,6 +144,22 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'wwtp': edar
                             },
                         ]
+                        if edar not in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
+                            escenaris.append({
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3", "SF"],
+                                'wwtp': edar
+                            })
+                            escenaris.append({
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3","SF","UV"],
+                                'wwtp': edar
+                            })
+                            escenaris.append({
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3","GAC","UV"],
+                                'wwtp': edar
+                            })
                 else:
                     escenaris = [
                         {
@@ -171,63 +171,86 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
 
                 escenaris_wwtp.extend(escenaris)
         escenaris_total.append(escenaris_wwtp)
-        """
 
+        """
         escenaris = {
             'secundari': secundari,
             'terciaris': terciaris,
             'wwtp': edar
         }
         escenaris_total.append([escenaris])
-
+        """
     return list(itertools.product(*escenaris_total)), preu_inicial
 
-def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated_init):
+def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_calibrated_init, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel):
 
-    contaminants_i_nutrients = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
 
-    scenarios, cost_inicial = all_scenarios(edars_escenaris, edars_calibrated_init)
+    contaminants_i_nutrients = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans", "Niquel dissolt", "Plom dissolt", "Diuron"]
 
+
+    edars_cic = pd.read_excel(edar_data_xlsx, index_col=0)
+    edars = edars_cic.loc[
+        ["ES9080010001010E",
+         "ES9080910001010E",
+         "ES9083020001010E",
+         "ES9081130006010E",
+         "ES9081140002010E",
+         "ES9081270001010E",
+         "ES9081840001010E",
+         "ES9082110001010E",
+         "ES9082790004050E"
+         ]]
+
+    scenarios, cost_inicial = all_scenarios(edars, edars_calibrated_init)
     random.shuffle(scenarios)
 
-    edars = pd.read_excel(edars_escenaris, index_col=0)
-    edars_cic = pd.read_excel(edar_data_xlsx, index_col=0)
+
 
     renameHelper = rS(None)
     id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points,
                                               contaminants_i_nutrients, connection)
 
-    pixel_to_poll = renameHelper.add_data_industry_to_graph(id_discharge_to_volumes, contaminants_i_nutrients)
+    pixel_to_poll = renameHelper.add_data_industry_to_graph(recall_points, id_discharge_to_volumes, contaminants_i_nutrients, abocaments_ci, id_pixel)
 
-    g = Simulation.Simulation()
+    g = Simulation.Simulation(graph_location, river_attenuation)
 
-    masses_aigua = pandas.read_csv("inputs/coord_codi_llob.csv")
+    masses_aigua = pandas.read_csv(coord_to_codi)
     masses_aigua["lat_lon"] = masses_aigua["lat"].map(str) + " " + masses_aigua["lon"].map(str)
     masses_aigua = masses_aigua.set_index('lat_lon').to_dict(orient = 'index')
 
+
+    """  
     coords_to_pixel = {}
     for coord in masses_aigua.values():
         pixel = g.give_pixel([coord["lat"], coord["lon"]], "inputs/reference_raster.tif", True, False)
         coords_to_pixel[str(coord["lat"])+" "+str(coord["lon"]) ] = pixel
+    """
 
-    #coords_to_pixel = g.closest_pixel(map(lambda x: [x['lat'], x['lon']], masses_aigua.values()), renameHelper)
+    coords_to_pixel = pandas.read_csv(coord_to_pixel)
+    coords_to_pixel["lat_long"] = coords_to_pixel["lat"].astype(str)+" "+coords_to_pixel["long"].astype(str)
+    coords_to_pixel = dict(coords_to_pixel.drop(columns=["lat", "long"]).reindex(columns=['lat_long','pixel']).values)
 
-    llindars_massa_aigua = pandas.read_excel("inputs/llindars_massa_aigua.xlsx", index_col=0)
+
+    llindars_massa_aigua = pandas.read_excel(llindars, index_col=0)
 
 
-    i = 0
-
-    with open("resultat.json", 'w', encoding="utf-8") as json_file:
-        json.dump([], json_file, ensure_ascii=False,
-                  indent=4,
-                  separators=(',', ': '))
+    with open("resultats.csv", 'w', newline='', encoding="utf-8") as write_obj:
+        # Create a writer object from csv module
+        csv_writer = csv.writer(write_obj)
+        # Add contents of list as last row in the csv file
+        csv_writer.writerow(['iteracio', 'escenari'])
 
     edars_cabal = {}
     for edar in edars_calibrated_init:
         edars_cabal[edar] = edars_calibrated_init[edar]["compounds_effluent"]["q"]
 
+    current_iteration = 0
+
 
     for scenario in scenarios:
+
+        if current_iteration == n_iteracions:
+            break
 
         cost_final = 0
         edars_aux = edars.copy()
@@ -239,17 +262,17 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                 edars_aux.at[edar['wwtp'], 'terciari'] = ','.join(edar['terciaris'])
 
         edars_aux = edars_aux.combine_first(edars_cic)
-        edars_aux.to_excel("inputs/excel_scenario.xlsx")
-        edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, "inputs/excel_scenario.xlsx", removal_rate, recall_points)
+        edars_aux.to_excel(excel_scenario)
+        edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, excel_scenario, removal_rate, recall_points)
 
-        df_pixels = renameHelper.add_data_edar_to_graph(edars_calibrated, contaminants_i_nutrients, pixel_to_poll.copy())
+        df_pixels = renameHelper.add_data_edar_to_graph(recall_points, edars_calibrated, contaminants_i_nutrients, pixel_to_poll.copy(), abocaments_ci)
         graph = g.run_graph(df_pixels)
-
 
 
         masses_aigua_valors = {}
         masses_aigua_incompliments = {}
         for contaminant in contaminants_i_nutrients:
+
             for coord in masses_aigua:
                 pixel = coords_to_pixel[coord]
                 massa_aigua = masses_aigua[coord]['codi_ma']
@@ -278,43 +301,73 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                 if mitjana_contaminant > llindars_massa_aigua.at[contaminant, massa_aigua]:
                     masses_aigua_incompliments[massa_aigua].append(contaminant)
 
-        # Read JSON file
-        with open("resultat.json", "rb") as fp:
-            listObj = json.load(fp)
-
-        listObj.append({
+        with open("resultats.csv", 'a', newline='', encoding="utf-8") as write_obj:
+            # Create a writer object from csv module
+            csv_writer = csv.writer(write_obj)
+            # Add contents of list as last row in the csv file
+            csv_writer.writerow([current_iteration, {
             "scenario": scenario,
             "masses_aigua_valors": masses_aigua_incompliments,
             "cost": cost_final - cost_inicial
-        })
-        
-        with open("resultat.json", 'w', encoding="utf-8") as json_file:
-            json.dump(listObj, json_file, ensure_ascii=False,
-                      indent=4,
-                      separators=(',', ': '))
+        }])
 
-        i += 1
-        print(i)
 
+        current_iteration += 1
+        print(current_iteration)
+        window['progress_1'].update(current_iteration)
 
 
     listObj = []
-    # Read JSON file
-    with open("resultat.json", "rb") as fp:
-        listObj = json.load(fp)
+    #df = dd.read_csv('resultats.csv').persist()
+    df = pandas.read_csv('resultats.csv')
+    for string in list(df['escenari']):
+        listObj.append(eval(string))
 
-    for obj in listObj:
+    def f(x):
+        incompliments = 0
+        for massa in x["masses_aigua_valors"]:
+            incompliments += len(x["masses_aigua_valors"][massa])
+        return incompliments, x["cost"]
+
+    data_sorted = sorted(listObj, key=lambda x: f(x))
+
+    configuracions = []
+    incompliments_masses = []
+    incompliment_contaminant = []
+
+    for obj in data_sorted:
         scenario = obj['scenario']
         masses_aigua = obj['masses_aigua_valors']
         cost = obj['cost']
 
+        obj = {}
+        for edar in scenario:
+            tractaments = "P,"+edar["secundari"]
+            if edar["terciaris"] is not None:
+                tractaments = tractaments+','+','.join(edar["terciaris"])
+            obj[edar["wwtp"]] = tractaments
+        obj["Cost diferencial"] = cost
+        incompliments_masses.append(masses_aigua)
+        n_incompliments = 0
         incompliment_per_contaminant = {}
 
         for massa_aigua in masses_aigua:
-            for contaminant in masses_aigua[massa_aigua]:
+            #for contaminant in masses_aigua[massa_aigua]:
+            for contaminant in contaminants_i_nutrients:
                 if contaminant not in incompliment_per_contaminant:
                     incompliment_per_contaminant[contaminant] = 0
-                incompliment_per_contaminant[contaminant] += 1
+                if contaminant in masses_aigua[massa_aigua]:
+                    incompliment_per_contaminant[contaminant] += 1
+                    n_incompliments += 1
 
-        print(incompliment_per_contaminant)
+        incompliment_contaminant.append(incompliment_per_contaminant)
+        obj["Nombre incompliments"] = n_incompliments
+        configuracions.append(obj)
+
+
+    with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
+        pd.DataFrame(configuracions).to_excel(writer, sheet_name='Configuracions', startrow=1, startcol=0)
+        pd.DataFrame(incompliments_masses).to_excel(writer, sheet_name="Incompliments per massa d'aigua", startrow=1, startcol=0)
+        pd.DataFrame(incompliment_contaminant).to_excel(writer, sheet_name='Incompliments per contaminant', startrow=1, startcol=0)
+
 

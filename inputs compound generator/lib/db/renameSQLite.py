@@ -3,6 +3,7 @@ from sqlite3 import Error
 import pandas as pd
 from math import radians, cos, sin, asin, sqrt
 import time
+import xlsxwriter
 
 class renameSQLite:
 
@@ -259,14 +260,14 @@ class renameSQLite:
         #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_domestic', '')
 
 
-        pixel_to_poll.to_csv('cloroalcans_calibrar.csv')
+        pixel_to_poll.to_csv('calibrar_estiu.csv')
         return pixel_to_poll
 
-    def add_data_industry_to_graph(self, volumes, contaminants_i_nutrients):
+    def add_data_industry_to_graph(self, recall_points, volumes, contaminants_i_nutrients, abocaments_ci, id_pixel):
 
-        recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
-        coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
-        pixel_to_poll = pd.read_csv("inputs/AGG_WWTP_df_no_treatment.csv", index_col=1)
+        recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
+        coord_index = list(map(lambda row: list(row.values()), pd.read_csv(abocaments_ci).to_dict(orient='index').values()))
+        pixel_to_poll = pd.read_csv(id_pixel, index_col=1)
         pixel_to_poll.drop(pixel_to_poll.columns[pixel_to_poll.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
 
 
@@ -287,10 +288,10 @@ class renameSQLite:
 
         return pixel_to_poll
 
-    def add_data_edar_to_graph(self, edars_calibrated, contaminants_i_nutrients, pixel_to_poll):
+    def add_data_edar_to_graph(self, recall_points, edars_calibrated, contaminants_i_nutrients, pixel_to_poll, abocaments_ci):
 
-        recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
-        coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
+        recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
+        coord_index = list(map(lambda row: list(row.values()), pd.read_csv(abocaments_ci).to_dict(orient='index').values()))
 
 
         for edar in edars_calibrated:
@@ -307,3 +308,42 @@ class renameSQLite:
         
 
         return pixel_to_poll
+
+    def add_data_to_excel(self, edars_calibrated, volumes, contaminants_i_nutrients, file_name):
+        edars = []
+        for eu_id in edars_calibrated:
+            edar = edars_calibrated[eu_id]
+            obj = {}
+            obj["EDAR EU_ID"] = eu_id
+            obj["Nom"] = edar["nom"]
+            obj["Població"] = edar["population_real"]
+            obj["Configuració"] = edar["configuration"]
+            obj["Cabal"] = edar["compounds_effluent"]["q"]
+            for contaminant in contaminants_i_nutrients:
+                if contaminant in edar["compounds_effluent"]:
+                    obj[contaminant] = edar["compounds_effluent"][contaminant] * 1000
+                else:
+                    obj[contaminant] = '-'
+
+            edars.append(obj)
+
+        #pd.DataFrame(edars).to_excel(file_name)
+
+        abocaments = []
+        for abocament_id in volumes:
+            abocament = volumes[abocament_id]
+            obj = {}
+            obj['SWAT ID'] = abocament_id
+            obj["Abocament"] = abocament["abocament"]
+            obj["Cabal"] = abocament["q"]
+            for contaminant in contaminants_i_nutrients:
+                if contaminant in abocament:
+                    obj[contaminant] = abocament[contaminant] * 1000
+                else:
+                    obj[contaminant] = '-'
+            abocaments.append(obj)
+
+
+        with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
+            pd.DataFrame(edars).to_excel(writer, sheet_name='EDAR', startrow=1, startcol=0)
+            pd.DataFrame(abocaments).to_excel(writer, sheet_name='Indústries', startrow=1, startcol=0)

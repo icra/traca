@@ -3,22 +3,15 @@ import time
 import pandas
 import numpy
 numpy.seterr(all='raise')
-"""
-import shapefile_raster_functions
-"""
-#import graph_functions
-import pickle
 import networkx
 import math
-import pickle
-from osgeo import gdal
 
 class Simulation:
-    def __init__(self):
-        self.attenuation_df = pandas.read_csv("./inputs/percentatges_eliminacio_tots_calibrats.csv").set_index('Nom')
+    def __init__(self, graph_location, river_attenuation):
+        self.attenuation_df = pandas.read_csv(river_attenuation).set_index('Nom')
 
 
-        open_file = open('./inputs/catalonia_graph.pkl', "rb")
+        open_file = open(graph_location, "rb")
         self.river_graph = networkx.read_gpickle(open_file)
         open_file.close()
         nodelist = []
@@ -35,16 +28,6 @@ class Simulation:
         columns = list(self.contamination_df.columns)
         columns.pop(0)
         """
-
-
-    def closest_pixel(self, coords, renameHelper):
-        coords_pixel = list(map(lambda x: [x[1]['longitude'], x[1]['latitude'], x[0]], self.river_graph.nodes(data = True)))
-        coord_to_pixel = {}
-
-        for coord in coords:
-            closest_point = renameHelper.shortest_dist(coords_pixel, coord)
-            coord_to_pixel[str(coord[0])+" "+str(coord[1])] = closest_point[2]
-        return coord_to_pixel
 
     def graph_to_df_with_tp(self, river_graph, topological_sort, attributes):
         """
@@ -73,98 +56,6 @@ class Simulation:
         graph_df = graph_df.set_index('pixel_number')
 
         return graph_df
-
-    def print_graph(self, graph_location: str, attribute_list: list, reference_raster_location: str, output_name: str,
-                    datatype=gdal.GDT_Float32):
-        """
-        This function takes in a graph, and converts it to a raster
-        :rtype: gdal raster
-        :graph_location: str: location of the raster
-        :attribute_list: list: list of strings that specify the attributes to be copied
-        :reference_raster_location: str: location of the reference raster
-        :output_name: str: the location name that the output raster should have
-        :datatype: gdal.Datatype: the datatype of the raster
-        """
-
-        print(str)
-        if isinstance(graph_location, str):
-            open_graph = open(graph_location, "rb")
-            graph = pickle.load(open_graph)
-            open_graph.close()
-        elif isinstance(graph_location, networkx.DiGraph):
-            graph = graph_location
-        else:
-            raise TypeError('Pass either a Digraph or a string. your input was ' + str(type(graph_location)))
-        reference_raster = gdal.Open(reference_raster_location)
-        count = len(attribute_list)
-        indicator = False
-
-        if count == 0:
-            count = 1
-            indicator = True
-
-        no_data_val = -523521
-        raster_matrix = numpy.zeros([reference_raster.RasterYSize, reference_raster.RasterXSize, count]) + no_data_val
-        iterations_number = 0
-        tot = graph.number_of_nodes()
-        if indicator:
-            for node_id in graph:
-                [i, j] = [graph.nodes[node_id]["x"], graph.nodes[node_id]["y"]]
-                raster_matrix[i, j] = 1
-        else:
-            for node_id in graph:
-                iterations_number += 1
-                for index in range(count):
-                    [i, j] = [graph.nodes[node_id]["x"],
-                              graph.nodes[node_id]["y"]]  # recover pixel coordinates from node
-                    raster_matrix[i, j, index] = graph.nodes[node_id][attribute_list[index]]
-
-        gtiff_driver = gdal.GetDriverByName('GTiff')
-        if not output_name.endswith('.tif'):
-            output_name += '.tif'
-        out_ds = gtiff_driver.Create(output_name, reference_raster.RasterXSize, reference_raster.RasterYSize,
-                                     count, datatype)  # this creates a raster document with dimensions, bands, datatype
-
-        out_ds.SetProjection(reference_raster.GetProjection())  # copy direction projection to output raster
-        out_ds.SetGeoTransform(
-            reference_raster.GetGeoTransform())  # copy direction resolution/location to output raster
-
-        for index in range(1, count + 1):
-            out_ds.GetRasterBand(index).WriteArray(raster_matrix[:, :, index - 1])
-            try:
-                out_ds.GetRasterBand(index).SetDescription(attribute_list[index - 1])
-            except IndexError:
-                out_ds.GetRasterBand(index).SetDescription('indicator')
-
-            out_ds.GetRasterBand(index).SetNoDataValue(no_data_val)
-        out_ds = None
-        pass
-
-    def give_pixel(self, coord: list, reference_raster_location: object, return_scalar: bool = False, reverse: bool = False):
-        """
-        This function gives the pixel of a coordinate (row/latitude, column/longitude). If reverse is specified, the function returns a coordinate for a
-        pixel number.
-        :rtype: location of the pixel as a list or as the pixel number. If reverse is specified, gives coordenates as a list
-        :coord: list: The coordinations of the point. If reverse is specified, this needs to be the pixel number
-        :reference_raster: object: A raster with the desired dimensions
-        :return_scalar: bool: if true, the output is returned as a scalar (pixel number)
-        :reverse: bool: if true, the function takes in a pixel number and returns a coordinate
-        """
-        reference_raster = gdal.Open(reference_raster_location)
-        transformation = reference_raster.GetGeoTransform()
-        if not reverse:
-            inverse_transform = gdal.InvGeoTransform(transformation)  # coordinate to pixel instructions
-            long_location, lat_location = map(int, gdal.ApplyGeoTransform(inverse_transform, coord[1], coord[0]))
-
-            if return_scalar:
-                pixel_number = lat_location * reference_raster.RasterXSize + long_location
-                return pixel_number
-            return [lat_location, long_location]
-        i = int(coord / reference_raster.RasterXSize)
-        j = coord - reference_raster.RasterXSize * i
-        long_location, lat_location = gdal.ApplyGeoTransform(transformation, int(j), i)
-        return [lat_location, long_location]
-
 
     def run_graph(self, contamination_df):
 

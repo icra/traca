@@ -1,14 +1,35 @@
 import PySimpleGUI
-import pandas
-
 from GUI.views.mainGUI import mainGUI as mainGUI
 from lib.calibrationMainConcentration import read_industries, read_edars
 from lib.db.renameSQLite import renameSQLite as rS
 from GUI.views.settingsGUI import settingsGUI as settingsGUI
 from lib.db.ConnectPostgree import ConnectDb as pg
 import sys
-import pandas as pd
 import lib.scenarios as scenarios
+import threading
+import sys, os
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+def run_scenarios_parallel(window, main_window, n_iteracions):
+
+    scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals,
+                            edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river,
+                            edars_calibrated, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel)
+
+
+    main_window.write_event_value('scenario_generator_ended', '')
+    window.close()
+
 
 pg_url = "icra.loading.net"
 pg_user = "traca_user"
@@ -16,15 +37,52 @@ pg_pass = "EdificiH2O!"
 pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
+#Codi per generar executable
+"""
+pyinstaller --onefile --add-data="inputs/industrial.xlsx;inputs" --add-data="inputs/recall_points.xlsx;inputs" --add-data="inputs/atenuacions_generacions.xlsx;inputs" --add-data="inputs/edar_data.xlsx;inputs" --add-data="inputs/catalonia_graph.pkl;inputs" --add-data="inputs/percentatges_eliminacio_tots_calibrats.csv;inputs" --add-data="inputs/excel_scenario.xlsx;inputs" --add-data="inputs/coords_to_pixel_llob.csv;inputs" --add-data="inputs/coord_codi_llob.csv;inputs" --add-data="inputs/llindars_massa_aigua.xlsx;inputs" --add-data="inputs/abocaments_ci.csv;inputs" --add-data="inputs/AGG_WWTP_df_no_treatment.csv;inputs" pymain.py
+"""
+"""
+edar_data_xlsx = 'Inputs/edar_data.xlsx'
+removal_rate = "Inputs/atenuacions_generacions.xlsx"
+industrial_data = resource_path('inputs/industrial.xlsx')
+recall_points = resource_path("inputs/recall_points.xlsx")
+edar_ptr = "inputs/prtr_edars.xlsx"
+analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
+review = "inputs/review.xlsx"
+resum_eliminacio = "inputs/resum_eliminacio.xlsx"
+
+graph_location = resource_path("inputs/catalonia_graph.pkl")
+river_attenuation = resource_path("inputs/percentatges_eliminacio_tots_calibrats.csv")
+excel_scenario = resource_path("inputs/excel_scenario.xlsx")
+coord_to_pixel = resource_path("inputs/coords_to_pixel_llob.csv")
+coord_to_codi = resource_path("inputs/coord_codi_llob.csv")
+llindars = "Inputs/llindars_massa_aigua.xlsx"
+resultat_escenaris = "Resultats/resultat.json"
+abocaments_ci = resource_path("inputs/abocaments_ci.csv")
+id_pixel = resource_path("inputs/AGG_WWTP_df_no_treatment.csv")
+"""
+
+#Fitxers per executar normal
+
 edar_data_xlsx = 'inputs/edar_data.xlsx'
-removal_rate = "inputs/atenuacions_generacions_backup.xlsx"
+removal_rate = "inputs/atenuacions_generacions.xlsx"
 industrial_data = 'inputs/industrial.xlsx'
 recall_points = "inputs/recall_points.xlsx"
 edar_ptr = "inputs/prtr_edars.xlsx"
 analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
 review = "inputs/review.xlsx"
 resum_eliminacio = "inputs/resum_eliminacio.xlsx"
-edars_escenaris = "inputs/edars_llobregat.xlsx"
+
+graph_location = "inputs/catalonia_graph.pkl"
+river_attenuation = "inputs/percentatges_eliminacio_tots_calibrats.csv"
+excel_scenario = "inputs/excel_scenario.xlsx"
+coord_to_pixel = "inputs/coords_to_pixel_llob.csv"
+coord_to_codi = "inputs/coord_codi_llob.csv"
+llindars = "inputs/llindars_massa_aigua.xlsx"
+resultat_escenaris = "resultat.json"
+abocaments_ci = "inputs/abocaments_ci.csv"
+id_pixel = "inputs/AGG_WWTP_df_no_treatment.csv"
+
 
 
 #Generar concentracions i penjar-les a DB
@@ -49,7 +107,9 @@ print(n_cells)
 #connection.estadistiques_final()
 
 #Posar info a fitxer .sqlite
-contaminants_i_nutrients = connection.get_contaminants_i_nutrients_puntuals()
+contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics()
+contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_calibrats_wwtp()
+
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated()
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection)
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)
@@ -88,13 +148,14 @@ for contaminant in contaminants:
     print(contaminant, total*1000)
 """
 
-scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated)
 
 
 #Calibrar
 #exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection)
 #wwtp_info(review, contaminants_i_nutrients, resum_eliminacio)
 
+renameHelper = rS(None)
+renameHelper.add_data_to_graph(edars_calibrated, id_discharge_to_volumes, contaminants_puntuals)
 
 #cli
 if len(sys.argv) > 2:
@@ -104,10 +165,11 @@ if len(sys.argv) > 2:
 
 #gui
 else:
-    mGUI = mainGUI(contaminants_i_nutrients)
+    mGUI = mainGUI(contaminants_calibrats_depuradora)
     sGUI = settingsGUI()
     mGUI.update_table(edars_calibrated)
     mGUI.update_table_in(id_discharge_to_volumes)
+
 
     while True:
         win, event, values = PySimpleGUI.read_all_windows()
@@ -116,10 +178,13 @@ else:
         print(event)
         if event != '__TIMEOUT__':
             print(values)
+
+        """
         if event == 'File properties':
             print("Open Settings Window")
             if sGUI.configWindow is None:
                 sGUI.createWindow(mGUI.window)
+        """
         if event == "add_dp_data":
             try:
                 if len(values["swat_db_sqlite"]) == 0: #No ha penjat db
@@ -133,6 +198,59 @@ else:
             except Exception as e:
                 print(str(e))
                 PySimpleGUI.popup("Error: " + str(e))
+        if event == "pollutants_generator":
+            try:
+                file_name = PySimpleGUI.popup_get_text('Escriu nom del fitxer per guardar els resultats (exemple: generacio_contaminacio.xlsx)')
+                if file_name is not None:
+
+                    if not file_name.endswith(".xlsx"):
+                        file_name += ".xlsx"
+
+                    file_name = "Resultats/"+file_name
+
+                    renameHelper = rS(None)
+                    renameHelper.add_data_to_excel(edars_calibrated, id_discharge_to_volumes, contaminants_i_nutrients, file_name)
+                    PySimpleGUI.popup("Operació realitzada correctament! Resultat guardat a la carpeta Resultats")
+
+            except Exception as e:
+                print(str(e))
+                PySimpleGUI.popup("Error: " + str(e))
+        if event == "scenarios_generator":
+            try:
+                file_name = PySimpleGUI.popup_get_text('Escriu nom del fitxer per guardar els resultats (exemple: generacio_escenaris.xlsx)')
+                if file_name is not None:
+
+                    if not file_name.endswith(".xlsx"):
+                        file_name += ".xlsx"
+
+                    file_name = "Resultats/" + file_name
+
+                    n_iteracions = PySimpleGUI.popup_get_text("Nombre d'escenaris a generar. El nombre d'escenaris màxim a generar és de 81920, però el temps de simulació pot ser d'uns 4 dies")
+                    if n_iteracions is not None:
+
+                        n_iteracions = int(n_iteracions)
+
+                        if n_iteracions > 81920:
+                            n_iteracions = 81920
+                        elif n_iteracions <= 0:
+                            n_iteracions = 1
+
+                        layout = [[PySimpleGUI.ProgressBar(max_value=n_iteracions, orientation='h', size=(20, 20),
+                                                           key='progress_1')]]
+                        popup_window = PySimpleGUI.Window('Test', layout, finalize=True, modal=True)
+
+                        threading.Thread(target=run_scenarios_parallel,
+                                         args=(popup_window,win, n_iteracions),
+                                         daemon=True).start()
+
+            except Exception as e:
+                print(str(e))
+                PySimpleGUI.popup("Error: " + str(e))
+
+
+        if event == 'scenario_generator_ended':
+            PySimpleGUI.popup("Operació realitzada correctament! Resultat guardat a la carpeta Resultats")
+
         if event == PySimpleGUI.WIN_CLOSED:
             win.close()
             if win == mGUI.window:

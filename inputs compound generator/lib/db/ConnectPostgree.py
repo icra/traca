@@ -95,7 +95,7 @@ class ConnectDb:
 
     def get_contaminants_i_nutrients_tipics(self):
         cur = self.conn.cursor()
-        cur.execute('SELECT component FROM tipus_components_no_calibrar')
+        cur.execute('SELECT component FROM tipus_components_atenuacio_depuradora')
         components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
         return components
 
@@ -105,6 +105,11 @@ class ConnectDb:
         components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
         return components
 
+    def get_contaminants_i_nutrients_calibrats_wwtp(self):
+        cur = self.conn.cursor()
+        cur.execute('SELECT component FROM tipus_components_calibrats_depuradora')
+        components = list(map(lambda component: component[0], cur.fetchall()))  # [comp_1, ..., comp_n]
+        return components
 
     def getIndustries(self, table='cens_v4_1_prova'):
         try:
