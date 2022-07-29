@@ -166,7 +166,6 @@ class renameSQLite:
 
                 except Error as error:
                     print(error)
-                    print("No es pot afegir WWTP ", edar["eu_code"])
 
             conn.commit()
 

@@ -225,13 +225,13 @@ else:
 
                     file_name = "Resultats/" + file_name
 
-                    n_iteracions = PySimpleGUI.popup_get_text("Nombre d'escenaris a generar. El nombre d'escenaris màxim a generar és de 81920, però el temps de simulació pot ser d'uns 4 dies")
+                    n_iteracions = PySimpleGUI.popup_get_text("Nombre d'escenaris a generar. El nombre d'escenaris màxim a generar és de 3512320, però el temps de simulació és llarg")
                     if n_iteracions is not None:
 
                         n_iteracions = int(n_iteracions)
 
-                        if n_iteracions > 81920:
-                            n_iteracions = 81920
+                        if n_iteracions > 3512320:
+                            n_iteracions = 3512320
                         elif n_iteracions <= 0:
                             n_iteracions = 1
 

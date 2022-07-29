@@ -103,18 +103,17 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'terciaris': terciaris,
                                 'wwtp': edar
                             },
-                        ]
-                        if edar not in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
-                            escenaris.append({
+                            {
                                 'secundari': secundari_aux,
                                 'terciaris': ["O3", "SF"],
                                 'wwtp': edar
-                            })
-                            escenaris.append({
+                            },
+                            {
                                 'secundari': secundari_aux,
-                                'terciaris': ["O3","SF","UV"],
+                                'terciaris': ["O3", "SF", "UV"],
                                 'wwtp': edar
-                            })
+                            }
+                        ]
 
                     else:
                         escenaris = [
@@ -130,11 +129,6 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                             },
                             {
                                 'secundari': secundari_aux,
-                                'terciaris': ["UF","RO","AOP"],
-                                'wwtp': edar
-                            },
-                            {
-                                'secundari': secundari_aux,
                                 'terciaris': ["UF","UV"],
                                 'wwtp': edar
                             },
@@ -143,23 +137,29 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'terciaris': terciaris,
                                 'wwtp': edar
                             },
-                        ]
-                        if edar not in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
-                            escenaris.append({
+                            {
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3", "GAC", "UV"],
+                                'wwtp': edar
+                            },
+                            {
+                                'secundari': secundari_aux,
+                                'terciaris': ["O3", "SF", "UV"],
+                                'wwtp': edar
+                            },
+                            {
                                 'secundari': secundari_aux,
                                 'terciaris': ["O3", "SF"],
                                 'wwtp': edar
-                            })
+                            }
+                        ]
+                        if edar in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
                             escenaris.append({
                                 'secundari': secundari_aux,
-                                'terciaris': ["O3","SF","UV"],
+                                'terciaris': ["UF","RO","AOP"],
                                 'wwtp': edar
                             })
-                            escenaris.append({
-                                'secundari': secundari_aux,
-                                'terciaris': ["O3","GAC","UV"],
-                                'wwtp': edar
-                            })
+
                 else:
                     escenaris = [
                         {
@@ -203,6 +203,8 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
     scenarios, cost_inicial = all_scenarios(edars, edars_calibrated_init)
     random.shuffle(scenarios)
+
+    print(len(scenarios))
 
 
 
