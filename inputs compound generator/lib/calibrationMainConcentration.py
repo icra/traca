@@ -2,6 +2,8 @@
 import csv
 import openpyxl
 import json
+from sqlalchemy import create_engine
+
 
 def sumIgnoreNone(object, compount, reciver):
     try:
@@ -84,7 +86,7 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
     return listOfEDARCompounds
 
 #Funcio per calibrar % eliminacio i cxgx
-def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx, connection):
+def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx, connection, file_name = 'json_data.json'):
     listOfEDARCompounds = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
 
     dc_to_eu = {}
@@ -194,13 +196,11 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
         listOfEDARCompounds[wwtp]["cabal_observat"] = sum(listOfEDARCompounds[wwtp]["cabal_observat"]) / len(listOfEDARCompounds[wwtp]["cabal_observat"])
 
 
-    with open('json_data.json', 'w', encoding='utf8') as outfile:
+    with open(file_name, 'w', encoding='utf8') as outfile:
         json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
 
-
-
 #Funcio per calibrar, llegeix fitxer review
-def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
+def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file_name = 'edars_pollutant_attenuation.json'):
 
     dict = {}
 
@@ -287,8 +287,6 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
             else:
                 pol_name = str(ptr[0].value)
 
-
-
                 if pol_name in contaminants_i_nutrients:
                     removal_rate = ptr[2].value
 
@@ -308,7 +306,7 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx):
                         elif technology == 'UF':
                             dict[pol_name]["UF"] = removal_rate
 
-    with open('edars_pollutant_attenuation.json', 'w', encoding='utf8') as outfile:
+    with open(file_name, 'w', encoding='utf8') as outfile:
         json.dump(dict, outfile, ensure_ascii=False)
 
 # Afegeix la concentració de cada contaminant a l'efluent
@@ -414,7 +412,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                 tp = compounds_effluent["Fòsfor total"]
                 compounds_effluent["Fòsfor orgànic"] = tp * 0.07
                 compounds_effluent["Fosfats"] = tp * 0.93
-
 
 
             """
@@ -652,7 +649,6 @@ def nom_abocament_a_id(industrial_data_file, recall_points_file):
     for discharge_point, ind_id in industries.items():
         if ind_id in point_2_id:
             discharge_point_to_id[discharge_point] = point_2_id[ind_id]
-
     return discharge_point_to_id
 
 def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = True):
@@ -709,7 +705,6 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
     for contaminant in contaminants_i_nutrients:
         for abocament in contaminants_per_punt_abocament:
             #contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament]["q"] * concentracions_avg[contaminant] * 10 / 1000  # Passem a kg
-
 
             if contaminant in contaminants_per_punt_abocament[abocament]:
                 contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg

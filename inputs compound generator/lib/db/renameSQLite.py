@@ -199,7 +199,7 @@ class renameSQLite:
 
         return min(points, key = lambda x: f(x, point))
 
-    def add_data_to_graph(self, edars_calibrated, volumes, contaminants_i_nutrients):
+    def export_graph_csv(self, edars_calibrated, volumes, contaminants_i_nutrients, file_name = 'graph.csv'):
 
         recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
         coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
@@ -258,8 +258,7 @@ class renameSQLite:
         #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_industrial', '')
         #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_domestic', '')
 
-
-        pixel_to_poll.to_csv('calibrar_estiu.csv')
+        pixel_to_poll.to_csv(file_name)
         return pixel_to_poll
 
     def add_data_industry_to_graph(self, recall_points, volumes, contaminants_i_nutrients, abocaments_ci, id_pixel):

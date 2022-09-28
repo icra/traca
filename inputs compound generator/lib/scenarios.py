@@ -8,7 +8,8 @@ import pandas as pd
 import random
 import csv
 import time
-from dask import dataframe as dd
+from UliPlot.XLSX import auto_adjust_xlsx_column_width
+
 
 def calculate_price(terciaris, cabal):
 
@@ -64,7 +65,8 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
         cabal = edars_cabal[edar]
         preu_inicial += calculate_price(terciaris, cabal)
 
-
+        #Tots els escenaris possibles
+        """
         if secundari is not None:
             if secundari == "SP" or secundari == "SN":
                 secundari = [secundari]
@@ -171,15 +173,16 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
 
                 escenaris_wwtp.extend(escenaris)
         escenaris_total.append(escenaris_wwtp)
-
         """
+        #Unicament configuracio inicial
+
         escenaris = {
             'secundari': secundari,
             'terciaris': terciaris,
             'wwtp': edar
         }
         escenaris_total.append([escenaris])
-        """
+
     return list(itertools.product(*escenaris_total)), preu_inicial
 
 def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_calibrated_init, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel):
@@ -207,7 +210,6 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     print(len(scenarios))
 
 
-
     renameHelper = rS(None)
     id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points,
                                               contaminants_i_nutrients, connection)
@@ -220,14 +222,14 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     masses_aigua["lat_lon"] = masses_aigua["lat"].map(str) + " " + masses_aigua["lon"].map(str)
     masses_aigua = masses_aigua.set_index('lat_lon').to_dict(orient = 'index')
 
-
-    """  
+    #Calcular al moment a partir del raster
+    """
     coords_to_pixel = {}
     for coord in masses_aigua.values():
         pixel = g.give_pixel([coord["lat"], coord["lon"]], "inputs/reference_raster.tif", True, False)
         coords_to_pixel[str(coord["lat"])+" "+str(coord["lon"]) ] = pixel
     """
-
+    #Calcular a partir de fitxer pre-guardat
     coords_to_pixel = pandas.read_csv(coord_to_pixel)
     coords_to_pixel["lat_long"] = coords_to_pixel["lat"].astype(str)+" "+coords_to_pixel["long"].astype(str)
     coords_to_pixel = dict(coords_to_pixel.drop(columns=["lat", "long"]).reindex(columns=['lat_long','pixel']).values)
@@ -294,12 +296,15 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
                 mitjana_contaminant = sum(masses_aigua_valors[massa_aigua][contaminant]) / len(masses_aigua_valors[massa_aigua][contaminant])
 
+                #Multiplicadors per adaptar optimització de tot CIC al Baix Llobregat
                 if contaminant == "Ciprofloxacina":
                     mitjana_contaminant = mitjana_contaminant / 1.76
                 elif contaminant == "Hexabromociclodecà":
                     mitjana_contaminant = mitjana_contaminant / 11.18
                 elif contaminant == "Nonilfenols":
                     mitjana_contaminant = mitjana_contaminant / 0.016
+
+
                 if mitjana_contaminant > llindars_massa_aigua.at[contaminant, massa_aigua]:
                     masses_aigua_incompliments[massa_aigua].append(contaminant)
 
@@ -320,10 +325,11 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
 
     listObj = []
-    #df = dd.read_csv('resultats.csv').persist()
+
     df = pandas.read_csv('resultats.csv')
     for string in list(df['escenari']):
         listObj.append(eval(string))
+
 
     def f(x):
         incompliments = 0
@@ -331,6 +337,7 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
             incompliments += len(x["masses_aigua_valors"][massa])
         return incompliments, x["cost"]
 
+    #Ordenem primer per nombre incompliments, despres per cost
     data_sorted = sorted(listObj, key=lambda x: f(x))
 
     configuracions = []
@@ -366,10 +373,17 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
         obj["Nombre incompliments"] = n_incompliments
         configuracions.append(obj)
 
+    def write_to_excel(dictionary, writer, sheet_name, n):
+        df = pd.DataFrame(dictionary).head(n)
+        df.to_excel(writer, sheet_name=sheet_name, startrow=1, startcol=0)
+        df.rename(columns=lambda x: str(x), inplace=True)
+        auto_adjust_xlsx_column_width(df, writer, sheet_name=sheet_name, margin=0)
 
+    # Guardem només els primers 1048576 resultats (màxim excel), ja que ja estan ordenats de millor a pitjor
+    n = min(len(scenarios), 1048576)
     with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
-        pd.DataFrame(configuracions).to_excel(writer, sheet_name='Configuracions', startrow=1, startcol=0)
-        pd.DataFrame(incompliments_masses).to_excel(writer, sheet_name="Incompliments per massa d'aigua", startrow=1, startcol=0)
-        pd.DataFrame(incompliment_contaminant).to_excel(writer, sheet_name='Incompliments per contaminant', startrow=1, startcol=0)
+        write_to_excel(configuracions, writer, 'Configuracions', n)
+        write_to_excel(incompliments_masses, writer, "Incompliments per massa d'aigua", n)
+        write_to_excel(incompliment_contaminant, writer, 'Incompliments per contaminant', n)
 
 

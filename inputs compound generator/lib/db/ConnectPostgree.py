@@ -296,17 +296,15 @@ class ConnectDb:
             "unitats": unitats,
         })
 
-    def get_industries_to_edar_and_industry_separated(self):
+    def get_industries_to_edar_and_industry_separated(self, table='cens_v4_1_prova'):
 
-        industries = self.getIndustries()
+        industries = self.getIndustries(table)
         industries_to_edar = {}
         industries_to_river = {}
 
         for industry in industries:
 
-
             tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
-
 
             if subtipus_llm != "Directe a Terreny" and subtipus_llm != "Indirecte a Terreny" and subtipus_llm != "Directe a Mar" and subtipus_llm != "Indirecte a Mar":
                 if uwwCode is not None:     #industria aboca a depuradora
@@ -454,13 +452,24 @@ class ConnectDb:
 
         return industries_grouped
 
-    def upload_data(self, industries_grouped, contaminants_i_nutrients, estimacions):
+    def upload_data(self, industries_grouped, contaminants_i_nutrients, estimacions, table_name = 'cens_v4_1_prova'):
+
 
         tid = 0
         compounds = contaminants_i_nutrients.copy()
         compounds.append("Cabal diari")
         compounds.append("Cabal anual")
         c = self.conn.cursor()
+
+        try:
+            query = """drop table """ + table_name
+            c.execute(query)
+        except:
+            pass
+        self.conn.commit()
+        query = """select * into """ + table_name + """ from cens_v4"""
+        c.execute(query)
+        self.conn.commit()
 
         for industry in industries_grouped.values():
 
@@ -505,7 +514,7 @@ class ConnectDb:
                     if valor_maxim > 0:
                         tid += 1
 
-                    query = """INSERT INTO cens_v4_1_prova (tid, "activitat/ubicacio", "Tipus Activitat/Ubicació (A/U)", cod_ccae, "Tipus (LLM)", "Subtipus (LLM)", nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, "uwwCode") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                    query = """INSERT INTO """+table_name+""" (tid, "activitat/ubicacio", "Tipus Activitat/Ubicació (A/U)", cod_ccae, "Tipus (LLM)", "Subtipus (LLM)", nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, "uwwCode") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
                     params = (tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, None, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode)
 
                     c.execute(query, params)
