@@ -11,6 +11,14 @@ import pandas as pd
 import time
 import random
 
+
+def highlighting_mean_greater(s):
+    """
+    highlighting yello value is greater than mean else red
+    """
+    is_max = s>s.mean()
+    return ['background-color:yellow' if i else 'background-color:red'for i in is_max]
+
 def calculate_price(terciaris, cabal):
 
     cost = 0
@@ -184,7 +192,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
 
 def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated_init):
 
-    contaminants_i_nutrients = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
+    contaminants_i_nutrients = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans", "Niquel dissolt", "Plom dissolt", "Diuron"]
 
     scenarios, cost_inicial = all_scenarios(edars_escenaris, edars_calibrated_init)
 
@@ -205,11 +213,20 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     masses_aigua["lat_lon"] = masses_aigua["lat"].map(str) + " " + masses_aigua["lon"].map(str)
     masses_aigua = masses_aigua.set_index('lat_lon').to_dict(orient = 'index')
 
+
     coords_to_pixel = {}
+
     for coord in masses_aigua.values():
         pixel = g.give_pixel([coord["lat"], coord["lon"]], "inputs/reference_raster.tif", True, False)
         coords_to_pixel[str(coord["lat"])+" "+str(coord["lon"]) ] = pixel
 
+
+    #Saber quin node del graf es correspon punts aigues amunt baix llobregat
+    """
+    print(g.give_pixel([41.56458, 1.64404], "inputs/reference_raster.tif", True, False))
+    print(g.give_pixel([41.70632, 1.83961], "inputs/reference_raster.tif", True, False))
+    print(g.give_pixel([41.68489, 1.85208], "inputs/reference_raster.tif", True, False))
+    """
     #coords_to_pixel = g.closest_pixel(map(lambda x: [x['lat'], x['lon']], masses_aigua.values()), renameHelper)
 
     llindars_massa_aigua = pandas.read_excel("inputs/llindars_massa_aigua.xlsx", index_col=0)
@@ -246,10 +263,17 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
         graph = g.run_graph(df_pixels)
 
 
-
+        massa_aigua_mitjanes = {}
         masses_aigua_valors = {}
         masses_aigua_incompliments = {}
         for contaminant in contaminants_i_nutrients:
+            #Càrrega i concentracio nodes aigues amunt baix llobrehat
+            """
+            print(contaminant,  round(24 * graph.nodes[117463114][contaminant] / 1000000000, 5) , round(graph.nodes[117463114][contaminant] / (1000*graph.nodes[117463114]['flow_HR']), 5))
+            print(contaminant, round(24 * graph.nodes[116965401][contaminant] / 1000000000, 5) , round(graph.nodes[116965401][contaminant] / (1000*graph.nodes[116965401]['flow_HR']), 5))
+            print(contaminant, round(24 * graph.nodes[117038604][contaminant] / 1000000000, 5) , round(graph.nodes[117038604][contaminant] / (1000*graph.nodes[117038604]['flow_HR']), 5))
+            print('------------------')
+            """
             for coord in masses_aigua:
                 pixel = coords_to_pixel[coord]
                 massa_aigua = masses_aigua[coord]['codi_ma']
@@ -260,12 +284,15 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
                 #print(graph.nodes[pixel])
                 conc = graph.nodes[pixel][contaminant] / graph.nodes[pixel]['flow_HR']
+
                 masses_aigua_valors[massa_aigua][contaminant].append(conc)
 
             for massa_aigua in masses_aigua_valors:
 
                 if massa_aigua not in masses_aigua_incompliments:
                     masses_aigua_incompliments[massa_aigua] = []
+                if massa_aigua not in massa_aigua_mitjanes:
+                    massa_aigua_mitjanes[massa_aigua] = {}
 
                 mitjana_contaminant = sum(masses_aigua_valors[massa_aigua][contaminant]) / len(masses_aigua_valors[massa_aigua][contaminant])
 
@@ -275,8 +302,30 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                     mitjana_contaminant = mitjana_contaminant / 11.18
                 elif contaminant == "Nonilfenols":
                     mitjana_contaminant = mitjana_contaminant / 0.016
+
+                massa_aigua_mitjanes[massa_aigua][contaminant] = mitjana_contaminant
+
                 if mitjana_contaminant > llindars_massa_aigua.at[contaminant, massa_aigua]:
                     masses_aigua_incompliments[massa_aigua].append(contaminant)
+
+        print(scenario)
+        print(masses_aigua_incompliments)
+        pandas.DataFrame(massa_aigua_mitjanes).to_excel("/home/zephol/Desktop/traca_csv/s0.xlsx")
+
+        def highlight(x):
+            red = f"background-color:red"
+            green = f"background-color:green"
+            df1 = pd.DataFrame('', index=x.index, columns=x.columns)
+            for row in df1.index.values:
+                for col in df1.columns:
+                    if col in masses_aigua_incompliments and row in masses_aigua_incompliments[col]:
+                        df1.loc[row, col] = red
+                    else:
+                        df1.loc[row, col] = green
+            return df1
+
+        pandas.DataFrame(massa_aigua_mitjanes).style.apply(highlight, axis=None).to_excel("/home/zephol/Desktop/traca_csv/sc0.xlsx", engine='openpyxl')
+
 
         # Read JSON file
         with open("resultat.json", "rb") as fp:

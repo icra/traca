@@ -56,8 +56,8 @@ edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar
 
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()
 
-"""
-contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
+
+contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans", "Niquel dissolt", "Plom dissolt", "Diuron"]
 edars_incloses = ["ES9080010001010E", "ES9080910001010E","ES9083020001010E","ES9081130006010E","ES9081140002010E","ES9081270001010E", "ES9081840001010E","ES9082110001010E","ES9082790004050E"]
 edars_excloses = [
     "ES9080480001010E",
@@ -74,11 +74,15 @@ edars_excloses = [
     "ES9080530002010E",
     "ES9080980004010E"
 ]
+"""
 for contaminant in contaminants:
     total = 0
     for edar in edars_excloses:
         total += edars_calibrated[edar]["compounds_effluent"][contaminant]
+    print(contaminant, 1000*total)
+
 a = pandas.read_csv("recall_points_baix_llob.csv", index_col=0)
+
 for contaminant in contaminants:
     total = 0
     for index in a.index:

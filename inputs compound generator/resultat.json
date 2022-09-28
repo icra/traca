@@ -1,0 +1,155 @@
+[
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082790004050E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 0
+    }
+]
