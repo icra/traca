@@ -3,7 +3,191 @@
         "scenario": [
             {
                 "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
                 "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12140104.151521536
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
                 "wwtp": "ES9080010001010E"
             },
             {
@@ -18,33 +202,62 @@
             },
             {
                 "secundari": "SP",
-                "terciaris": null,
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
                 "wwtp": "ES9081130006010E"
             },
             {
                 "secundari": "SP",
-                "terciaris": null,
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
                 "wwtp": "ES9081140002010E"
             },
             {
                 "secundari": "SN",
-                "terciaris": null,
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
                 "wwtp": "ES9081270001010E"
             },
             {
                 "secundari": "SP",
-                "terciaris": null,
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
                 "wwtp": "ES9081840001010E"
             },
             {
                 "secundari": "SP",
-                "terciaris": null,
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
                 "wwtp": "ES9082110001010E"
             },
             {
                 "secundari": "SP",
                 "terciaris": null,
                 "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
             }
         ],
         "masses_aigua_valors": {
@@ -150,6 +363,6195 @@
                 "Hexabromociclodecà"
             ]
         },
-        "cost": 0
+        "cost": 10273082.780407993
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 10544076.421412673
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 15786305.076177191
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12958109.964137778
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 10781819.810615666
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 9813987.513633516
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 16303065.698699685
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 13577898.130346145
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 14553840.361838168
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12977899.201470973
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 9252016.578876918
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 8507041.233961562
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12401750.657027066
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 10304265.773233937
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 15160817.362373155
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 9165657.197059514
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 14136619.305271624
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 10014577.83801349
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 14971447.471411958
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 17603841.737628184
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 9783962.791261258
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 8183433.054061858
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 10763579.880184807
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12128183.865117632
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 19885606.646451127
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12512202.229373915
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 14575386.291266706
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 16734616.952885648
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 14483300.931384686
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 13089929.137902923
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 12498934.907040289
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Nonilfenols",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 8629461.064127851
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 10427267.986555012
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": null,
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "RO",
+                    "AOP"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "UF",
+                    "UV"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": [
+                "Hexabromociclodecà"
+            ]
+        },
+        "cost": 13386521.310684636
+    },
+    {
+        "scenario": [
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080010001010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9080910001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9083020001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "GAC",
+                    "UV"
+                ],
+                "wwtp": "ES9081130006010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081140002010E"
+            },
+            {
+                "secundari": "SN",
+                "terciaris": [
+                    "SF",
+                    "UV"
+                ],
+                "wwtp": "ES9081270001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "GAC"
+                ],
+                "wwtp": "ES9081840001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082110001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": [
+                    "O3",
+                    "SF"
+                ],
+                "wwtp": "ES9082790004050E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080440001010E"
+            },
+            {
+                "secundari": "SP",
+                "terciaris": null,
+                "wwtp": "ES9080530002010E"
+            }
+        ],
+        "masses_aigua_valors": {
+            "1000950": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000900": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000940": [],
+            "1000930": [
+                "Octilfenols"
+            ],
+            "1000860": [
+                "Octilfenols"
+            ],
+            "1000920": [],
+            "1000910": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000850": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000830": [
+                "Octilfenols"
+            ],
+            "1000840": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000880": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000890": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt",
+                "Diuron"
+            ],
+            "1000820": [
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Triclorometà",
+                "Cloroalcans",
+                "Niquel dissolt"
+            ],
+            "1000870": [
+                "Ciprofloxacina",
+                "Hexabromociclodecà",
+                "Octilfenols",
+                "Niquel dissolt",
+                "Plom dissolt"
+            ],
+            "1000810": [],
+            "1000760": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000770": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000750": [
+                "Octilfenols"
+            ],
+            "1000740": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000800": [
+                "Octilfenols",
+                "Cloroalcans"
+            ],
+            "1000710": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000720": [],
+            "1000730": [],
+            "1000690": [
+                "Hexabromociclodecà",
+                "Octilfenols"
+            ],
+            "1000700": []
+        },
+        "cost": 13653783.181824815
     }
 ]

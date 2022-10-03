@@ -12,13 +12,6 @@ import time
 import random
 
 
-def highlighting_mean_greater(s):
-    """
-    highlighting yello value is greater than mean else red
-    """
-    is_max = s>s.mean()
-    return ['background-color:yellow' if i else 'background-color:red'for i in is_max]
-
 def calculate_price(terciaris, cabal):
 
     cost = 0
@@ -72,7 +65,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
         cabal = edars_cabal[edar]
         preu_inicial += calculate_price(terciaris, cabal)
 
-        """
+
         if secundari is not None:
             if secundari == "SP" or secundari == "SN":
                 secundari = [secundari]
@@ -179,15 +172,15 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
 
                 escenaris_wwtp.extend(escenaris)
         escenaris_total.append(escenaris_wwtp)
-        """
 
+        """
         escenaris = {
             'secundari': secundari,
             'terciaris': terciaris,
             'wwtp': edar
         }
         escenaris_total.append([escenaris])
-
+        """
     return list(itertools.product(*escenaris_total)), preu_inicial
 
 def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river, edars_escenaris, edars_calibrated_init):
@@ -242,6 +235,8 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     edars_cabal = {}
     for edar in edars_calibrated_init:
         edars_cabal[edar] = edars_calibrated_init[edar]["compounds_effluent"]["q"]
+
+    print(len(scenarios), ' ESCENARIS TOTALS')
 
 
     for scenario in scenarios:
@@ -310,6 +305,7 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
         print(scenario)
         print(masses_aigua_incompliments)
+        """
         pandas.DataFrame(massa_aigua_mitjanes).to_excel("/home/zephol/Desktop/traca_csv/s0.xlsx")
 
         def highlight(x):
@@ -325,7 +321,7 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
             return df1
 
         pandas.DataFrame(massa_aigua_mitjanes).style.apply(highlight, axis=None).to_excel("/home/zephol/Desktop/traca_csv/sc0.xlsx", engine='openpyxl')
-
+        """
 
         # Read JSON file
         with open("resultat.json", "rb") as fp:
