@@ -66,7 +66,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
         preu_inicial += calculate_price(terciaris, cabal)
 
         #Tots els escenaris possibles
-        """
+
         if secundari is not None:
             if secundari == "SP" or secundari == "SN":
                 secundari = [secundari]
@@ -155,7 +155,7 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
                                 'wwtp': edar
                             }
                         ]
-                        if edar in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E']:
+                        if edar in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E', 'ES9080440001010E']:
                             escenaris.append({
                                 'secundari': secundari_aux,
                                 'terciaris': ["UF","RO","AOP"],
@@ -173,15 +173,16 @@ def all_scenarios(edars_escenaris, edars_calibrated_init):
 
                 escenaris_wwtp.extend(escenaris)
         escenaris_total.append(escenaris_wwtp)
-        """
-        #Unicament configuracio inicial
 
+        #Unicament configuracio inicial
+        """
         escenaris = {
             'secundari': secundari,
             'terciaris': terciaris,
             'wwtp': edar
         }
         escenaris_total.append([escenaris])
+        """
 
     return list(itertools.product(*escenaris_total)), preu_inicial
 
@@ -201,13 +202,15 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
          "ES9081270001010E",
          "ES9081840001010E",
          "ES9082110001010E",
-         "ES9082790004050E"
+         "ES9082790004050E",
+         "ES9080440001010E",
+         "ES9080530002010E"
          ]]
 
     scenarios, cost_inicial = all_scenarios(edars, edars_calibrated_init)
     random.shuffle(scenarios)
 
-    print(len(scenarios))
+    print("NOMBRE SIMULACIONS --",  str(len(scenarios)))
 
 
     renameHelper = rS(None)
