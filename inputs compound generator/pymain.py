@@ -134,6 +134,7 @@ edars_incloses = ["ES9080010001010E",
                   "ES9080440001010E",
                   "ES9080530002010E"
                   ]
+
 edars_excloses = [
     "ES9080480001010E",
 	"ES9083000004010E",
@@ -151,7 +152,7 @@ edars_excloses = [
 for contaminant in ["Triclorometà"]:
     total = 0
     for edar in edars_incloses:
-        print(edar, [contaminant])
+        print(edar, edars_calibrated[edar]["compounds_effluent"][contaminant])
         total += edars_calibrated[edar]["compounds_effluent"][contaminant]
 
     print(contaminant, total * 1000)
