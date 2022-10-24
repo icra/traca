@@ -11,7 +11,6 @@
       integer :: j                  !none       |hru number
       integer :: isrc               !none       |source object number
       integer :: irec               !none       |recall database number
-      real :: max_m3                            !LVerdura
 
       !! zero total demand for each object
       wallod_out(iwallo)%dmd(idmd)%dmd_tot = 0.
@@ -57,8 +56,7 @@
           j = wallo(iwallo)%dmd(idmd)%ob_num
           !! if there is demand, use amount from water allocation file
           if (irrig(j)%demand > 0.) then
-            max_m3 = wallo(iwallo)%dmd(idmd)%amount * hru(j)%area_ha * 10.         !LVerdura, m3 = mm * ha * 10.
-            wallod_out(iwallo)%dmd(idmd)%dmd_tot = amin1 (irrig(j)%demand, max_m3) !LVerdura
+            wallod_out(iwallo)%dmd(idmd)%dmd_tot = irrig(j)%demand !LVerdura
             !wallod_out(iwallo)%dmd(idmd)%dmd_tot = wallo(iwallo)%dmd(idmd)%amount * hru(j)%area_ha * 10. !m3 = mm * ha * 10. !LVerdura
           else
             wallod_out(iwallo)%dmd(idmd)%dmd_tot = 0.
