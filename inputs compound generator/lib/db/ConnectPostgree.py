@@ -157,6 +157,7 @@ class ConnectDb:
 
         # Agrupar per contaminant i codi de cens
         cens_filtrat.sort(key=lambda x: (x[0], x[4]))
+
         for key, group in groupby(cens_filtrat, lambda x: (x[0], x[4])):
             compostos_grouped = list(group)
             for compost in compostos_grouped:
@@ -187,6 +188,8 @@ class ConnectDb:
                 contaminants_per_tipologia[new_ccae_l][contaminant].append(valor_mitja)
                 step_0 += 1
 
+
+        """
         for ccae_l in contaminants_per_tipologia:
             for compound in contaminants_per_tipologia[ccae_l]:
                 valors = contaminants_per_tipologia[ccae_l][compound]
@@ -197,8 +200,7 @@ class ConnectDb:
                     if (cv <= 1.5):
                         contaminants_per_tipologia_mitjanes[ccae_l][compound] = mitjana
                         step_1 += 1
-
-
+        """
         #Info Nils
         wb_ptr = openpyxl.load_workbook("inputs/means&stds.xlsx")
         ws_ptr = wb_ptr["Sheet 1"]
@@ -220,6 +222,8 @@ class ConnectDb:
                         contaminants_per_tipologia_mitjanes[cod_ccae] = {}
                     if compound not in contaminants_per_tipologia_mitjanes[cod_ccae]:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = None
+
+                    #Si coincideixen categories CCAE, fem mitjana
                     if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
                         contaminants_per_tipologia_mitjanes[cod_ccae][compound] = [mean/1000000]  #ng/L a mg/L
                         step_2 += 1
@@ -243,8 +247,10 @@ class ConnectDb:
                 contaminants_per_tipologia_mitjanes[cod_ccae] = {}
             if compound not in contaminants_per_tipologia_mitjanes[cod_ccae]:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound] = None
+
+            # Si coincideixen categories CCAE, fem mitjana
             if contaminants_per_tipologia_mitjanes[cod_ccae][compound] is None:
-                contaminants_per_tipologia_mitjanes[cod_ccae][compound] = valor / 1000  #Passem de µg/l a mg/l
+                contaminants_per_tipologia_mitjanes[cod_ccae][compound] = [valor / 1000]  #Passem de µg/l a mg/l
                 step_3 += 1
             elif type(contaminants_per_tipologia_mitjanes[cod_ccae][compound]) == list:
                 contaminants_per_tipologia_mitjanes[cod_ccae][compound].append(valor / 1000)  #Passem de µg/l a mg/l
@@ -306,15 +312,17 @@ class ConnectDb:
 
             tid, activitat_ubicacio, tipus_activitat, cod_ccae, tipus_llm, subtipus_llm, nom_abocament, nom_variable, valor_minim, valor_maxim, unitats, ccae_l, nace_l, isic_l, blocs, tipus, cod_ccae_xs, origen, uwwCode = industry
 
-            if subtipus_llm != "Directe a Terreny" and subtipus_llm != "Indirecte a Terreny" and subtipus_llm != "Directe a Mar" and subtipus_llm != "Indirecte a Mar":
-                if uwwCode is not None:     #industria aboca a depuradora
-                    #if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
-                    if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"] and subtipus_llm not in ["Directe a Riu", "Indirecte a Riu"]:  # Influent depuradora
+            if uwwCode is not None:     #industria aboca a depuradora
+                if subtipus_llm != "Directe a Terreny" and subtipus_llm != "Indirecte a Terreny" and subtipus_llm != "Directe a Mar" and subtipus_llm != "Indirecte a Mar" and subtipus_llm != "Directe a Riu" and subtipus_llm != "Indirecte a Riu":
+                    if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:  # Influent depuradora
                         self.add_industry_to_edar(industries_to_edar, industry)
                     else:   #No passa per depuradora
                         self.add_industry_to_river(industries_to_river, industry)
                 else:    #No passa per depuradora
                     self.add_industry_to_river(industries_to_river, industry)
+            else:  # No passa per depuradora
+                self.add_industry_to_river(industries_to_river, industry)
+
             """
             if uwwCode is not None:  # industria aboca a depuradora
                 # if tipus_llm in ["Abocament", "Depuradora", "Entrada EDAR"]:    #Influent depuradora
@@ -376,8 +384,27 @@ class ConnectDb:
 
         return dict
 
-    #funcions auxiliars
+    def getIndustryPollution(self, nom_industria, nom_abocament, contaminant, table='cens_v4_1_prova'):
+        try:
+            cur = self.conn.cursor()
+            query = """SELECT * FROM """ + table + """ WHERE "activitat/ubicacio" = '""" + nom_industria + """' and nom_abocament = '""" + nom_abocament + """'"""
+            cur.execute(query)
+            abocaments_industria = cur.fetchall()
+            try:
+                abocaments_contaminant = max(map(lambda entry: float(entry[9]),
+                                                 filter(lambda entry: entry[7] == contaminant, abocaments_industria)))
+            except:
+                abocaments_contaminant = 0
+            try:
+                cabal = max(map(lambda entry: float(entry[9]), filter(lambda entry: entry[7] == "Cabal diari", abocaments_industria)))
+            except:
+                cabal = 0
 
+            return abocaments_contaminant*cabal
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+
+    #funcions auxiliars
     def read_all_data(self, table='cens_v4_1_prova'):
         industries = self.getIndustries(table)
         industries_to_river = {}
@@ -454,25 +481,27 @@ class ConnectDb:
 
     def upload_data(self, industries_grouped, contaminants_i_nutrients, estimacions, table_name = 'cens_v4_1_prova'):
 
-
         tid = 0
         compounds = contaminants_i_nutrients.copy()
         compounds.append("Cabal diari")
         compounds.append("Cabal anual")
+        compounds.append("Cabal")
         c = self.conn.cursor()
+
 
         try:
             query = """drop table """ + table_name
             c.execute(query)
-        except:
+        except BaseException as e:
+            print(e)
             pass
         self.conn.commit()
-        query = """select * into """ + table_name + """ from cens_v4"""
+        #query = """select * into """ + table_name + """ from cens_v4 where 0"""
+        query = 'CREATE TABLE '+ table_name +' (LIKE cens_v4 INCLUDING ALL)'
         c.execute(query)
         self.conn.commit()
 
         for industry in industries_grouped.values():
-
             activitat_ubicacio = industry["activitat/ubicacio"]
             tipus_activitat = industry["tipus_activitat"]
             cod_ccae = industry["cod_ccae"]
@@ -502,14 +531,33 @@ class ConnectDb:
                         unitats = "m3/dia"
                     elif nom_variable == 'Cabal anual':
                         unitats = "m3/any"
+                    elif nom_variable == "Cabal" and unitats == 'm3/h' and "Cabal diari" not in industry and "Cabal anual" not in industry:
+                        nom_variable = "Cabal diari"
+                        unitats = "m3/dia"
+                        industry[contaminant] *= 24
                     else:
                         unitats = "mg/l"
+
+                    """
                     if contaminant in industry:
                         valor_maxim = industry[contaminant]
                         origen = "ACA"
                     elif estimation is not None:
                         valor_maxim = estimation
                         origen = "ICRA"
+                    """
+
+                    #Encara que tenim cabal com a contaminant, com que estimation sera None, no agafara cap estimacio
+                    if estimation is not None and contaminant in industry:
+                        valor_maxim = max(estimation, industry[contaminant])
+                        origen = "ICRA"
+                    elif estimation is not None:
+                        valor_maxim = estimation
+                        origen = "ICRA"
+                    elif contaminant in industry:
+                        valor_maxim = industry[contaminant]
+                        origen = "ACA"
+
 
                     if valor_maxim > 0:
                         tid += 1
@@ -568,7 +616,6 @@ class ConnectDb:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-
     def estadistiques_final(self):
 
         ind_origen = set()
@@ -615,5 +662,9 @@ class ConnectDb:
         df_2.to_csv("industries_ccae.csv")
 
         return industries_to_edar, industries_to_river
+
+
+
+
 
 

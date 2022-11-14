@@ -221,6 +221,7 @@ class renameSQLite:
         for edar in edars_calibrated:
             id = int(edars_calibrated[edar]["id_swat"])
             point = [recall[id]['lat'], recall[id]['lon']]
+
             id_pixel = (self.shortest_dist(coord_index, point))[2]
 
             for pollutant in contaminants_i_nutrients:

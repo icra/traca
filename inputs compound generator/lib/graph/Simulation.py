@@ -5,7 +5,7 @@ import numpy
 numpy.seterr(all='raise')
 import networkx
 import math
-
+from osgeo import gdal
 class Simulation:
     def __init__(self, graph_location, river_attenuation):
         self.attenuation_df = pandas.read_csv(river_attenuation).set_index('Nom')
@@ -56,6 +56,34 @@ class Simulation:
         graph_df = graph_df.set_index('pixel_number')
 
         return graph_df
+
+    def give_pixel(self, coord: list, reference_raster_location: object, return_scalar: bool = False, reverse: bool = False):
+        """
+        This function gives the pixel of a coordinate (row/latitude, column/longitude). If reverse is specified, the function returns a coordinate for a
+        pixel number.
+        :rtype: location of the pixel as a list or as the pixel number. If reverse is specified, gives coordenates as a list
+        :coord: list: The coordinations of the point. If reverse is specified, this needs to be the pixel number
+        :reference_raster: object: A raster with the desired dimensions
+        :return_scalar: bool: if true, the output is returned as a scalar (pixel number)
+        :reverse: bool: if true, the function takes in a pixel number and returns a coordinate
+        """
+        reference_raster = gdal.Open(reference_raster_location)
+        transformation = reference_raster.GetGeoTransform()
+        if not reverse:
+            inverse_transform = gdal.InvGeoTransform(transformation)  # coordinate to pixel instructions
+            long_location, lat_location = map(int, gdal.ApplyGeoTransform(inverse_transform, coord[1], coord[0]))
+
+            if return_scalar:
+                pixel_number = lat_location * reference_raster.RasterXSize + long_location
+                return pixel_number
+            return [lat_location, long_location]
+        i = int(coord / reference_raster.RasterXSize)
+        j = coord - reference_raster.RasterXSize * i
+        long_location, lat_location = gdal.ApplyGeoTransform(transformation, int(j), i)
+        return [lat_location, long_location]
+
+
+
 
     def run_graph(self, contamination_df):
 

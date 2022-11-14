@@ -9,6 +9,7 @@ import lib.scenarios as scenarios
 import threading
 import sys, os
 import pandas
+import json
 
 
 def resource_path(relative_path):
@@ -38,9 +39,10 @@ pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
 pujar_concentracions_db = False
-fitxers_calibracio_nils = False
+fitxers_calibracio_nils = True
 generate_exe = False
-export_graph_to_csv = False
+export_graph_to_csv = True
+export_edars_calibrated_json = True
 
 if generate_exe:
 #Codi per generar executable
@@ -114,50 +116,36 @@ contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics() #Tot
 contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_calibrats_wwtp()    #Contaminants que hem pogut calibrar a EDAR
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
-id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection)    #Dades de contaminants despres de ser filtrats per edar
+id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate)    #Dades de contaminants despres de ser filtrats per edar
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)    #Dades de contaminants abocats directament a riu o a sortida depuradora
-
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
-
-
 contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
 
-edars_incloses = ["ES9080010001010E",
-                  "ES9080910001010E",
-                  "ES9083020001010E",
-                  "ES9081130006010E",
-                  "ES9081140002010E",
-                  "ES9081270001010E",
-                  "ES9081840001010E",
-                  "ES9082110001010E",
-                  "ES9082790004050E",
-                  "ES9080440001010E",
-                  "ES9080530002010E"
-                  ]
 
-edars_excloses = [
-    "ES9080480001010E",
-	"ES9083000004010E",
-	"ES9082910001010E",
-    "ES9081620002010E",
-    "ES9081610008010E",
-    "ES9082400005010E",
-    "ES9082220003010E",
-    "ES9081190002010E",
-    "ES9082050005010E",
-    "ES9082870007010E",
-    "ES9080980004010E"
-]
+
 """
-for contaminant in ["Triclorometà"]:
+industries_fora_ambit_llobregat = pandas.read_csv("inputs/industries_riu_llob.csv", index_col=0)
+for row in industries_fora_ambit_llobregat.itertuples():
+    nom_industria = row[0].replace("'", "''")
+    nom_abocament = row[1].replace("'", "''")
+
+    print(connection.getIndustryPollution(nom_industria, nom_abocament, 'Octilfenols') * 307956.3739797776)
+"""
+
+
+
+"""
+for contaminant in ["Octilfenols"]:
     total = 0
-    for edar in edars_incloses:
-        print(edar, edars_calibrated[edar]["compounds_effluent"][contaminant])
-        total += edars_calibrated[edar]["compounds_effluent"][contaminant]
+    for edar in depuradores_llobregat_fora_ambit:
+        print(edar, edars_calibrated[edar]["compounds_effluent"][contaminant] * 307956.3739797776)
+        #total += edars_calibrated[edar]["compounds_effluent"][contaminant]
 
-    print(contaminant, total * 1000)
+    #print(contaminant, total * 1000)
+"""
 
 
+"""
 a = pandas.read_csv("recall_points_baix_llob.csv", index_col=0)
 for contaminant in contaminants:
     total = 0
@@ -170,14 +158,17 @@ for contaminant in contaminants:
 
 if fitxers_calibracio_nils:
     #Fitxers per calibrar contaminacio a depuradora (en nils te l'script)
-    exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name = "calibracio_contaminants.json")
+    exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="scripts/inputs/calibracio_contaminants.json")
     wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='edars_pollutant_attenuation.json')
 
 if export_graph_to_csv:
     file_name = 'graph.csv'
     renameHelper = rS(None)
-    renameHelper.export_graph_csv(edars_calibrated, id_discharge_to_volumes, contaminants_puntuals, file_name = 'graph.csv')
+    renameHelper.export_graph_csv(edars_calibrated, id_discharge_to_volumes, contaminants_puntuals, file_name = file_name)
 
+if export_edars_calibrated_json:
+    with open("scripts/inputs/edars_calibrated.json", 'w', encoding='utf-8') as outfile:
+        json.dump(edars_calibrated, outfile, ensure_ascii=False)
 #cli
 if len(sys.argv) > 2:
     db_url = sys.argv[1]
@@ -190,7 +181,6 @@ else:
     sGUI = settingsGUI()
     mGUI.update_table(edars_calibrated)
     mGUI.update_table_in(id_discharge_to_volumes)
-
 
     while True:
         win, event, values = PySimpleGUI.read_all_windows()

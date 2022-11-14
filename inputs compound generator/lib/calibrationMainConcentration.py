@@ -3,6 +3,7 @@ import csv
 import openpyxl
 import json
 from sqlalchemy import create_engine
+import pandas as pd
 
 
 def sumIgnoreNone(object, compount, reciver):
@@ -117,7 +118,6 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
                                     value = float(ptr[i].value)
                                     listOfEDARCompounds[eu_code]["cabal_observat"].append(value)
                             else:
-
                                 pollutant = ""
                                 isEffluent = False
                                 if "effluent" in ptr_key.value:
@@ -464,7 +464,6 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
             edars_calibrated[row[6].value]['id_swat'] = row[0].value
             edars_calibrated[row[6].value]['lat'] = float(row[3].value)
             edars_calibrated[row[6].value]['long'] = float(row[4].value)
-
     return edars_calibrated
 
 def readListOfIndustriesFromCSV(industrial_data):
@@ -674,7 +673,8 @@ def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = T
         abocaments_sumat[id_abocament] = aux
     return abocaments_sumat
 
-def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection):
+#Si id_nom_abocament, retorna diccionari on l'id és el nom abocament (i no id de SWAT)
+def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection, removal_rate, id_nom_abocament = False):
 
     industries_grouped = {}
 
@@ -702,12 +702,27 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
     #for contaminant in contaminants_i_nutrients:
     #    concentracions_avg[contaminant] = connection.avg_estacions_riu(contaminant)
 
+    removal_rate_df = pd.read_excel(removal_rate).set_index("contaminant")
+
     for contaminant in contaminants_i_nutrients:
         for abocament in contaminants_per_punt_abocament:
             #contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament]["q"] * concentracions_avg[contaminant] * 10 / 1000  # Passem a kg
 
             if contaminant in contaminants_per_punt_abocament[abocament]:
-                contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg
+
+                try:
+                    multiplicador = float(removal_rate_df.loc[contaminant, "Error industrial"])
+                except:
+                    multiplicador = 1
+
+                contaminants_per_punt_abocament[abocament][contaminant] = multiplicador * contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg
+
+    if id_nom_abocament:
+        contaminants_per_nom_abocament = {}
+        for abocament in contaminants_per_punt_abocament:
+            nom_abocament = contaminants_per_punt_abocament[abocament]['abocament']
+            contaminants_per_nom_abocament[nom_abocament] = contaminants_per_punt_abocament[abocament]
+        return contaminants_per_nom_abocament
 
 
     return contaminants_per_punt_abocament
