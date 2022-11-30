@@ -46,6 +46,10 @@
         
         do ic = 1, imax
           read (104,*,iostat=eof) pldb(ic)
+          !!LVerdura: canvi valors per calibració paràmetres plantes
+          id_plt = ic
+          call cal_conditions_icra 
+          !!LVerdura end
           if (eof < 0) exit
         end do
         

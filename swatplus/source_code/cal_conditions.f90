@@ -121,22 +121,22 @@
                     end if
                   end do
                 end do
-              case ("lai_pot")
-                do ipl = 1, pcom(ielem)%npl
-                  do ic = 1, cal_upd(ichg_par)%conds
-                    if (cal_upd(ichg_par)%cond(ic)%targc == pcom(ielem)%pl(ipl)) then
-                      ireg = hru(ielem)%crop_reg
-                      do ilum = 1, plcal(ireg)%lum_num
-                        if (pl_prms(1)%prm(ilum)%name == pcom(ielem)%pl(ipl)) then
-                          absmin = pl_prms(1)%prm(ilum)%lo
-                          absmax = pl_prms(1)%prm(ilum)%up
-                          pcom(ielem)%plcur(ipl)%lai_pot = chg_par (pcom(ielem)%plcur(ipl)%lai_pot, ielem, chg_typ, chg_val, &
-                            absmin, absmax, num_db)
-                        end if
-                      end do
-                    end if
-                  end do
-                end do
+              ! case ("lai_pot")
+                ! do ipl = 1, pcom(ielem)%npl
+                  ! do ic = 1, cal_upd(ichg_par)%conds
+                    ! if (cal_upd(ichg_par)%cond(ic)%targc == pcom(ielem)%pl(ipl)) then
+                      ! ireg = hru(ielem)%crop_reg
+                      ! do ilum = 1, plcal(ireg)%lum_num
+                        ! if (pl_prms(1)%prm(ilum)%name == pcom(ielem)%pl(ipl)) then
+                          ! absmin = pl_prms(1)%prm(ilum)%lo
+                          ! absmax = pl_prms(1)%prm(ilum)%up
+                          ! pcom(ielem)%plcur(ipl)%lai_pot = chg_par (pcom(ielem)%plcur(ipl)%lai_pot, ielem, chg_typ, chg_val, &
+                            ! absmin, absmax, num_db)
+                        ! end if
+                      ! end do
+                    ! end if
+                  ! end do
+                ! end do
               case ("harv_idx")
                 do ipl = 1, pcom(ielem)%npl
                   do ic = 1, cal_upd(ichg_par)%conds

@@ -1,7 +1,11 @@
       subroutine proc_db
       
       implicit none
-
+      
+      !! LVerdura: les cridem ara per poder fer calibració dels paràmetres de plantes
+      call cal_parm_read
+      call cal_parmchg_read
+      
       !! databases used by all spatial modules
       call plant_parm_read                          !! read the plant paramter database
       call plantparm_init                           !! initialize plant parameters

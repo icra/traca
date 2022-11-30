@@ -781,7 +781,8 @@
          case ("sp_yld")
             aqu_prm(ielem)%spyld = chg_par(aqu_prm(ielem)%spyld,            &
                          ielem, chg_typ, chg_val, absmin, absmax, num_db)
-                           
+            aqu_d(ielem)%stor = 1000. * (aqudb(ielem)%dep_bot - aqu_d(ielem)%dep_wt) * aqu_prm(ielem)%spyld
+            
          case ("deep_seep")
             aqu_prm(ielem)%seep = chg_par(aqu_prm(ielem)%seep,              &
                          ielem, chg_typ, chg_val, absmin, absmax, num_db)

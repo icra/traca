@@ -136,5 +136,7 @@
         real :: fr_yrmat = 0.05             !years      |fraction of current year of growth to years to maturity 
       end type plant_transplant_db
       type (plant_transplant_db), dimension(:), allocatable :: transpl
+      
+      integer :: id_plt !LVerdura
     
       end module plant_data_module 
