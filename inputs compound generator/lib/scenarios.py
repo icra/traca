@@ -9,7 +9,7 @@ from UliPlot.XLSX import auto_adjust_xlsx_column_width
 from lib.LazyCartesianProduct import LazyCartesianProduct
 from lib.Optimitzacio_tec import Optimitzacio_tec
 
-#aaaabvbvbvxcvxcvcx
+#aaa
 
 #Donada una depuradora amb tractaments terciaris i cabal determinats, retorna el cost
 def calculate_price(terciaris, cabal):
