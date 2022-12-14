@@ -7,6 +7,7 @@ import random
 import csv
 from UliPlot.XLSX import auto_adjust_xlsx_column_width
 from lib.LazyCartesianProduct import LazyCartesianProduct
+from lib.Optimitzacio_tec import Optimitzacio_tec
 
 
 #Donada una depuradora amb tractaments terciaris i cabal determinats, retorna el cost
@@ -152,7 +153,7 @@ def trens_tractament_reals(configuracions_edars, edars_cabal, n_iteracions, limi
 """
 Configuracions de tecnologies completament aleatories
 """
-def trens_tractament_random(configuracions_edars, n_iteracions, threshold  = 0.9):
+def trens_tractament_random(configuracions_edars, n_iteracions, threshold  = 0.7):
 
     tecnologies = ["SF", "UV", "GAC", "O3", "UF", "RO", "AOP"]
     escenaris_total = []
@@ -177,7 +178,7 @@ def trens_tractament_random(configuracions_edars, n_iteracions, threshold  = 0.9
     return escenaris_total, 0
 
 
-def all_scenarios(edars_escenaris, edars_calibrated_init, n_iteracions):
+def all_scenarios(edars_escenaris, edars_calibrated_init, n_iteracions, escenaris_reals=True):
 
     configuracions_edars = edars_escenaris.to_dict(orient='index')
 
@@ -185,12 +186,30 @@ def all_scenarios(edars_escenaris, edars_calibrated_init, n_iteracions):
     for edar in edars_calibrated_init:
         edars_cabal[edar] = edars_calibrated_init[edar]["compounds_effluent"]["q"]
 
-
-    #escenaris, preu_inicial = trens_tractament_random(configuracions_edars, n_iteracions)
-    escenaris, preu_inicial = trens_tractament_reals(configuracions_edars, edars_cabal, n_iteracions, limitacio_osmosi_inversa=True,
-                               nomes_escenari_base=True)
+    if escenaris_reals:
+        escenaris, preu_inicial = trens_tractament_reals(configuracions_edars, edars_cabal, n_iteracions, limitacio_osmosi_inversa=True,
+                               nomes_escenari_base=False)
+    else:
+        escenaris, preu_inicial = trens_tractament_random(configuracions_edars, n_iteracions)
 
     return escenaris, preu_inicial
+
+def nomes_escenari_base(edars_escenaris, edars_calibrated_init, n_iteracions):
+    configuracions_edars = edars_escenaris.to_dict(orient='index')
+
+    edars_cabal = {}
+    for edar in edars_calibrated_init:
+        edars_cabal[edar] = edars_calibrated_init[edar]["compounds_effluent"]["q"]
+
+    escenaris, preu_inicial = trens_tractament_reals(configuracions_edars, edars_cabal, n_iteracions,
+                                                     limitacio_osmosi_inversa=True,
+                                                     nomes_escenari_base=True)
+
+    #print(list(escenaris)[0])
+    #pd.DataFrame(list(escenaris)[0]).to_csv("escenari_base_nils_2.csv")
+
+    return escenaris, preu_inicial
+
 
 def prepare_calibration(contaminant, g, graph):
     path = "C:\\Users\\jsalo\\Desktop\\obseravacions_contaminants\\"
@@ -234,8 +253,22 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
          "ES9080530002010E"
          ]]
 
-    #Tenim iterador d'scenarios amb on de totes les combinacions, se n'han agafat n_iteracions a l'atzar
-    scenarios, cost_inicial = all_scenarios(edars, edars_calibrated_init, n_iteracions)
+
+    edars_osmosi_inversa = ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E', 'ES9082110001010E', 'ES9080440001010E']
+
+
+    escenari_base, cost_inicial = nomes_escenari_base(edars, edars_calibrated_init, n_iteracions)
+
+
+
+    #Canviar per resultat optimitzacio nils
+
+    optimitzacio = Optimitzacio_tec(pd.DataFrame(pd.DataFrame(list(escenari_base)[0])))
+    resultats = optimitzacio.optimize()
+    #print('aaa')
+    print(resultats[0])
+    #scenarios, cost_inicial = all_scenarios(edars, edars_calibrated_init, n_iteracions, True)
+    #print(list(scenarios))
 
     #Assignem càrregues d'origen industrial
     renameHelper = rS(None)
@@ -291,6 +324,9 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
         edars_aux = edars.copy()
         for edar in scenario:
             edars_aux.at[edar['wwtp'], 'secundari'] = edar['secundari']
+
+            #print(edar['wwtp'], '---', calculate_price(edar['terciaris'], edars_cabal[edar['wwtp']]))
+
             cost_final += calculate_price(edar['terciaris'], edars_cabal[edar['wwtp']])
             if 'terciaris' in edar and edar['terciaris'] is not None:
                 edars_aux.at[edar['wwtp'], 'terciari'] = ','.join(edar['terciaris'])
@@ -334,10 +370,10 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
                 mitjana_contaminant = sum(masses_aigua_valors[massa_aigua][contaminant]) / len(masses_aigua_valors[massa_aigua][contaminant])
 
-
+                """
                 if massa_aigua == 1000900 or massa_aigua == 1000740:
                     print(contaminant, massa_aigua, mitjana_contaminant)
-
+                """
                 #Multiplicadors per adaptar optimització de tot CIC al Baix Llobregat
                 """
                 if contaminant == "Ciprofloxacina":

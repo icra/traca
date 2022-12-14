@@ -379,12 +379,24 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                 load_influent_filtered = load_influent_industrial + load_influent_domestic
 
                 if contaminant in calibrated_parameters:    #Si no tenim dades de eliminacio, assumim que no neteja res
+                    contaminacio_incial = load_influent_filtered
                     for configuration in wwtp["configuration"]:
                         load_influent_filtered *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
 
                         #load_influent_domestic *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
                         #load_influent_industrial *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
-
+                    edars = ["ES9080010001010E",
+                             "ES9080910001010E",
+                             "ES9083020001010E",
+                             "ES9081130006010E",
+                             "ES9081140002010E",
+                             "ES9081270001010E",
+                             "ES9081840001010E",
+                             "ES9082110001010E",
+                             "ES9082790004050E",
+                             "ES9080440001010E",
+                             "ES9080530002010E"
+                            ]
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
