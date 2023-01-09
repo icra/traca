@@ -228,6 +228,53 @@ else:
                 PySimpleGUI.popup("Error: " + str(e))
         if event == "scenarios_generator":
             try:
+                layout = [
+                    #Input text with default value
+                    [PySimpleGUI.Text('Nom del fitxer per guardar els resultats', size=(30, 1)), PySimpleGUI.InputText(key='file_name', default_text='generacio_escenaris.xlsx')],
+                    #Input number field with default value
+                    [PySimpleGUI.Text('Nombre de simulacions', size=(30, 1)), PySimpleGUI.InputText(key='n_scenarios', default_text='100')],
+                    [PySimpleGUI.Text('')],
+                    #Checkboxes
+                    [PySimpleGUI.Text('Filtres:', font='Any 12', size=(30, 1))],
+                    [PySimpleGUI.Checkbox('Terciaris a depuradores petites', key='puntual', default=True)],
+                    [PySimpleGUI.Checkbox('Permetre trens tractament amb O3', key='difusa', default=True)],
+                    [PySimpleGUI.Text('')],
+                    [PySimpleGUI.Button('Ok'), PySimpleGUI.Button('Cancel')]
+                ]
+
+                pop_up_escenaris = PySimpleGUI.Window("Generació d'escenaris", layout, size=(600, 300),
+                                   )
+                event, values = pop_up_escenaris.read()
+                pop_up_escenaris.close()
+
+                if event == "Ok":
+                    if not values['file_name'].endswith(".xlsx"):
+                        file_name = values['file_name'] + ".xlsx"
+                    else:
+                        file_name = values['file_name']
+
+                    file_name = "Resultats/" + file_name
+
+                    if not values["n_scenarios"].isdigit():
+                        n_iteracions = 100
+                    else:
+                        n_iteracions = int(values["n_scenarios"])
+
+                    if n_iteracions > 3512320:
+                        n_iteracions = 3512320
+                    elif n_iteracions <= 0:
+                        n_iteracions = 1
+
+                    layout = [[PySimpleGUI.ProgressBar(max_value=n_iteracions, orientation='h', size=(20, 20),
+                                                       key='progress_1')]]
+                    popup_window = PySimpleGUI.Window('Test', layout, finalize=True, modal=True)
+
+                    threading.Thread(target=run_scenarios_parallel,
+                                     args=(popup_window, win, n_iteracions),
+                                     daemon=True).start()
+
+
+                """
                 file_name = PySimpleGUI.popup_get_text('Escriu nom del fitxer per guardar els resultats (exemple: generacio_escenaris.xlsx)')
                 if file_name is not None:
 
@@ -237,6 +284,7 @@ else:
                     file_name = "Resultats/" + file_name
 
                     n_iteracions = PySimpleGUI.popup_get_text("Nombre d'escenaris a generar. El nombre d'escenaris màxim a generar és de 3512320, però el temps de simulació de 20 dies")
+
                     if n_iteracions is not None:
 
                         n_iteracions = int(n_iteracions)
@@ -253,6 +301,7 @@ else:
                         threading.Thread(target=run_scenarios_parallel,
                                          args=(popup_window,win, n_iteracions),
                                          daemon=True).start()
+                """
 
             except Exception as e:
                 print(str(e))

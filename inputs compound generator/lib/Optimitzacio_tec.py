@@ -17,9 +17,8 @@ import sklearn
 # %%
 class Optimitzacio_tec:
     def __init__(self, escenari_base):
-        print('------------')
-        self.esc_base = escenari_base
 
+        self.esc_base = escenari_base
         print(self.esc_base)
         print('------------')
 
@@ -90,15 +89,26 @@ class Optimitzacio_tec:
         # ES9081130006010E -> edar4, ES9081270001010E -> edar6, ES9080010001010E -> edar1
         # ES9081140002010E -> edar5, ES9082110001010E -> edar8, ES9080440001010E -> edar10
 
-        def __init__(self, names_edars, esc_base, evaluate):
+        def __init__(self, names_edars, esc_base, evaluate, filtres=None):
+
+            if filtres is None:
+                filtres = set()
+
             self.evaluate = evaluate
             self.params = []
             ind = 0
 
             for edar in names_edars:
+                # de moment si ja té terciaris no hi ha canvis.
                 if esc_base["terciaris"][ind] is not None:  # is not nan
                     self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
-                    # de moment si ja té terciaris no hi ha canvis.
+                #Si es vol aplicar filtres de cabal i cabal depuradora < 20000, no hi ha canvis
+                elif 'cabal' in filtres and esc_base['cabal'][ind] < 20000:
+                    self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
+                #si filtre o3, no es poden aplicar tractaments amb o3
+                elif 'o3' in filtres:
+                    #QUÈ S'HA DE POSAR AQUÍ
+                    self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
                 else:
                     if edar in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E',
                                 'ES9082110001010E', 'ES9080440001010E']:
@@ -128,7 +138,7 @@ class Optimitzacio_tec:
             return objectivefunction
 
     def optimize(self):
-        rep = 1000
+        rep = 15000
         parallel = "seq"
         dbformat = "csv"
         timeout = 10  # Given in Seconds
@@ -150,7 +160,7 @@ class Optimitzacio_tec:
 
         best_results = []
         for i in range(len(self.results)):
-            if self.results[i][0] == minimum:
+            if (self.results[i][0] == minimum) or (self.results[i][0] == minimum + 1):
                 best_results.append(self.results[i])
 
         tec_trains = ["no_mod", ['SF', 'UV'], ["GAC"], ["UF", "UV"], ["O3","GAC","UV"], ["O3","SF", "UV"], ["O3", "SF"], ["UF","RO","AOP"]]

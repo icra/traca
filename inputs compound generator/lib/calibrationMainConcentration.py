@@ -5,7 +5,6 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
-
 def sumIgnoreNone(object, compount, reciver):
     try:
         if compount != 'cabal':
@@ -97,104 +96,27 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
         eu = listOfEDARCompounds[edar]["eu_code"]
         dc_to_eu[dc] = eu
 
-    # llegeix observacions influent i efluent depuradora de TN, TP i DBO del fitxer edars_analitiques_sitemes_2
-    wb_ptr = openpyxl.load_workbook(edar_analitiques_xlsx)
-    ws_ptr = wb_ptr["Hoja1"]
-    isFirst = False
-    for ptr in ws_ptr.iter_rows():
-        if not isFirst:
-            isFirst = True
-        else:
-            dc_code = ptr[0].value
-            if dc_code in dc_to_eu:
-                eu_code = dc_to_eu[dc_code]
-                if eu_code in listOfEDARCompounds:
-                    for first_line in ws_ptr.iter_rows(max_row=1):
-                        i = 0
-                        for ptr_key in first_line:
+    #It is assumed all the units are in mg/L and non null
+    effluent_observations = connection.get_effluent_observations_edars()
+    for observation in effluent_observations:
+        eu_code = observation['cod_eu']
+        contaminant = observation['Substance name']
+        valor = observation['Value']
+        if eu_code in listOfEDARCompounds and contaminant in contaminants_i_nutrients:
+            if contaminant not in listOfEDARCompounds[eu_code]["efluent"]:
+                listOfEDARCompounds[eu_code]["efluent"][contaminant] = []
+            listOfEDARCompounds[eu_code]["efluent"][contaminant].append(valor)
 
-                            if ptr_key.value == "cabal_diari":
-                                if isfloat(ptr[i].value):
-                                    value = float(ptr[i].value)
-                                    listOfEDARCompounds[eu_code]["cabal_observat"].append(value)
-                            else:
-                                pollutant = ""
-                                isEffluent = False
-                                if "effluent" in ptr_key.value:
-                                    pollutant = ptr_key.value.replace(" effluent", "")
-                                    isEffluent = True
-                                elif "influent" in ptr_key.value:
-                                    pollutant = ptr_key.value.replace(" influent", "")
-
-                                if pollutant in contaminants_i_nutrients:
-
-                                    if isfloat(ptr[i].value):
-                                        value = float(ptr[i].value)
-
-                                        if isEffluent:
-                                            if pollutant not in listOfEDARCompounds[eu_code]["efluent"]:
-                                                listOfEDARCompounds[eu_code]["efluent"][pollutant] = []
-                                            listOfEDARCompounds[eu_code]["efluent"][pollutant].append(value)
-
-                                        else:
-                                            if pollutant not in listOfEDARCompounds[eu_code]["influent"]:
-                                                listOfEDARCompounds[eu_code]["influent"][pollutant] = []
-                                            listOfEDARCompounds[eu_code]["influent"][pollutant].append(value)
-
-                            i += 1
-
-    # Llegeix fitxer prtr
-    wb_ptr = openpyxl.load_workbook(edar_prtr_xlsx)
-    ws_ptr = wb_ptr["Hoja1"]
-    isFirst = False
-    for ptr in ws_ptr.iter_rows():
-        if not isFirst:
-            isFirst = True
-        else:
-            eu_code = ptr[1].value
-            if eu_code in listOfEDARCompounds:
-                for first_line in ws_ptr.iter_rows(max_row=1):
-                    i = 0
-                    for ptr_key in first_line:
-                        if ptr_key.value in contaminants_i_nutrients:
-
-                            if isfloat(ptr[i].value):
-                                value = float(ptr[i].value)
-
-                                if ptr_key.value not in listOfEDARCompounds[eu_code]["efluent"]:
-                                    listOfEDARCompounds[eu_code]["efluent"][ptr_key.value] = [value / 1000]
-                                else:
-                                    listOfEDARCompounds[eu_code]["efluent"][ptr_key.value].append(value / 1000)
-
-                        i += 1
-
-    # Edar scarce
-    edar_scarce = connection.get_edar_scarce()
-    for wwtp in edar_scarce:
-        for contaminant in edar_scarce[wwtp]:
-            if contaminant in contaminants_i_nutrients:
-
-                values_o = edar_scarce[wwtp][contaminant]['efluent']
-                if len(values_o) > 0:
-                    if contaminant not in listOfEDARCompounds[wwtp]['efluent']:
-                        listOfEDARCompounds[wwtp]["efluent"][contaminant] = []
-                    listOfEDARCompounds[wwtp]["efluent"][contaminant].extend(values_o)
-
-                values_i = edar_scarce[wwtp][contaminant]['influent']
-                if len(values_i) > 0:
-                    if contaminant not in listOfEDARCompounds[wwtp]['influent']:
-                        listOfEDARCompounds[wwtp]["influent"][contaminant] = []
-                    listOfEDARCompounds[wwtp]["influent"][contaminant].extend(values_i)
 
     for wwtp in listOfEDARCompounds:
         for compound in listOfEDARCompounds[wwtp]["efluent"]:
             listOfEDARCompounds[wwtp]["efluent"][compound] = (sum(listOfEDARCompounds[wwtp]["efluent"][compound]) / len(listOfEDARCompounds[wwtp]["efluent"][compound]))
-
+        """
         for compound in listOfEDARCompounds[wwtp]["influent"]:
             listOfEDARCompounds[wwtp]["influent"][compound] = (sum(listOfEDARCompounds[wwtp]["influent"][compound]) / len(listOfEDARCompounds[wwtp]["influent"][compound]))
-
+        
         listOfEDARCompounds[wwtp]["cabal_observat"] = sum(listOfEDARCompounds[wwtp]["cabal_observat"]) / len(listOfEDARCompounds[wwtp]["cabal_observat"])
-
+        """
 
     with open(file_name, 'w', encoding='utf8') as outfile:
         json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)

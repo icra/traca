@@ -384,6 +384,10 @@ class ConnectDb:
 
         return dict
 
+    def get_effluent_observations_edars(self):
+        command = 'SELECT * FROM edars_effluent'
+        return pd.read_sql(command, con=self.engine).to_dict('records')
+
     def getIndustryPollution(self, nom_industria, nom_abocament, contaminant, table='cens_v4_1_prova'):
         try:
             cur = self.conn.cursor()
