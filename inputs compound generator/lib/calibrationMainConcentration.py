@@ -231,7 +231,7 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file
     with open(file_name, 'w', encoding='utf8') as outfile:
         json.dump(dict, outfile, ensure_ascii=False)
 
-# Afegeix la concentració de cada contaminant a l'efluent
+# Afegeix la concentració de cada contaminant a l'efluent (en kg)
 def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
     # Llegim paràmetres calibrats
@@ -307,18 +307,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                         #load_influent_domestic *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
                         #load_influent_industrial *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
-                    edars = ["ES9080010001010E",
-                             "ES9080910001010E",
-                             "ES9083020001010E",
-                             "ES9081130006010E",
-                             "ES9081140002010E",
-                             "ES9081270001010E",
-                             "ES9081840001010E",
-                             "ES9082110001010E",
-                             "ES9082790004050E",
-                             "ES9080440001010E",
-                             "ES9080530002010E"
-                            ]
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
@@ -400,6 +388,73 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
             edars_calibrated[row[6].value]['long'] = float(row[4].value)
     return edars_calibrated
 
+def llegir_nuclis_no_sanejats(nuclis_no_sanejats_excel, contaminants_i_nutrients, removal_rate_excel):
+
+    nuclis_no_sanejats = pd.read_excel(nuclis_no_sanejats_excel, index_col=0)
+
+    nuclis_no_sanejats["possibles_ubicacions_descarregues"] = nuclis_no_sanejats["possibles_ubicacions_descarregues"].str.split(",").replace(' ', '')
+
+    nuclis_no_sanejats = nuclis_no_sanejats.where((pd.notnull(nuclis_no_sanejats)), None)
+
+    removal_rate = pd.read_excel(removal_rate_excel, index_col=0)
+
+    #Contaminacio d'origen domèstic
+    for contaminant in contaminants_i_nutrients:
+        if contaminant in removal_rate.index:
+            nuclis_no_sanejats[contaminant] = removal_rate.loc[contaminant, 'coef'] * nuclis_no_sanejats["poblacio_no_sanejada"] / 1000 # Càrrega en kg
+
+    #df to list of dicts
+    return_obj = {}
+    for index, row in nuclis_no_sanejats.iterrows():
+        return_obj[index] = {
+            "poblacio_no_sanejada": row["poblacio_no_sanejada"],
+            "lat": row["lat"],
+            "lon": row["lon"],
+            "contaminants": {contaminant: row[contaminant] for contaminant in contaminants_i_nutrients if contaminant in row},
+            "ubicacio_descarrega_actual": row["ubicacio_descarrega_actual"],
+            "possibles_ubicacions_descarregues": row["possibles_ubicacions_descarregues"],
+        }
+
+        return_obj[index]["contaminants"]["q"] = return_obj[index]["poblacio_no_sanejada"] * 0.242 #m3/dia
+        return_obj[index]["contaminants"] = estimacio_contaminants(return_obj[index]["contaminants"])
+
+
+    return return_obj
+
+#Return keys from both dicts, if they appear in both dicts, sum the values
+def sum_keys(obj1, obj2):
+    return {k: obj1.get(k, 0) + obj2.get(k, 0) for k in set(obj1) | set(obj2)}
+
+#Llegeix nuclis no sanejats, si aboca a un altre nucli no sanejat o a depuradora li assignem les carregues
+def afegir_nuclis_no_sanejats_a_edars_descarrega(edars, nuclis_no_sanejats):
+
+    edars = edars.copy()
+    nuclis_no_sanejats = nuclis_no_sanejats.copy()
+
+    for nucli_no_sanejat in nuclis_no_sanejats:
+
+        ubicacio_descarrega_actual = nuclis_no_sanejats[nucli_no_sanejat]["ubicacio_descarrega_actual"]
+
+        if ubicacio_descarrega_actual is not None:  #Descarrega a algun lloc
+            #Descarrega a depuradora
+            if ubicacio_descarrega_actual in edars:
+                contaminacio_agregada = sum_keys(nuclis_no_sanejats[nucli_no_sanejat]['contaminants'], edars[ubicacio_descarrega_actual]['compounds_effluent'])
+                edars[ubicacio_descarrega_actual]['compounds_effluent'] = contaminacio_agregada
+                nuclis_no_sanejats[nucli_no_sanejat]['contaminants'] = {}
+
+            #Descarrega a nucli no sanejat
+            elif ubicacio_descarrega_actual in nuclis_no_sanejats and ubicacio_descarrega_actual != nucli_no_sanejat:
+                #Sumar carregues
+                contaminacio_agregada = sum_keys(nuclis_no_sanejats[nucli_no_sanejat]['contaminants'], nuclis_no_sanejats[ubicacio_descarrega_actual]['contaminants'])
+                nuclis_no_sanejats[ubicacio_descarrega_actual]['contaminants'] = contaminacio_agregada
+                nuclis_no_sanejats[nucli_no_sanejat]['contaminants'] = {}
+
+            #No descarrega enlloc, va directament a medi
+            else:
+                pass
+
+    return edars, nuclis_no_sanejats
+
 def readListOfIndustriesFromCSV(industrial_data):
     # Reads the first column of the csv file with the industrial to river mapping
     # Returns a list of strings
@@ -426,6 +481,7 @@ def readListOfIndustriesFromCSV(industrial_data):
                 }
     return industries
 
+#Carregues (g/m3) en un punt d'abocament
 def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrients):
 
     aux_point = {
@@ -468,6 +524,13 @@ def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrie
         if key not in ['activitat', 'abocament', 'q']:
             aux_point[key] = float(aux_point[key]) * float(aux_point["q"])
 
+    aux_point = estimacio_contaminants(aux_point)
+
+    return aux_point
+
+#Et fa estimacio de nitrogen, nitrats, fosfor i fosfats en base als nutrients presens
+def estimacio_contaminants(contaminants):
+    aux_point = contaminants.copy()
 
     if "Nitrats" not in aux_point:
         if "Nitrogen Total" in aux_point and "Amoni" in aux_point and "Nitrogen orgànic" in aux_point:
@@ -637,7 +700,6 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
     #    concentracions_avg[contaminant] = connection.avg_estacions_riu(contaminant)
 
     removal_rate_df = pd.read_excel(removal_rate).set_index("contaminant")
-
     for contaminant in contaminants_i_nutrients:
         for abocament in contaminants_per_punt_abocament:
             #contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament]["q"] * concentracions_avg[contaminant] * 10 / 1000  # Passem a kg
@@ -647,6 +709,7 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
                 try:
                     multiplicador = float(removal_rate_df.loc[contaminant, "Error industrial"])
                 except:
+
                     multiplicador = 1
 
                 contaminants_per_punt_abocament[abocament][contaminant] = multiplicador * contaminants_per_punt_abocament[abocament][contaminant] / 1000 #Passem a kg

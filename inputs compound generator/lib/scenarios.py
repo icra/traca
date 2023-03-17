@@ -248,10 +248,10 @@ def prepare_calibration(contaminant, g, graph):
 
 
 def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate,
-                  industries_to_edar, industries_to_river, edars_calibrated_init, file_name, n_iteracions, window,
+                  industries_to_edar, industries_to_river, edars_calibrated_init, nuclis_no_sanejats, file_name, n_iteracions, window,
                   graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars,
                   resultat_escenaris, abocaments_ci, id_pixel):
-    # contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
+
     contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Nonilfenols", "Octilfenols",
                                 "Hexabromociclodecà", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
 
@@ -355,7 +355,7 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                                       recall_points)
 
         # Afegim contaminació de depuradores al graf
-        df_pixels = renameHelper.add_data_edar_to_graph(recall_points, edars_calibrated, contaminants_i_nutrients,
+        df_pixels = renameHelper.add_data_edar_i_nuclis_no_sanejats_to_graph(recall_points, edars_calibrated, nuclis_no_sanejats, contaminants_i_nutrients,
                                                         pixel_to_poll.copy(), abocaments_ci)
 
         # Executem simulacio

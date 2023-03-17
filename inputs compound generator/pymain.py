@@ -1,6 +1,6 @@
 import PySimpleGUI
 from GUI.views.mainGUI import mainGUI as mainGUI
-from lib.calibrationMainConcentration import read_industries, read_edars, exportDataForNils, wwtp_info
+from lib.calibrationMainConcentration import read_industries, read_edars, exportDataForNils, wwtp_info, llegir_nuclis_no_sanejats, afegir_nuclis_no_sanejats_a_edars_descarrega
 from lib.db.renameSQLite import renameSQLite as rS
 from GUI.views.settingsGUI import settingsGUI as settingsGUI
 from lib.db.ConnectPostgree import ConnectDb as pg
@@ -26,7 +26,7 @@ def run_scenarios_parallel(window, main_window, n_iteracions):
 
     scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals,
                             edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river,
-                            edars_calibrated, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel)
+                            edars_calibrated, nuclis_no_sanejats, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel)
 
 
     main_window.write_event_value('scenario_generator_ended', '')
@@ -42,7 +42,7 @@ pujar_concentracions_db = False
 fitxers_calibracio_nils = True
 generate_exe = False
 export_graph_to_csv = True
-export_edars_calibrated_json = True
+export_edars_calibrated_json = False
 
 if generate_exe:
 #Codi per generar executable
@@ -85,8 +85,10 @@ else:
     resultat_escenaris = "resultat.json"
     abocaments_ci = "inputs/abocaments_ci.csv"
     id_pixel = "inputs/AGG_WWTP_df_no_treatment.csv"
+    nuclis_no_sanejats_excel = "inputs/nuclis_no_sanejats.xlsx"
 
 table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
+
 if pujar_concentracions_db:
     #Generar concentracions i estimacions i penjar-les a DB (esborra table_name, en cas que existeixi, i en crea una de nova)
     contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics()
@@ -118,6 +120,19 @@ contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_cali
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate)    #Dades de contaminants despres de ser filtrats per edar
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)    #Dades de contaminants abocats directament a riu o a sortida depuradora
+
+with open("scripts/inputs/edars_calibrated.json", 'w', encoding='utf-8') as outfile:
+    json.dump(edars_calibrated, outfile, ensure_ascii=False)
+
+
+nuclis_no_sanejats = llegir_nuclis_no_sanejats(nuclis_no_sanejats_excel, contaminants_i_nutrients, removal_rate)    #Nuclis que no estan sanejats
+edars_calibrated, nuclis_no_sanejats = afegir_nuclis_no_sanejats_a_edars_descarrega(edars_calibrated, nuclis_no_sanejats)    #Afegir nuclis no sanejats a edars o altres nuclis
+
+
+with open("scripts/inputs/nuclis_no_sanejats.json", 'w', encoding='utf-8') as outfile:
+    json.dump(nuclis_no_sanejats, outfile, ensure_ascii=False)
+
+
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
 contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
 
@@ -159,12 +174,13 @@ for contaminant in contaminants:
 if fitxers_calibracio_nils:
     #Fitxers per calibrar contaminacio a depuradora (en nils te l'script)
     exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="scripts/inputs/calibracio_contaminants.json")
-    wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='edars_pollutant_attenuation.json')
+    wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='scripts/inputs/edars_pollutant_attenuation.json')
+    print("Fitxers calibració guardats")
 
 if export_graph_to_csv:
     file_name = 'graph.csv'
     renameHelper = rS(None)
-    renameHelper.export_graph_csv(edars_calibrated, id_discharge_to_volumes, contaminants_puntuals, file_name = file_name)
+    renameHelper.export_graph_csv(edars_calibrated, id_discharge_to_volumes, nuclis_no_sanejats, contaminants_puntuals, file_name = file_name)
 
 if export_edars_calibrated_json:
     with open("scripts/inputs/edars_calibrated.json", 'w', encoding='utf-8') as outfile:

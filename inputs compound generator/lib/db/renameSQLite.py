@@ -199,7 +199,7 @@ class renameSQLite:
 
         return min(points, key = lambda x: f(x, point))
 
-    def export_graph_csv(self, edars_calibrated, volumes, contaminants_i_nutrients, file_name = 'graph.csv'):
+    def export_graph_csv(self, edars_calibrated, volumes, nuclis_no_sanejats, contaminants_i_nutrients, file_name = 'graph.csv'):
 
         recall = pd.read_excel("inputs/recall_points.xlsx", index_col=0).to_dict(orient='index')
         coord_index = list(map(lambda row: list(row.values()), pd.read_csv("inputs/abocaments_ci.csv").to_dict(orient='index').values()))
@@ -214,7 +214,6 @@ class renameSQLite:
             contaminants_aux.append(pollutant + "_domestic")
         pixel_to_poll.loc[:, contaminants_aux] = 0
         """
-
 
         pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
 
@@ -238,10 +237,7 @@ class renameSQLite:
                 #pixel_to_poll.loc[id_pixel, pollutant+"_industrial"] += load_industrial
                 #pixel_to_poll.loc[id_pixel, pollutant+"_domestic"] += load_domestic
 
-
         #Repetir per industries
-
-
         for industry in volumes:
             id = int(volumes[industry]["id"])
             point = [recall[id]['lat'], recall[id]['lon']]
@@ -258,6 +254,16 @@ class renameSQLite:
             end = time.time()
         #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_industrial', '')
         #pixel_to_poll.columns = pixel_to_poll.columns.str.replace('_domestic', '')
+
+        #Informació nuclis no sanejats
+        for nucli in nuclis_no_sanejats:
+            lat = nuclis_no_sanejats[nucli]["lat"]
+            lon = nuclis_no_sanejats[nucli]["lon"]
+            id_pixel = (self.shortest_dist(coord_index, [lat, lon]))[2]
+            for contaminant, carrega in nuclis_no_sanejats[nucli]["contaminants"].items():
+                if contaminant in contaminants_i_nutrients:
+                    load = (carrega * 1000000000 / 24) #kg/dia a micro/h
+                    pixel_to_poll.at[id_pixel, contaminant] += load
 
         pixel_to_poll.to_csv(file_name)
         return pixel_to_poll
@@ -287,11 +293,10 @@ class renameSQLite:
 
         return pixel_to_poll
 
-    def add_data_edar_to_graph(self, recall_points, edars_calibrated, contaminants_i_nutrients, pixel_to_poll, abocaments_ci):
+    def add_data_edar_i_nuclis_no_sanejats_to_graph(self, recall_points, edars_calibrated, nuclis_no_sanejats, contaminants_i_nutrients, pixel_to_poll, abocaments_ci):
 
         recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
         coord_index = list(map(lambda row: list(row.values()), pd.read_csv(abocaments_ci).to_dict(orient='index').values()))
-
 
         for edar in edars_calibrated:
             id = int(edars_calibrated[edar]["id_swat"])
@@ -304,9 +309,18 @@ class renameSQLite:
                     load = (edars_calibrated[edar]["compounds_effluent"][pollutant] * 1000000000 / 24) #kg/dia a micro/h
 
                 pixel_to_poll.at[id_pixel, pollutant] += load
-        
+
+        for nucli in nuclis_no_sanejats:
+            lat = nuclis_no_sanejats[nucli]["lat"]
+            lon = nuclis_no_sanejats[nucli]["lon"]
+            id_pixel = (self.shortest_dist(coord_index, [lat, lon]))[2]
+            for contaminant, carrega in nuclis_no_sanejats[nucli]["contaminants"].items():
+                if contaminant in contaminants_i_nutrients:
+                    load = (carrega * 1000000000 / 24) #kg/dia a micro/h
+                    pixel_to_poll.at[id_pixel, contaminant] += load
 
         return pixel_to_poll
+
 
     def add_data_to_excel(self, edars_calibrated, volumes, contaminants_i_nutrients, file_name):
         edars = []
