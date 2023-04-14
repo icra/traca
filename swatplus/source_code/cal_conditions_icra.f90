@@ -54,6 +54,8 @@
                 pldb(id_plt)%bio_e = chg_par (pldb(id_plt)%bio_e, ielem, chg_typ, chg_val, absmin, absmax, num_db)
               case ("tmp_base")
                 pldb(id_plt)%t_base = chg_par (pldb(id_plt)%t_base, ielem, chg_typ, chg_val, absmin, absmax, num_db)
+              case ("tmp_opt")
+                pldb(id_plt)%t_opt = chg_par (pldb(id_plt)%t_opt, ielem, chg_typ, chg_val, absmin, absmax, num_db)
               end select
           end if
 

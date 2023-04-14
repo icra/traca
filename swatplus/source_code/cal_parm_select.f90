@@ -33,6 +33,7 @@
       use hydrograph_module
       use pesticide_data_module
       use plant_module
+	  use mgt_operations_module, only : harvop_db !LVerdura
       
       implicit none
 
@@ -849,6 +850,11 @@
             
         case ("uslels_lte")
             hlt_db(ielem)%uslels = chg_par (hlt_db(ielem)%uslels, ielem, chg_typ, chg_val, absmin, absmax, num_db)
+		
+		!LVerdura: operation harvest index
+		case ("harv_idx")
+            harvop_db(ielem)%hi_ovr = chg_par (harvop_db(ielem)%hi_ovr, ielem, chg_typ, chg_val, absmin, absmax, num_db)
+		!LVerdura end
 
         end select
 

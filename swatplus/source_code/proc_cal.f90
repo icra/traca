@@ -6,8 +6,10 @@
       implicit none
    
       !read calibration data (if included)
-      !call cal_parm_read     !LVerdura: les cridem abans
-      !call cal_parmchg_read  !LVerdura: les cridem abans
+      deallocate (cal_parms)  !LVerdura: per tornar-la a cridar
+      deallocate (cal_upd)    !LVerdura: per tornar-la a cridar
+      call cal_parm_read
+      call cal_parmchg_read  
 
       !! need to read plant parms before calibrating
       call pl_read_regions_cal      !soft data for plant parms (lai_pot and harv_idx) calibration

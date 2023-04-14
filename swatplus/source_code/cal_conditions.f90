@@ -8,6 +8,7 @@
       use plant_module
       use time_module
       use climate_module, only : pcp, tmp
+	  use mgt_operations_module, only : harvop_db !LVerdura
       
       implicit none
            
@@ -82,6 +83,13 @@
                 cond_met = "n"
                 exit
               end if
+			!LVerdura: harvest operation
+			case ("harvop")
+              if (cal_upd(ichg_par)%cond(ic)%targc /= harvop_db(ielem)%name) then 
+                cond_met = "n"
+                exit
+              end if
+			!LVerdura end
             end select
           end do    ! ic - conditions
 
@@ -137,22 +145,22 @@
                     ! end if
                   ! end do
                 ! end do
-              case ("harv_idx")
-                do ipl = 1, pcom(ielem)%npl
-                  do ic = 1, cal_upd(ichg_par)%conds
-                    if (cal_upd(ichg_par)%cond(ic)%targc == pcom(ielem)%pl(ipl)) then
-                      ireg = hru(ielem)%crop_reg
-                      do ilum = 1, plcal(ireg)%lum_num
-                        if (pl_prms(1)%prm(ilum)%name == pcom(ielem)%pl(ipl)) then
-                          absmin = pl_prms(1)%prm(ilum+nvar)%lo
-                          absmax = pl_prms(1)%prm(ilum+nvar)%up
-                          pcom(ielem)%plcur(ipl)%harv_idx = chg_par (pcom(ielem)%plcur(ipl)%harv_idx, ielem, chg_typ, chg_val, &
-                            absmin, absmax, num_db)
-                        end if
-                      end do
-                    end if
-                  end do
-                end do
+              ! case ("harv_idx")
+                ! do ipl = 1, pcom(ielem)%npl
+                  ! do ic = 1, cal_upd(ichg_par)%conds
+                    ! if (cal_upd(ichg_par)%cond(ic)%targc == pcom(ielem)%pl(ipl)) then
+                      ! ireg = hru(ielem)%crop_reg
+                      ! do ilum = 1, plcal(ireg)%lum_num
+                        ! if (pl_prms(1)%prm(ilum)%name == pcom(ielem)%pl(ipl)) then
+                          ! absmin = pl_prms(1)%prm(ilum+nvar)%lo
+                          ! absmax = pl_prms(1)%prm(ilum+nvar)%up
+                          ! pcom(ielem)%plcur(ipl)%harv_idx = chg_par (pcom(ielem)%plcur(ipl)%harv_idx, ielem, chg_typ, chg_val, &
+                            ! absmin, absmax, num_db)
+                        ! end if
+                      ! end do
+                    ! end if
+                  ! end do
+                ! end do
               end select
  
             case ("cli")

@@ -128,6 +128,8 @@
               cal_upd(i)%num_elem = db_mx%pcpfiles
             case ("tmp")
               cal_upd(i)%num_elem = db_mx%tmpfiles
+            case ("hop") !LVerdura
+              cal_upd(i)%num_elem = db_mx%harvop_db !LVerdura
             end select
             
             allocate (cal_upd(i)%num(cal_upd(i)%num_elem))
