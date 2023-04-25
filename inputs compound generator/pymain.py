@@ -39,10 +39,10 @@ pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
 pujar_concentracions_db = False
-fitxers_calibracio_nils = True
+fitxers_calibracio_nils = False
 generate_exe = False
-export_graph_to_csv = True
-export_edars_calibrated_json = True
+export_graph_to_csv = False
+export_edars_calibrated_json = False
 
 if generate_exe:
 #Codi per generar executable
@@ -317,3 +317,5 @@ else:
                 break
 
     mGUI.window.close()
+
+#%%

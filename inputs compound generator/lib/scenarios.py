@@ -251,6 +251,7 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                   industries_to_edar, industries_to_river, edars_calibrated_init, file_name, n_iteracions, window,
                   graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars,
                   resultat_escenaris, abocaments_ci, id_pixel):
+
     # contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
     contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Nonilfenols", "Octilfenols",
                                 "Hexabromociclodecà", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
@@ -277,17 +278,18 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     edars_osmosi_inversa = ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E',
                             'ES9082110001010E', 'ES9080440001010E']
 
+
+
     escenari_base, cost_inicial = nomes_escenari_base(edars, edars_calibrated_init, n_iteracions)
-    print(escenari_base)
+    scenarios = list(escenari_base)
 
     """
     optimitzacio = Optimitzacio_tec(pd.DataFrame(list(escenari_base)[0]))
     resultats = optimitzacio.optimize()
-
-
     scenarios = map(lambda df: df.to_dict('records'), resultats)
     """
-    scenarios = list(escenari_base)
+
+
 
     # Assignem càrregues d'origen industrial
     renameHelper = rS(None)

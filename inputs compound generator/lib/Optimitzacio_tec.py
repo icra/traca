@@ -11,7 +11,7 @@ import pandas as pd
 import joblib
 #from sklearn.ensemble import HistGradientBoostingRegressor
 import math
-import sklearn
+import sklearn.ensemble._hist_gradient_boosting
 
 
 # %%
@@ -19,11 +19,8 @@ class Optimitzacio_tec:
     def __init__(self, escenari_base):
 
         self.esc_base = escenari_base
-        print(self.esc_base)
-        print('------------')
-
-
         self.num_dep = len(self.esc_base)
+
         self.names_edars = []
 
         for i in range(self.num_dep):
@@ -31,9 +28,11 @@ class Optimitzacio_tec:
 
         self.tecnologies = ["SC", "SN", "SP", "SF", "UV", "GAC", "O3", "UF", "RO", "AOP"]
         self.histxgboost = joblib.load('lib/XGboost_escenaris')
+
         self.results = []
+
     def evaluate(self, par):
-        num_tec = 10
+        num_tec = len(self.tecnologies)
         x = np.zeros(num_tec * self.num_dep * 2).reshape(2, num_tec * self.num_dep)
         for i in range(self.num_dep):
             for j in range(3):
@@ -45,6 +44,7 @@ class Optimitzacio_tec:
                 for j in range(3, 10):
                     if self.tecnologies[j] in self.esc_base["terciaris"][i]:
                         x[0][i * num_tec + j] = 1
+
             # 0 -> sense modificar
             # 1 -> [SF,UV]
             # 2 -> [GAC]
@@ -102,13 +102,16 @@ class Optimitzacio_tec:
                 # de moment si ja té terciaris no hi ha canvis.
                 if esc_base["terciaris"][ind] is not None:  # is not nan
                     self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
+
                 #Si es vol aplicar filtres de cabal i cabal depuradora < 20000, no hi ha canvis
                 elif 'cabal' in filtres and esc_base['cabal'][ind] < 20000:
                     self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
+
                 #si filtre o3, no es poden aplicar tractaments amb o3
                 elif 'o3' in filtres:
                     #QUÈ S'HA DE POSAR AQUÍ
                     self.params.append(spotpy.parameter.Uniform(edar, 0, 0))
+
                 else:
                     if edar in ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E',
                                 'ES9082110001010E', 'ES9080440001010E']:

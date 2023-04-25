@@ -6,14 +6,15 @@ numpy.seterr(all='raise')
 import networkx
 import math
 from osgeo import gdal
+import pickle
+
 class Simulation:
     def __init__(self, graph_location, river_attenuation):
         self.attenuation_df = pandas.read_csv(river_attenuation).set_index('Nom')
 
+        with open(graph_location, 'rb') as f:
+            self.river_graph = pickle.load(f)
 
-        open_file = open(graph_location, "rb")
-        self.river_graph = networkx.read_gpickle(open_file)
-        open_file.close()
         nodelist = []
 
         for node in self.river_graph:
