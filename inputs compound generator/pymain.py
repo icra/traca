@@ -1,4 +1,6 @@
 import PySimpleGUI
+import pandas as pd
+
 from GUI.views.mainGUI import mainGUI as mainGUI
 from lib.calibrationMainConcentration import read_industries, read_edars, exportDataForNils, wwtp_info
 from lib.db.renameSQLite import renameSQLite as rS
@@ -47,7 +49,7 @@ export_edars_calibrated_json = False
 if generate_exe:
 #Codi per generar executable
     """
-    pyinstaller --onefile --add-data="inputs/industrial.xlsx;inputs" --add-data="inputs/recall_points.xlsx;inputs" --add-data="inputs/atenuacions_generacions.xlsx;inputs" --add-data="inputs/edar_data.xlsx;inputs" --add-data="inputs/catalonia_graph.pkl;inputs" --add-data="inputs/percentatges_eliminacio_tots_calibrats.csv;inputs" --add-data="inputs/excel_scenario.xlsx;inputs" --add-data="inputs/coords_to_pixel_llob.csv;inputs" --add-data="inputs/coord_codi_llob.csv;inputs" --add-data="inputs/llindars_massa_aigua.xlsx;inputs" --add-data="inputs/abocaments_ci.csv;inputs" --add-data="inputs/AGG_WWTP_df_no_treatment.csv;inputs" pymain.py
+    pyinstaller --onefile --add-data="inputs/industrial.xlsx;inputs" --add-data="inputs/recall_points.xlsx;inputs" --add-data="inputs/atenuacions_generacions.xlsx;inputs" --add-data="inputs/edar_data.xlsx;inputs" --add-data="inputs/catalonia_graph_2022.pkl;inputs" --add-data="inputs/percentatges_eliminacio_tots_calibrats.csv;inputs" --add-data="inputs/excel_scenario.xlsx;inputs" --add-data="inputs/coords_to_pixel_llob.csv;inputs" --add-data="inputs/coord_codi_llob.csv;inputs" --add-data="inputs/llindars_massa_aigua.xlsx;inputs" --add-data="inputs/abocaments_ci.csv;inputs" --add-data="inputs/AGG_WWTP_df_no_treatment.csv;inputs" pymain.py
     """
     edar_data_xlsx = 'Inputs/edar_data.xlsx'
     removal_rate = "Inputs/atenuacions_generacions.xlsx"
@@ -57,7 +59,7 @@ if generate_exe:
     analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
     review = "inputs/review.xlsx"
     resum_eliminacio = "inputs/resum_eliminacio.xlsx"
-    graph_location = resource_path("inputs/catalonia_graph.pkl")
+    graph_location = resource_path("inputs/catalonia_graph_2022.pkl")
     river_attenuation = resource_path("inputs/percentatges_eliminacio_tots_calibrats.csv")
     excel_scenario = resource_path("inputs/excel_scenario.xlsx")
     coord_to_pixel = resource_path("inputs/coords_to_pixel_llob.csv")
@@ -76,7 +78,7 @@ else:
     analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
     review = "inputs/review.xlsx"
     resum_eliminacio = "inputs/resum_eliminacio.xlsx"
-    graph_location = "inputs/catalonia_graph.pkl"
+    graph_location = "inputs/catalonia_graph_2022.pkl"
     river_attenuation = "inputs/percentatges_eliminacio_tots_calibrats.csv"
     excel_scenario = "inputs/excel_scenario.xlsx"
     coord_to_pixel = "inputs/coords_to_pixel_llob.csv"
@@ -116,44 +118,56 @@ contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics() #Tot
 contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_calibrats_wwtp()    #Contaminants que hem pogut calibrar a EDAR
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
-id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate)    #Dades de contaminants despres de ser filtrats per edar
-edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)    #Dades de contaminants abocats directament a riu o a sortida depuradora
+id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate)      #Dades de contaminants abocats directament a riu o a sortida depuradora
+edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)    #Dades de contaminants despres de ser filtrats per edar
+
+
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
-contaminants = ["Ciprofloxacina", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Cloroalcans"]
+#contaminants_puntuals = ["Diuron", "Coure", "Naftalè", "Indeno(1.2.3-C.D)pirè", "Fluorantè", "Benzo(b)fluorantè", "Antracè"]
 
+
+
+rows = []
+
+edars_llob = ["ES9081130006010E",
+             "ES9080480001010E",
+             "ES9083020001010E",
+             "ES9083000004010E",
+             "ES9082910001010E",
+             "ES9081620002010E",
+             "ES9081610008010E",
+             "ES9082400005010E",
+             "ES9081140002010E",
+             "ES9082110001010E",
+             "ES9082220003010E",
+             "ES9081190002010E",
+             "ES9081840001010E",
+             "ES9082050005010E",
+             "ES9082870007010E",
+             "ES9080440001010E",
+             "ES9080010001010E",
+             "ES9081270001010E",
+             "ES9080530002010E",
+             "ES9080980004010E",
+             "ES9080910001010E",
+             "ES9082790004050E"]
 
 
 """
-industries_fora_ambit_llobregat = pandas.read_csv("inputs/industries_riu_llob.csv", index_col=0)
-for row in industries_fora_ambit_llobregat.itertuples():
-    nom_industria = row[0].replace("'", "''")
-    nom_abocament = row[1].replace("'", "''")
+for edar in edars_llob:
 
-    print(connection.getIndustryPollution(nom_industria, nom_abocament, 'Octilfenols') * 307956.3739797776)
-"""
+    nt = edars_calibrated[edar]["compounds_effluent"]["Nitrogen Total"]
+    ft = edars_calibrated[edar]["compounds_effluent"]["Fòsfor total"]
+    cabal = edars_calibrated[edar]["compounds_effluent"]["q"]
+    poblacio = edars_calibrated[edar]['population_real']
 
-
-
-"""
-for contaminant in ["Octilfenols"]:
-    total = 0
-    for edar in depuradores_llobregat_fora_ambit:
-        print(edar, edars_calibrated[edar]["compounds_effluent"][contaminant] * 307956.3739797776)
-        #total += edars_calibrated[edar]["compounds_effluent"][contaminant]
-
-    #print(contaminant, total * 1000)
-"""
+    print(edars_calibrated[edar])
 
 
-"""
-a = pandas.read_csv("recall_points_baix_llob.csv", index_col=0)
-for contaminant in contaminants:
-    total = 0
-    for index in a.index:
-        index_str = str(index)
-        if index_str in id_discharge_to_volumes and contaminant in id_discharge_to_volumes[index_str]:
-            total += id_discharge_to_volumes[index_str][contaminant]
-    print(contaminant, total*1000)
+    rows.append({'Codi': edar, 'Cabal': cabal, "Nitrogen total": nt, "Fòsfor total": ft, "Poblacio": poblacio})
+
+df = pd.DataFrame(rows)
+df.to_csv("nitrogen_fosfor_edars_llobregat.csv")
 """
 
 if fitxers_calibracio_nils:
@@ -274,34 +288,6 @@ else:
                                      daemon=True).start()
 
 
-                """
-                file_name = PySimpleGUI.popup_get_text('Escriu nom del fitxer per guardar els resultats (exemple: generacio_escenaris.xlsx)')
-                if file_name is not None:
-
-                    if not file_name.endswith(".xlsx"):
-                        file_name += ".xlsx"
-
-                    file_name = "Resultats/" + file_name
-
-                    n_iteracions = PySimpleGUI.popup_get_text("Nombre d'escenaris a generar. El nombre d'escenaris màxim a generar és de 3512320, però el temps de simulació de 20 dies")
-
-                    if n_iteracions is not None:
-
-                        n_iteracions = int(n_iteracions)
-
-                        if n_iteracions > 3512320:
-                            n_iteracions = 3512320
-                        elif n_iteracions <= 0:
-                            n_iteracions = 1
-
-                        layout = [[PySimpleGUI.ProgressBar(max_value=n_iteracions, orientation='h', size=(20, 20),
-                                                           key='progress_1')]]
-                        popup_window = PySimpleGUI.Window('Test', layout, finalize=True, modal=True)
-
-                        threading.Thread(target=run_scenarios_parallel,
-                                         args=(popup_window,win, n_iteracions),
-                                         daemon=True).start()
-                """
 
             except Exception as e:
                 print(str(e))

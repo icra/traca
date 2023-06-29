@@ -49,11 +49,11 @@ class mainGUI:
                 vertical_scroll_only=False
             )],
 
-            #[PySimpleGUI.Text('.SQLite location: '),
-            #PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
-            #PySimpleGUI.FileBrowse(),
-            #PySimpleGUI.Button("Add data from the point of discharge", key="add_dp_data")
-            #],
+            [PySimpleGUI.Text('.SQLite location: '),
+            PySimpleGUI.InputText('', key='swat_db_sqlite', enable_events=True),
+            PySimpleGUI.FileBrowse(),
+            PySimpleGUI.Button("Add data from the point of discharge", key="add_dp_data")
+            ],
 
             [
                 PySimpleGUI.Button("Guardar generació de contaminants", key="pollutants_generator"),

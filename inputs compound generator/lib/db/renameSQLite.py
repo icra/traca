@@ -262,6 +262,7 @@ class renameSQLite:
         pixel_to_poll.to_csv(file_name)
         return pixel_to_poll
 
+    #Posa les dades de les indústries al graf. Executar abans que add_data_edar_to_graph
     def add_data_industry_to_graph(self, recall_points, volumes, contaminants_i_nutrients, abocaments_ci, id_pixel):
 
         recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
@@ -270,8 +271,8 @@ class renameSQLite:
         pixel_to_poll.drop(pixel_to_poll.columns[pixel_to_poll.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
 
 
-        pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
-
+        #pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
+        pixel_to_poll = pixel_to_poll.assign(**{column: 0 for column in contaminants_i_nutrients})
 
         for industry in volumes:
             id = int(volumes[industry]["id"])

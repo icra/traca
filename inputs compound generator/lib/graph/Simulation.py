@@ -18,7 +18,7 @@ class Simulation:
         nodelist = []
 
         for node in self.river_graph:
-            if self.river_graph.nodes[node]['basin'] == 12207:
+            if self.river_graph.nodes[node]['basin'] == 12207: #Unicament conca del llobregat
                 self.river_graph.nodes[node]['pixel_number'] = node
                 nodelist.append(node)
 
@@ -113,7 +113,7 @@ class Simulation:
             """
             for n in self.sorted_river_list:  # for all river pixels
                 if n in contamination_df.index:
-                    g.nodes[n][contaminant] = contamination_df.at[n, contaminant] * multiplicador
+                    g.nodes[n][contaminant] = contamination_df.at[n, contaminant] * multiplicador   #micrograms / h
 
                     """
                     if n == 117433900 and contaminant == 'Tetracloroetilè':

@@ -229,7 +229,8 @@ def nomes_escenari_base(edars_escenaris, edars_calibrated_init, n_iteracions):
 
 
 def prepare_calibration(contaminant, g, graph):
-    path = "C:\\Users\\jsalo\\Desktop\\obseravacions_contaminants\\"
+
+    path = "C:\\Users\\jsalo\\Desktop\\observacions_contaminants\\"
     df = pd.read_csv(path + contaminant + ".csv")
     df[['lat', 'long']] = df['lat_long'].str.replace('"', '').str.split(' ', 1, expand=True)
     df['lat'] = df['lat'].astype(float)
@@ -252,10 +253,6 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                   graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars,
                   resultat_escenaris, abocaments_ci, id_pixel):
 
-    # contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Hexabromociclodecà", "Nonilfenols", "Octilfenols", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
-    contaminants_i_nutrients = ["Ciprofloxacina", "Cloroalcans", "Clorobenzè", "Nonilfenols", "Octilfenols",
-                                "Hexabromociclodecà", "Tetracloroetilè", "Triclorometà", "Niquel", "Plom", "Diuron"]
-
     store_calibration_files = False
 
     edars_cic = pd.read_excel(edar_data_xlsx, index_col=0)
@@ -275,21 +272,15 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
          "ES9080530002010E"
          ]]
 
-    edars_osmosi_inversa = ['ES9081130006010E', 'ES9081270001010E', 'ES9080010001010E', 'ES9081140002010E',
-                            'ES9082110001010E', 'ES9080440001010E']
-
-
 
     escenari_base, cost_inicial = nomes_escenari_base(edars, edars_calibrated_init, n_iteracions)
     scenarios = list(escenari_base)
 
     """
-    optimitzacio = Optimitzacio_tec(pd.DataFrame(list(escenari_base)[0]))
+    optimitzacio = Optimitzacio_tec(pd.DataFrame(scenarios[0]))
     resultats = optimitzacio.optimize()
     scenarios = map(lambda df: df.to_dict('records'), resultats)
     """
-
-
 
     # Assignem càrregues d'origen industrial
     renameHelper = rS(None)
@@ -336,6 +327,9 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     current_iteration = 0
 
     for scenario in scenarios:
+
+
+
         if current_iteration == n_iteracions:
             break
 
@@ -366,6 +360,12 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
         # Llegim estadistiques
         masses_aigua_valors = {}
         masses_aigua_incompliments = {}
+
+        #copy dataframe llindars_massa_aigua and set to 0
+        df_concentracio_massa = pd.DataFrame(0, columns=llindars_massa_aigua.columns, index=llindars_massa_aigua.index)
+
+
+
         for contaminant in contaminants_i_nutrients:
             if store_calibration_files:
                 prepare_calibration(contaminant, g, graph)
@@ -379,7 +379,13 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                 if contaminant not in masses_aigua_valors[massa_aigua]:
                     masses_aigua_valors[massa_aigua][contaminant] = []
 
+                """
+                massa en micrograms/h
+                cabal en m3/h
+                conc en ng/L
+                """
                 conc = graph.nodes[pixel][contaminant] / graph.nodes[pixel]['flow_HR']
+
 
                 masses_aigua_valors[massa_aigua][contaminant].append(conc)
 
@@ -391,6 +397,9 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
                 mitjana_contaminant = sum(masses_aigua_valors[massa_aigua][contaminant]) / len(
                     masses_aigua_valors[massa_aigua][contaminant])
+
+                df_concentracio_massa.at[contaminant, massa_aigua] = mitjana_contaminant
+
 
                 """
                 if massa_aigua == 1000900 or massa_aigua == 1000740:
@@ -406,8 +415,13 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
                     mitjana_contaminant = mitjana_contaminant / 0.016
                 """
 
-                if mitjana_contaminant > llindars_massa_aigua.at[contaminant, massa_aigua]:
-                    masses_aigua_incompliments[massa_aigua].append(contaminant)
+
+                try:
+                    if mitjana_contaminant > llindars_massa_aigua.at[contaminant, massa_aigua]:
+                        masses_aigua_incompliments[massa_aigua].append(contaminant)
+                except: #Si no tenim un limit de contaminacio, assumim que aquest es 0
+                    if mitjana_contaminant > 0:
+                        masses_aigua_incompliments[massa_aigua].append(contaminant)
 
         # Guardem a fitxer intermig
         with open("resultats.csv", 'a', newline='', encoding="utf-8") as write_obj:
@@ -428,6 +442,10 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
 
     # Calculem estadistiques
     df = pandas.read_csv('resultats.csv')
+
+    df_concentracio_massa.to_excel('C:\\Users\\jsalo\\Desktop\\concentracio_masses.xlsx')
+
+
     for string in list(df['escenari']):
         listObj.append(eval(string))
 

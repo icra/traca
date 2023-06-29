@@ -38,7 +38,7 @@ def isfloat(num):
         return False
 
 # Llegeix data edar de tots els fitxers i database i retorna {dc_code: edar}, no es fa calcul dels contaminants a efluent
-def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx ):
+def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx):
 
     listOfEDARCompounds = {}
 
@@ -71,6 +71,10 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
                     listOfEDARCompounds[str(row[0].value)]['configuration'].extend(str(row[6].value).replace(' ', '').split(','))
 
         edar_id = row[0].value
+
+
+
+
 
         if edar_id in industries_to_edar:
             group_of_dicharges = industries_to_edar[edar_id]
@@ -307,18 +311,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                         #load_influent_domestic *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
                         #load_influent_industrial *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
-                    edars = ["ES9080010001010E",
-                             "ES9080910001010E",
-                             "ES9083020001010E",
-                             "ES9081130006010E",
-                             "ES9081140002010E",
-                             "ES9081270001010E",
-                             "ES9081840001010E",
-                             "ES9082110001010E",
-                             "ES9082790004050E",
-                             "ES9080440001010E",
-                             "ES9080530002010E"
-                            ]
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
@@ -399,6 +391,7 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
             edars_calibrated[row[6].value]['lat'] = float(row[3].value)
             edars_calibrated[row[6].value]['long'] = float(row[4].value)
     return edars_calibrated
+
 
 def readListOfIndustriesFromCSV(industrial_data):
     # Reads the first column of the csv file with the industrial to river mapping
