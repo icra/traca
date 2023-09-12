@@ -304,6 +304,9 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                 load_influent_filtered = load_influent_industrial + load_influent_domestic
 
+                if edar_key == 'ES9081050001010E' and contaminant == 'Diuron':
+                    print(load_influent_filtered)
+
                 if contaminant in calibrated_parameters:    #Si no tenim dades de eliminacio, assumim que no neteja res
                     contaminacio_incial = load_influent_filtered
                     for configuration in wwtp["configuration"]:
@@ -370,7 +373,7 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
     return listEdars
 
-def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, swat_to_edar_code):
+def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, swat_to_edar_code, conca):
 
     edars_calibrated = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
 
@@ -380,17 +383,22 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
     ws_ptr = wb_ptr["Sheet1"]
     isFirst = True
 
+    edars_calibrated_in_watershed = {}
+
     for row in ws_ptr.iter_rows():
         # if ptr[1].value == "ES9081940001010E":
         #     print("trobat")
         if isFirst:
             isFirst = False
             continue
-        elif row[6].value is not None:
-            edars_calibrated[row[6].value]['id_swat'] = row[0].value
-            edars_calibrated[row[6].value]['lat'] = float(row[3].value)
-            edars_calibrated[row[6].value]['long'] = float(row[4].value)
-    return edars_calibrated
+        elif row[6].value is not None and row[6].value != "":
+            if row[10].value == conca:
+                edars_calibrated_in_watershed[row[6].value] = edars_calibrated[row[6].value]
+                edars_calibrated_in_watershed[row[6].value]['id_swat'] = row[0].value    #Aquí hauriem de guardar el pt nom
+                edars_calibrated_in_watershed[row[6].value]['lat'] = float(row[1].value)
+                edars_calibrated_in_watershed[row[6].value]['long'] = float(row[2].value)
+
+    return edars_calibrated_in_watershed
 
 
 def readListOfIndustriesFromCSV(industrial_data):
@@ -543,7 +551,7 @@ def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrie
 
     return aux_point
 
-def nom_abocament_a_id(industrial_data_file, recall_points_file):
+def nom_abocament_a_id(industrial_data_file, recall_points_file, conca):
 
     #Llegir industrial data
     industries = {}
@@ -567,14 +575,15 @@ def nom_abocament_a_id(industrial_data_file, recall_points_file):
             isFirst = False
             continue
 
-        if row[7].value is not None:
+        if row[7].value is not None and row[10].value == conca:
             if row[7].value not in point_2_id:
-                point_2_id[int(row[7].value)] = row[0].value
+                point_2_id[int(row[7].value)] = row[0].value    #Aquí hauria de guardar els pt
 
     discharge_point_to_id = {}
     for discharge_point, ind_id in industries.items():
         if ind_id in point_2_id:
             discharge_point_to_id[discharge_point] = point_2_id[ind_id]
+    #print(discharge_point_to_id)
     return discharge_point_to_id
 
 def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = True):
@@ -601,7 +610,7 @@ def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = T
     return abocaments_sumat
 
 #Si id_nom_abocament, retorna diccionari on l'id és el nom abocament (i no id de SWAT)
-def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection, removal_rate, id_nom_abocament = False):
+def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection, removal_rate, conca, id_nom_abocament = False):
 
     industries_grouped = {}
 
@@ -609,9 +618,8 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
     for key, industry in industries_to_river.items():
         industries_grouped[key] = group_industries(industry, contaminants_i_nutrients)
 
-
     #Llegir dades de industrial_data i recall_points
-    discharge_point_to_id = nom_abocament_a_id(industrial_data_file, recall_points_file)
+    discharge_point_to_id = nom_abocament_a_id(industrial_data_file, recall_points_file, conca)
 
     #Agrupar les industries en punts d'abocament
     discharge_points = {}
@@ -636,7 +644,6 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
             #contaminants_per_punt_abocament[abocament][contaminant] = contaminants_per_punt_abocament[abocament]["q"] * concentracions_avg[contaminant] * 10 / 1000  # Passem a kg
 
             if contaminant in contaminants_per_punt_abocament[abocament]:
-
                 try:
                     multiplicador = float(removal_rate_df.loc[contaminant, "Error industrial"])
                 except:
@@ -650,6 +657,5 @@ def read_industries(industries_to_river, industrial_data_file, recall_points_fil
             nom_abocament = contaminants_per_punt_abocament[abocament]['abocament']
             contaminants_per_nom_abocament[nom_abocament] = contaminants_per_punt_abocament[abocament]
         return contaminants_per_nom_abocament
-
 
     return contaminants_per_punt_abocament

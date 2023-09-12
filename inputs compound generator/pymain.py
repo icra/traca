@@ -28,7 +28,7 @@ def run_scenarios_parallel(window, main_window, n_iteracions):
 
     scenarios.run_scenarios(connection, industrial_data, recall_points, contaminants_puntuals,
                             edar_data_xlsx, removal_rate, industries_to_edar, industries_to_river,
-                            edars_calibrated, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel)
+                            edars_calibrated, file_name, n_iteracions, window, graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars, resultat_escenaris, abocaments_ci, id_pixel, conca)
 
 
     main_window.write_event_value('scenario_generator_ended', '')
@@ -45,6 +45,7 @@ fitxers_calibracio_nils = False
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
+conca = 'besos'
 
 if generate_exe:
 #Codi per generar executable
@@ -79,6 +80,7 @@ else:
     review = "inputs/review.xlsx"
     resum_eliminacio = "inputs/resum_eliminacio.xlsx"
     graph_location = "inputs/catalonia_graph_2022.pkl"
+    graph_location = "inputs/catalonia_graph_2022.pkl"
     river_attenuation = "inputs/percentatges_eliminacio_tots_calibrats.csv"
     excel_scenario = "inputs/excel_scenario.xlsx"
     coord_to_pixel = "inputs/coords_to_pixel_llob.csv"
@@ -87,6 +89,7 @@ else:
     resultat_escenaris = "resultat.json"
     abocaments_ci = "inputs/abocaments_ci.csv"
     id_pixel = "inputs/AGG_WWTP_df_no_treatment.csv"
+    compound_features_path = "inputs/compound_features.xlsx"
 
 table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
 if pujar_concentracions_db:
@@ -118,8 +121,9 @@ contaminants_i_nutrients = connection.get_contaminants_i_nutrients_tipics() #Tot
 contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_calibrats_wwtp()    #Contaminants que hem pogut calibrar a EDAR
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
-id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate)      #Dades de contaminants abocats directament a riu o a sortida depuradora
-edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points)    #Dades de contaminants despres de ser filtrats per edar
+id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate, conca)      #Dades de contaminants abocats directament a riu o a sortida depuradora
+edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca)    #Dades de contaminants despres de ser filtrats per edar
+
 
 
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
@@ -187,7 +191,7 @@ if export_edars_calibrated_json:
 if len(sys.argv) > 2:
     db_url = sys.argv[1]
     renameHelper = rS(db_url)
-    renameHelper.add_data_to_swat(edars_calibrated, id_discharge_to_volumes)
+    renameHelper.add_data_to_swat(edars_calibrated, id_discharge_to_volumes, compound_features_path, conca)
 
 #gui
 else:
@@ -217,7 +221,7 @@ else:
 
                 elif PySimpleGUI.popup_yes_no('This action will overwrite the uploaded file.\nDo you want to continue?') == "Yes":
                     renameHelper = rS(values["swat_db_sqlite"])
-                    renameHelper.add_data_to_swat(edars_calibrated, id_discharge_to_volumes, contaminants_i_nutrients)
+                    renameHelper.add_data_to_swat(edars_calibrated, id_discharge_to_volumes, contaminants_i_nutrients, compound_features_path, conca)
                     PySimpleGUI.popup("Data added successfully!")
 
             except Exception as e:

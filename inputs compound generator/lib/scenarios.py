@@ -251,7 +251,7 @@ def prepare_calibration(contaminant, g, graph):
 def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nutrients, edar_data_xlsx, removal_rate,
                   industries_to_edar, industries_to_river, edars_calibrated_init, file_name, n_iteracions, window,
                   graph_location, river_attenuation, excel_scenario, coord_to_pixel, coord_to_codi, llindars,
-                  resultat_escenaris, abocaments_ci, id_pixel):
+                  resultat_escenaris, abocaments_ci, id_pixel, conca):
 
     store_calibration_files = False
 
@@ -285,9 +285,9 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
     # Assignem càrregues d'origen industrial
     renameHelper = rS(None)
     id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points,
-                                              contaminants_i_nutrients, connection, removal_rate)
+                                              contaminants_i_nutrients, connection, removal_rate, conca)
     pixel_to_poll = renameHelper.add_data_industry_to_graph(recall_points, id_discharge_to_volumes,
-                                                            contaminants_i_nutrients, abocaments_ci, id_pixel)
+                                                            contaminants_i_nutrients, abocaments_ci, id_pixel, conca)
 
     g = Simulation.Simulation(graph_location, river_attenuation)
 
@@ -348,11 +348,11 @@ def run_scenarios(connection, industrial_data, recall_points, contaminants_i_nut
         edars_aux.to_excel(excel_scenario)
         # Calculem contaminants a sortida de depuradora per configuració actual
         edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, excel_scenario, removal_rate,
-                                      recall_points)
+                                      recall_points, conca)
 
         # Afegim contaminació de depuradores al graf
         df_pixels = renameHelper.add_data_edar_to_graph(recall_points, edars_calibrated, contaminants_i_nutrients,
-                                                        pixel_to_poll.copy(), abocaments_ci)
+                                                        pixel_to_poll.copy(), abocaments_ci, conca)
 
         # Executem simulacio
         graph = g.run_graph(df_pixels)

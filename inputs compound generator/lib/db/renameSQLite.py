@@ -4,20 +4,128 @@ import pandas as pd
 from math import radians, cos, sin, asin, sqrt
 import time
 import xlsxwriter
+from pathlib import Path
 
 class renameSQLite:
 
     def __init__(self, url):
         self.url = url
 
-    def add_data_to_swat(self, edars_calibrated, volumes, contaminants_i_nutrients):
+    #add pollutant features table to pollutants_pth table
+    def add_compound_features(self, conn, compound_features_path):
+        df = pd.read_excel(Path(compound_features_path))
+        df['description'] = df['name']
+        df = df.dropna()
+
+        # reset index and begin at 1
+        df = df.reset_index(drop=True)
+        df.index += 1
+
+        df.to_sql('pollutants_pth', conn, if_exists='replace', index=True, index_label='id')
+
+    #modifications required for converting .sql to txtinout using swat editor
+    def modify_file_cio(self, cursor, conn):
+
+        #file cio classification
+        # Check if the table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='file_cio_classification'")
+        table_exists = cursor.fetchone()
+
+        if table_exists:
+            # Check if the id exists in the table
+            id_to_check = 31  # Replace with the id you want to check
+            cursor.execute("SELECT COUNT(*) FROM file_cio_classification WHERE id=?", (id_to_check,))
+            id_count = cursor.fetchone()[0]
+
+            if id_count == 0:
+                # The id doesn't exist, so add it
+                cursor.execute("INSERT INTO file_cio_classification (id, name) VALUES (?, ?)", (id_to_check, 'pollutants'))
+                conn.commit()
+
+
+        #file cio
+        #check if id=148 and id=149 exist in file_cio. if not, create them
+        # Check if the table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='file_cio'")
+        table_exists = cursor.fetchone()
+
+        if table_exists:
+            # Check if the id exists in the table
+            id_to_check = 148  # Replace with the id you want to check
+            cursor.execute("SELECT COUNT(*) FROM file_cio WHERE id=?", (id_to_check,))
+            id_count = cursor.fetchone()[0]
+
+            if id_count == 0:
+                # The id doesn't exist, so add it
+                cursor.execute("INSERT INTO file_cio (id, classification_id, order_in_class, file_name) VALUES (?, ?, ?, ?)", (id_to_check, 31, 1, 'pollutants.def'))
+                conn.commit()
+
+            # Check if the id exists in the table
+            id_to_check = 149  # Replace with the id you want to check
+            cursor.execute("SELECT COUNT(*) FROM file_cio WHERE id=?", (id_to_check,))
+            id_count = cursor.fetchone()[0]
+
+            if id_count == 0:
+                # The id doesn't exist, so add it
+                cursor.execute(
+                    "INSERT INTO file_cio (id, classification_id, order_in_class, file_name) VALUES (?, ?, ?, ?)",
+                    (id_to_check, 31, 2, 'pollutants_om.exc'))
+                conn.commit()
+
+
+    def add_data_to_swat(self, edars_calibrated, volumes, contaminants_i_nutrients, compound_features_path, conca):
 
         try:
+
             conn = sqlite3.connect(self.url)
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
+
+            #add compound features table
+            self.add_compound_features(conn, compound_features_path)
+            self.modify_file_cio(c, conn)
+
+            #check if table pollutant_pth exists. if not, create it
+            c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='pollutants_pth' ''')
+
+            if c.fetchone()[0] == 0:
+                c.execute('''CREATE TABLE pollutants_pth
+                             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                             name text, 
+                             solub real, 
+                             aq_hlife real, 
+                             aq_volat real, 
+                             mol_wt real, 
+                             aq_resus real, 
+                             aq_settle real, 
+                             ben_act_dep real, 
+                             ben_bury real, 
+                             ben_hlife real, 
+                             description text)''')
+                conn.commit()
+
+            #check if table recall_pollutants_dat exists. if not, create it
+            c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='recall_pollutants_dat' ''')
+
+            if c.fetchone()[0] == 0:
+                c.execute('''CREATE TABLE recall_pollutants_dat
+                             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                              recall_rec_id INTEGER, 
+                              pollutants_pth_id INTEGER, 
+                              jday INTEGER, 
+                              mo INTEGER, 
+                              day_mo INTEGER, 
+                              yr INTEGER, 
+                              load INTEGER,
+                              FOREIGN KEY (recall_rec_id) REFERENCES recall_rec(id),
+                              FOREIGN KEY (pollutants_pth_id) REFERENCES pollutants_pth(id))''')
+
+                conn.commit()
+
+
             # Insert data of volumes to swat database
             for point in volumes:
+
                 try:
                     dbo = 0
                     fosfor = 0
@@ -52,7 +160,7 @@ class renameSQLite:
                                   nh3 = ? + nh3,   
                                   cbod = ? + cbod,
                                   solp = ? + solp
-                              WHERE recall_rec_id = ?''',
+                              WHERE ob_name = ?''',
                         (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, fosfats, point,))
 
 
@@ -79,12 +187,12 @@ class renameSQLite:
                                     c.execute(
                                         ''' UPDATE recall_pollutants_dat
                                               SET load = ? + load
-                                              WHERE (recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
+                                              WHERE (recall_rec_id = (SELECT id FROM recall_rec WHERE name=?) and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
                                         (volumes[point][contaminant], point, contaminant))
                                 else:
                                     c.execute(
                                         ''' INSERT INTO recall_pollutants_dat (recall_rec_id, pollutants_pth_id, jday, mo, day_mo, yr, load) VALUES 
-                                                  (?, (SELECT id FROM pollutants_pth WHERE name=?), ?, ?, ?, ?, ?)''',
+                                                  ((SELECT id FROM recall_rec WHERE name=?), (SELECT id FROM pollutants_pth WHERE name=?), ?, ?, ?, ?, ?)''',
                                         (point, contaminant, 1, 1, 1, 1, volumes[point][contaminant]))
 
 
@@ -130,12 +238,15 @@ class renameSQLite:
                                            nh3 = ? + nh3,
                                            cbod = ? + cbod,
                                            solp = ? + solp
-                                       WHERE recall_rec_id = ?''',
+                                       WHERE ob_name = ?''',
                                  (cabal, ptl_n, fosfor, no3_n, nh3_n, dbo, fosfats, edar["id_swat"]))
+
+
 
                         #Per cadascun dels contaminants que no va a recall_dat, posar-lo a recall_pollutants_dat
                         for contaminant in contaminants_i_nutrients:
-                            if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in volumes[point]:
+
+                            if contaminant not in ["DBO 5 dies", "Fòsfor orgànic", "Nitrogen orgànic", "Amoniac", "Nitrats", "Fosfats"] and contaminant in edar["compounds_effluent"]:
 
                                 #Mirem que el contaminant estigui creat a db
                                 c.execute(
@@ -156,12 +267,12 @@ class renameSQLite:
                                         c.execute(
                                             ''' UPDATE recall_pollutants_dat
                                                   SET load = ? + load
-                                                  WHERE (recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
+                                                  WHERE (recall_rec_id = (SELECT id FROM recall_rec WHERE name=?) and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?))''',
                                             (edar["compounds_effluent"][contaminant], edar["id_swat"], contaminant))
                                     else:
                                         c.execute(
                                             ''' INSERT INTO recall_pollutants_dat (recall_rec_id, pollutants_pth_id, jday, mo, day_mo, yr, load) VALUES 
-                                                      (?, (SELECT id FROM pollutants_pth WHERE name=?), ?, ?, ?, ?, ?)''',
+                                                      ((SELECT id FROM recall_rec WHERE name=?), (SELECT id FROM pollutants_pth WHERE name=?), ?, ?, ?, ?, ?)''',
                                             (edar["id_swat"], contaminant, 1, 1, 1, 1, edar["compounds_effluent"][contaminant]))
 
                 except Error as error:
@@ -263,19 +374,23 @@ class renameSQLite:
         return pixel_to_poll
 
     #Posa les dades de les indústries al graf. Executar abans que add_data_edar_to_graph
-    def add_data_industry_to_graph(self, recall_points, volumes, contaminants_i_nutrients, abocaments_ci, id_pixel):
+    def add_data_industry_to_graph(self, recall_points, volumes, contaminants_i_nutrients, abocaments_ci, id_pixel, conca):
 
         recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
+
         coord_index = list(map(lambda row: list(row.values()), pd.read_csv(abocaments_ci).to_dict(orient='index').values()))
         pixel_to_poll = pd.read_csv(id_pixel, index_col=1)
         pixel_to_poll.drop(pixel_to_poll.columns[pixel_to_poll.columns.str.contains('unnamed', case=False)], axis=1, inplace=True)
-
 
         #pixel_to_poll.loc[:, contaminants_i_nutrients] = 0
         pixel_to_poll = pixel_to_poll.assign(**{column: 0 for column in contaminants_i_nutrients})
 
         for industry in volumes:
             id = int(volumes[industry]["id"])
+
+            if recall[id]['conca'] != conca:
+                continue
+
             point = [recall[id]['lat'], recall[id]['lon']]
             id_pixel = (self.shortest_dist(coord_index, point))[2]
 
@@ -288,14 +403,17 @@ class renameSQLite:
 
         return pixel_to_poll
 
-    def add_data_edar_to_graph(self, recall_points, edars_calibrated, contaminants_i_nutrients, pixel_to_poll, abocaments_ci):
+    def add_data_edar_to_graph(self, recall_points, edars_calibrated, contaminants_i_nutrients, pixel_to_poll, abocaments_ci, conca):
 
         recall = pd.read_excel(recall_points, index_col=0).to_dict(orient='index')
         coord_index = list(map(lambda row: list(row.values()), pd.read_csv(abocaments_ci).to_dict(orient='index').values()))
 
-
         for edar in edars_calibrated:
             id = int(edars_calibrated[edar]["id_swat"])
+
+            if recall[id]['conca'] != conca:
+                continue
+
             point = [recall[id]['lat'], recall[id]['lon']]
             id_pixel = (self.shortest_dist(coord_index, point))[2]
 
@@ -305,7 +423,6 @@ class renameSQLite:
                     load = (edars_calibrated[edar]["compounds_effluent"][pollutant] * 1000000000 / 24) #kg/dia a micro/h
 
                 pixel_to_poll.at[id_pixel, pollutant] += load
-        
 
         return pixel_to_poll
 
