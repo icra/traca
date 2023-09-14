@@ -45,7 +45,7 @@ fitxers_calibracio_nils = False
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
-conca = 'besos'
+conca = 'fluvia'
 
 if generate_exe:
 #Codi per generar executable
