@@ -21,6 +21,8 @@ class renameSQLite:
         df = df.reset_index(drop=True)
         df.index += 1
 
+        df = df[['name', 'solub', 'aq_hlife', 'aq_volat', 'mol_wt', 'aq_resus', 'aq_settle', 'ben_act_dep', 'ben_bury', 'ben_hlife', 'kow', 'description']]
+
         df.to_sql('pollutants_pth', conn, if_exists='replace', index=True, index_label='id')
 
     #modifications required for converting .sql to txtinout using swat editor
@@ -175,9 +177,9 @@ class renameSQLite:
 
                             rows = c.fetchall()
                             if len(rows) > 0:
-
+                                #(SELECT id FROM recall_rec WHERE name=?)
                                 c.execute(
-                                    ''' SELECT * FROM recall_pollutants_dat WHERE recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?)''',
+                                    ''' SELECT * FROM recall_pollutants_dat WHERE recall_rec_id = (SELECT id FROM recall_rec WHERE name=?) and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?)''',
                                     (point, contaminant,))
 
                                 rows = c.fetchall()
@@ -257,7 +259,7 @@ class renameSQLite:
                                 if len(rows) > 0:
 
                                     c.execute(
-                                        ''' SELECT * FROM recall_pollutants_dat WHERE recall_rec_id = ? and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?)''',
+                                        ''' SELECT * FROM recall_pollutants_dat WHERE recall_rec_id = (SELECT id FROM recall_rec WHERE name=?) and pollutants_pth_id = (SELECT id FROM pollutants_pth WHERE name=?)''',
                                         (edar["id_swat"], contaminant,))
 
                                     rows = c.fetchall()

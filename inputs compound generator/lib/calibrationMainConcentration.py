@@ -73,9 +73,6 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
         edar_id = row[0].value
 
 
-
-
-
         if edar_id in industries_to_edar:
             group_of_dicharges = industries_to_edar[edar_id]
             discharges_to_edar = {}  # Dummy per reutilitzar funcio
@@ -145,7 +142,6 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file
                             "cxgx": [],
                             "excrecio": []
                         }
-
 
                     if ptr[i].value in contaminants_i_nutrients and ptr[i+2].value == "MEAN":
                         if isfloat(ptr[i+24].value):
@@ -304,9 +300,6 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                 load_influent_filtered = load_influent_industrial + load_influent_domestic
 
-                if edar_key == 'ES9081050001010E' and contaminant == 'Diuron':
-                    print(load_influent_filtered)
-
                 if contaminant in calibrated_parameters:    #Si no tenim dades de eliminacio, assumim que no neteja res
                     contaminacio_incial = load_influent_filtered
                     for configuration in wwtp["configuration"]:
@@ -314,6 +307,7 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
                         #load_influent_domestic *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
                         #load_influent_industrial *= (1 - (calibrated_parameters[contaminant][configuration] / 100))
+
 
                 compounds_effluent[contaminant] = load_influent_filtered  # kg
 
@@ -397,6 +391,10 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
                 edars_calibrated_in_watershed[row[6].value]['id_swat'] = row[0].value    #Aquí hauriem de guardar el pt nom
                 edars_calibrated_in_watershed[row[6].value]['lat'] = float(row[1].value)
                 edars_calibrated_in_watershed[row[6].value]['long'] = float(row[2].value)
+
+                if edars_calibrated_in_watershed[row[6].value]['id_swat'] == 'pt075':
+                    print(edars_calibrated_in_watershed[row[6].value])
+
 
     return edars_calibrated_in_watershed
 

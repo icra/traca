@@ -45,7 +45,7 @@ fitxers_calibracio_nils = False
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
-conca = 'fluvia'
+conca = 'muga'
 
 if generate_exe:
 #Codi per generar executable
@@ -123,8 +123,6 @@ contaminants_calibrats_depuradora = connection.get_contaminants_i_nutrients_cali
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate, conca)      #Dades de contaminants abocats directament a riu o a sortida depuradora
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca)    #Dades de contaminants despres de ser filtrats per edar
-
-
 
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
 #contaminants_puntuals = ["Diuron", "Coure", "Naftalè", "Indeno(1.2.3-C.D)pirè", "Fluorantè", "Benzo(b)fluorantè", "Antracè"]
