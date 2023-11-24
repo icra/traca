@@ -110,8 +110,7 @@ class renameSQLite:
             c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='recall_pollutants_dat' ''')
 
             if c.fetchone()[0] == 0:
-                c.execute('''CREATE TABLE recall_pollutants_dat
-                             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                c.execute('''CREATE TABLE recall_pollutants_dat (id INTEGER PRIMARY KEY AUTOINCREMENT, 
                               recall_rec_id INTEGER, 
                               pollutants_pth_id INTEGER, 
                               jday INTEGER, 
@@ -288,6 +287,10 @@ class renameSQLite:
         finally:
             if conn:
                 conn.close()
+
+
+    def add_data_to_swat_txtinout(self, edars_calibrated, volumes, contaminants_i_nutrients, compound_features_path, conca):
+        print('function called')
 
     def dist(self, lat1, long1, lat2, long2):
         """

@@ -1,8 +1,5 @@
-
-import csv
 import openpyxl
 import json
-from sqlalchemy import create_engine
 import pandas as pd
 
 def sumIgnoreNone(object, compount, reciver):
@@ -89,6 +86,8 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
 #Funcio per calibrar % eliminacio i cxgx
 def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx, connection, file_name = 'json_data.json'):
     listOfEDARCompounds = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
+
+    print(listOfEDARCompounds)
 
     dc_to_eu = {}
 

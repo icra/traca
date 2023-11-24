@@ -41,11 +41,21 @@ pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
 pujar_concentracions_db = False
-fitxers_calibracio_nils = False
+fitxers_calibracio_nils = True
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
-conca = 'muga'
+conca = 'ter'
+
+
+#read arguments
+if len(sys.argv) > 1:
+    print(sys.argv[1])
+
+    pass
+
+
+
 
 if generate_exe:
 #Codi per generar executable
@@ -125,57 +135,19 @@ id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, 
 edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca)    #Dades de contaminants despres de ser filtrats per edar
 
 contaminants_puntuals = connection.get_contaminants_i_nutrients_puntuals()  #Contaminants nomes d'origen puntual (per generacio escenaris)
-#contaminants_puntuals = ["Diuron", "Coure", "Naftalè", "Indeno(1.2.3-C.D)pirè", "Fluorantè", "Benzo(b)fluorantè", "Antracè"]
-
 
 
 rows = []
 
-edars_llob = ["ES9081130006010E",
-             "ES9080480001010E",
-             "ES9083020001010E",
-             "ES9083000004010E",
-             "ES9082910001010E",
-             "ES9081620002010E",
-             "ES9081610008010E",
-             "ES9082400005010E",
-             "ES9081140002010E",
-             "ES9082110001010E",
-             "ES9082220003010E",
-             "ES9081190002010E",
-             "ES9081840001010E",
-             "ES9082050005010E",
-             "ES9082870007010E",
-             "ES9080440001010E",
-             "ES9080010001010E",
-             "ES9081270001010E",
-             "ES9080530002010E",
-             "ES9080980004010E",
-             "ES9080910001010E",
-             "ES9082790004050E"]
 
-
-"""
-for edar in edars_llob:
-
-    nt = edars_calibrated[edar]["compounds_effluent"]["Nitrogen Total"]
-    ft = edars_calibrated[edar]["compounds_effluent"]["Fòsfor total"]
-    cabal = edars_calibrated[edar]["compounds_effluent"]["q"]
-    poblacio = edars_calibrated[edar]['population_real']
-
-    print(edars_calibrated[edar])
-
-
-    rows.append({'Codi': edar, 'Cabal': cabal, "Nitrogen total": nt, "Fòsfor total": ft, "Poblacio": poblacio})
-
-df = pd.DataFrame(rows)
-df.to_csv("nitrogen_fosfor_edars_llobregat.csv")
-"""
 
 if fitxers_calibracio_nils:
     #Fitxers per calibrar contaminacio a depuradora (en nils te l'script)
-    exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="scripts/inputs/calibracio_contaminants.json")
-    wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='edars_pollutant_attenuation.json')
+    #exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="scripts/inputs/calibracio_contaminants.json")
+    #wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='edars_pollutant_attenuation.json')
+    exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="C:/Users/jsalo/Desktop/a/calibracio_contaminants.json")
+    wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='C:/Users/jsalo/Desktop/a/edars_pollutant_attenuation.json')
+
 
 if export_graph_to_csv:
     file_name = 'graph.csv'
@@ -190,6 +162,7 @@ if len(sys.argv) > 2:
     db_url = sys.argv[1]
     renameHelper = rS(db_url)
     renameHelper.add_data_to_swat(edars_calibrated, id_discharge_to_volumes, compound_features_path, conca)
+
 
 #gui
 else:
