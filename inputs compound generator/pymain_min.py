@@ -11,6 +11,7 @@ txtinput_path = sys.argv[2]
 removal_rate = sys.argv[3]
 contaminant = sys.argv[4]
 
+#aaa
 
 pg_url = "217.61.208.188"
 pg_user = "traca_user"
