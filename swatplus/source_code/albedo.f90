@@ -32,6 +32,6 @@
         !! equation 2.2.13 in SWAT manual
         albday = 0.8
       end if
-
+!!
       return
       end subroutine albedo
