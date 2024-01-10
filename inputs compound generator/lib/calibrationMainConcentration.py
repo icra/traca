@@ -87,7 +87,7 @@ def calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients
 def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, edar_analitiques_xlsx, edar_prtr_xlsx, connection, file_name = 'json_data.json'):
     listOfEDARCompounds = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
 
-    print(listOfEDARCompounds)
+    #print(listOfEDARCompounds)
 
     dc_to_eu = {}
 
@@ -118,9 +118,12 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
         listOfEDARCompounds[wwtp]["cabal_observat"] = sum(listOfEDARCompounds[wwtp]["cabal_observat"]) / len(listOfEDARCompounds[wwtp]["cabal_observat"])
         """
 
-    with open(file_name, 'w', encoding='utf8') as outfile:
-        json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
 
+    if file_name is not None:
+        with open(file_name, 'w', encoding='utf8') as outfile:
+            json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
+
+    return listOfEDARCompounds
 #Funcio per calibrar, llegeix fitxer review
 def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file_name = 'edars_pollutant_attenuation.json'):
 
@@ -227,9 +230,11 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file
                         elif technology == 'UF':
                             dict[pol_name]["UF"] = removal_rate
 
-    with open(file_name, 'w', encoding='utf8') as outfile:
-        json.dump(dict, outfile, ensure_ascii=False)
+    if file_name is not None:
+        with open(file_name, 'w', encoding='utf8') as outfile:
+            json.dump(dict, outfile, ensure_ascii=False)
 
+    return dict
 # Afegeix la concentració de cada contaminant a l'efluent
 def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
@@ -297,7 +302,9 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                     load_influent_industrial = calibrated_parameters[contaminant]["error_industrial"] * wwtp["industriesTotalInfluent"][
                                                    contaminant] / 1000  # kg/dia
 
-                load_influent_filtered = load_influent_industrial + load_influent_domestic
+                #load_influent_filtered = load_influent_industrial + load_influent_domestic
+                load_influent_filtered = load_influent_domestic
+
 
                 if contaminant in calibrated_parameters:    #Si no tenim dades de eliminacio, assumim que no neteja res
                     contaminacio_incial = load_influent_filtered
@@ -390,10 +397,6 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
                 edars_calibrated_in_watershed[row[6].value]['id_swat'] = row[0].value    #Aquí hauriem de guardar el pt nom
                 edars_calibrated_in_watershed[row[6].value]['lat'] = float(row[1].value)
                 edars_calibrated_in_watershed[row[6].value]['long'] = float(row[2].value)
-
-                if edars_calibrated_in_watershed[row[6].value]['id_swat'] == 'pt075':
-                    print(edars_calibrated_in_watershed[row[6].value])
-
 
     return edars_calibrated_in_watershed
 

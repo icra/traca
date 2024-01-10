@@ -472,7 +472,6 @@ def read_edars(swat_to_edar_code_csv, edar_compounds_csv, edar_population_csv, e
     edars_calibrated = edarsCalibratedFormated(edar_compounds_csv, edar_population_csv, edar_analitiques_xlsx, edar_ptr_xlsx, edar_cabals_xlsx)
 
     edars_calibrated = estimate_effluent(removal_rate_csv, edars_calibrated)
-    print('aaaaa')
 
     with open(swat_to_edar_code_csv) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')

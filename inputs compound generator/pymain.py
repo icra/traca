@@ -45,7 +45,7 @@ fitxers_calibracio_nils = True
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
-conca = 'ter'
+conca = 'tordera'
 
 
 #read arguments
@@ -145,8 +145,8 @@ if fitxers_calibracio_nils:
     #Fitxers per calibrar contaminacio a depuradora (en nils te l'script)
     #exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="scripts/inputs/calibracio_contaminants.json")
     #wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='edars_pollutant_attenuation.json')
-    exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="C:/Users/jsalo/Desktop/a/calibracio_contaminants.json")
-    wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='C:/Users/jsalo/Desktop/a/edars_pollutant_attenuation.json')
+    contaminacio = exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name ="C:/Users/jsalo/Desktop/a/calibracio_contaminants.json")
+    coeficients = wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name='C:/Users/jsalo/Desktop/a/edars_pollutant_attenuation.json')
 
 
 if export_graph_to_csv:

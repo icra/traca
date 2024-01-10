@@ -11,7 +11,6 @@ txtinput_path = sys.argv[2]
 removal_rate = sys.argv[3]
 contaminant = sys.argv[4]
 
-#aaa
 
 pg_url = "217.61.208.188"
 pg_user = "traca_user"
@@ -30,7 +29,6 @@ table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
 #Posar info a fitxer .sqlite
 
 contaminants_i_nutrients = [contaminant]
-
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate, conca)      #Dades de contaminants abocats directament a riu o a sortida depuradora
@@ -103,9 +101,10 @@ for es_code, wwtp in edars_calibrated.items():
         
 
 #llegir abocaments industries i afegir a pollutants_om_df
+"""
 for pt, abocament in id_discharge_to_volumes.items():
     add_data_to_txtinout(pt, abocament)
-
+"""
 
 
 pollutants_om.df = pollutants_om_df
