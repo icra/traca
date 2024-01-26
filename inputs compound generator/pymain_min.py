@@ -21,8 +21,12 @@ connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
 #Fitxers per executar en projecte
 edar_data_xlsx = 'inputs/edar_data.xlsx'
-industrial_data = 'inputs/industrial.xlsx'
-recall_points = "inputs/recall_points.xlsx"
+
+
+#industrial_data = 'inputs/industrial.xlsx'
+#recall_points = "inputs/recall_points.xlsx"
+industrial_data = f'inputs/ind_{conca}.csv'
+recall_points = f"inputs/ptsources_{conca}.csv"
 
 table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
 

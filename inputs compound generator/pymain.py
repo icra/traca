@@ -41,11 +41,16 @@ pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
 pujar_concentracions_db = False
-fitxers_calibracio_nils = True
+fitxers_calibracio_nils = False
 generate_exe = False
 export_graph_to_csv = False
 export_edars_calibrated_json = False
-conca = 'tordera'
+
+
+"""
+MODIFICAR SEGONS CONCA A TRACTAR, DE MOMENT NOMÉS BESÒS, FLUVIÀ I TORDERA (SEGONS LAIA NECESSITI)
+"""
+conca = 'fluvia'
 
 
 #read arguments
@@ -53,7 +58,6 @@ if len(sys.argv) > 1:
     print(sys.argv[1])
 
     pass
-
 
 
 
@@ -83,8 +87,10 @@ else:
     #Fitxers per executar en projecte
     edar_data_xlsx = 'inputs/edar_data.xlsx'
     removal_rate = "inputs/atenuacions_generacions.xlsx"
-    industrial_data = 'inputs/industrial.xlsx'
-    recall_points = "inputs/recall_points.xlsx"
+    #industrial_data = 'inputs/industrial.xlsx'
+    #recall_points = "inputs/recall_points.xlsx"
+    industrial_data = f'inputs/ind_{conca}.csv'
+    recall_points = f"inputs/ptsources_{conca}.csv"
     edar_ptr = "inputs/prtr_edars.xlsx"
     analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
     review = "inputs/review.xlsx"

@@ -379,11 +379,28 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
 
     edars_calibrated = estimate_effluent(removal_rate, edars_calibrated, contaminants_i_nutrients)
 
-    wb_ptr = openpyxl.load_workbook(swat_to_edar_code)
+    edars_calibrated_in_watershed = {}
+
+    swat_to_edar_code_df = pd.read_csv(swat_to_edar_code, encoding="latin-1")
+
+    swat_to_edar_code_df = swat_to_edar_code_df[['name', 'edar_code', 'lat', 'lon']]
+    swat_to_edar_code_df = swat_to_edar_code_df.dropna()
+
+    for row in swat_to_edar_code_df.itertuples():
+        edar_code = row.edar_code
+        name = row.name
+        lat = row.lat
+        lon = row.lon
+
+        edars_calibrated_in_watershed[edar_code] = edars_calibrated[edar_code]
+        edars_calibrated_in_watershed[edar_code]['id_swat'] = name  # Aquí hauriem de guardar el pt nom
+        edars_calibrated_in_watershed[edar_code]['lat'] = lat
+        edars_calibrated_in_watershed[edar_code]['long'] = lon
+
+    """"
+    wb_ptr = openpyxl.load_workbook("inputs/recall_points.xlsx")
     ws_ptr = wb_ptr["Sheet1"]
     isFirst = True
-
-    edars_calibrated_in_watershed = {}
 
     for row in ws_ptr.iter_rows():
         # if ptr[1].value == "ES9081940001010E":
@@ -397,6 +414,9 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
                 edars_calibrated_in_watershed[row[6].value]['id_swat'] = row[0].value    #Aquí hauriem de guardar el pt nom
                 edars_calibrated_in_watershed[row[6].value]['lat'] = float(row[1].value)
                 edars_calibrated_in_watershed[row[6].value]['long'] = float(row[2].value)
+
+    print(edars_calibrated_in_watershed)
+    """
 
     return edars_calibrated_in_watershed
 
@@ -553,6 +573,7 @@ def group_industries(abocaments_activitat_en_una_ubicacio, contaminants_i_nutrie
 
 def nom_abocament_a_id(industrial_data_file, recall_points_file, conca):
 
+    """
     #Llegir industrial data
     industries = {}
     wb_ptr = openpyxl.load_workbook(industrial_data_file)
@@ -584,6 +605,20 @@ def nom_abocament_a_id(industrial_data_file, recall_points_file, conca):
         if ind_id in point_2_id:
             discharge_point_to_id[discharge_point] = point_2_id[ind_id]
     #print(discharge_point_to_id)
+    return discharge_point_to_id
+    """
+
+    recall_points_pd = pd.read_csv(recall_points_file, encoding='latin-1')[['name', 'ind']]
+    industral_data_pd = pd.read_csv(industrial_data_file, encoding='latin-1')[['Punt2', 'nom_abocam']]
+
+    merged = pd.merge(recall_points_pd, industral_data_pd, left_on='ind', right_on='Punt2', how='left')
+    merged = merged[['name', 'nom_abocam']].dropna()
+
+    #convert df to dict
+    discharge_point_to_id = {}
+    for index, row in merged.iterrows():
+        discharge_point_to_id[row['nom_abocam']] = row['name']
+
     return discharge_point_to_id
 
 def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = True):
