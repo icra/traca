@@ -124,6 +124,7 @@ def exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xl
             json.dump(listOfEDARCompounds, outfile, ensure_ascii=False)
 
     return listOfEDARCompounds
+
 #Funcio per calibrar, llegeix fitxer review
 def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file_name = 'edars_pollutant_attenuation.json'):
 
@@ -235,8 +236,9 @@ def wwtp_info(review_xlsx, contaminants_i_nutrients, resum_eliminacio_xlsx, file
             json.dump(dict, outfile, ensure_ascii=False)
 
     return dict
-# Afegeix la concentració de cada contaminant a l'efluent
-def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
+
+# Afegeix la concentració de cada contaminant a l'efluent. If ignore_industries = True, nomes tractem la contaminacio domestica (la industrial abocada a edars no)
+def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients, ignore_industries = False):
 
     # Llegim paràmetres calibrats
     calibrated_parameters = {}
@@ -302,8 +304,11 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
                     load_influent_industrial = calibrated_parameters[contaminant]["error_industrial"] * wwtp["industriesTotalInfluent"][
                                                    contaminant] / 1000  # kg/dia
 
-                #load_influent_filtered = load_influent_industrial + load_influent_domestic
-                load_influent_filtered = load_influent_domestic
+                if ignore_industries:
+                    load_influent_filtered = load_influent_domestic
+                else:
+                    load_influent_filtered = load_influent_industrial + load_influent_domestic
+                    
 
 
                 if contaminant in calibrated_parameters:    #Si no tenim dades de eliminacio, assumim que no neteja res
@@ -373,17 +378,24 @@ def estimate_effluent(removal_rate, listEdars, contaminants_i_nutrients):
 
     return listEdars
 
-def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, swat_to_edar_code, conca):
+#return info of wwtp in kg/day (and flow in m3/day). If ignore_industries = True, nomes tractem la contaminacio domestica (la industrial abocada a edars no)
+def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, swat_to_edar_code, conca, ignore_industries = False):
 
     edars_calibrated = calcAllDataForNilsConcentration(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx)
 
-    edars_calibrated = estimate_effluent(removal_rate, edars_calibrated, contaminants_i_nutrients)
+    edars_calibrated = estimate_effluent(removal_rate, edars_calibrated, contaminants_i_nutrients, ignore_industries)
 
     edars_calibrated_in_watershed = {}
 
-    swat_to_edar_code_df = pd.read_csv(swat_to_edar_code, encoding="latin-1")
+    if swat_to_edar_code.endswith('.xlsx'): #reads recall_points.xlsx
+        swat_to_edar_code_df = pd.read_excel(swat_to_edar_code)
+        swat_to_edar_code_df = swat_to_edar_code_df[swat_to_edar_code_df['conca'] == conca]
+        swat_to_edar_code_df = swat_to_edar_code_df[['name_ind', 'edar_code', 'lat', 'lon']]
+        swat_to_edar_code_df.rename(columns={'name_ind': 'name'}, inplace=True)
+    else:   #reads ptsources_{conca}.csv
+        swat_to_edar_code_df = pd.read_csv(swat_to_edar_code, encoding="latin-1")
+        swat_to_edar_code_df = swat_to_edar_code_df[['name', 'edar_code', 'lat', 'lon']]
 
-    swat_to_edar_code_df = swat_to_edar_code_df[['name', 'edar_code', 'lat', 'lon']]
     swat_to_edar_code_df = swat_to_edar_code_df.dropna()
 
     for row in swat_to_edar_code_df.itertuples():
@@ -419,7 +431,6 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
     """
 
     return edars_calibrated_in_watershed
-
 
 def readListOfIndustriesFromCSV(industrial_data):
     # Reads the first column of the csv file with the industrial to river mapping
@@ -608,11 +619,23 @@ def nom_abocament_a_id(industrial_data_file, recall_points_file, conca):
     return discharge_point_to_id
     """
 
-    recall_points_pd = pd.read_csv(recall_points_file, encoding='latin-1')[['name', 'ind']]
-    industral_data_pd = pd.read_csv(industrial_data_file, encoding='latin-1')[['Punt2', 'nom_abocam']]
 
-    merged = pd.merge(recall_points_pd, industral_data_pd, left_on='ind', right_on='Punt2', how='left')
-    merged = merged[['name', 'nom_abocam']].dropna()
+    if industrial_data_file.endswith('.xlsx') and recall_points_file.endswith('.xlsx'):  #reads industrial.xlsx and recall_points.xlsx
+        industrial_data_pd = pd.read_excel(industrial_data_file)
+        recall_points_pd = pd.read_excel(recall_points_file)
+
+        merged = pd.merge(recall_points_pd, industrial_data_pd, left_on='ind_id', right_on='punt', how='left')
+        merged = merged[merged['conca'] == conca]
+        merged = merged[['name_ind', 'nom abocament']].dropna()
+        merged = merged.rename(columns={'name_ind': 'name', 'nom abocament': 'nom_abocam'})
+
+
+    else:   #reads ind_{conca}.csv and ptsources_{conca}.csv
+        industrial_data_pd = pd.read_csv(industrial_data_file, encoding='latin-1')[['Punt2', 'nom_abocam']]
+        recall_points_pd = pd.read_csv(recall_points_file, encoding='latin-1')[['name', 'ind']]
+
+        merged = pd.merge(recall_points_pd, industrial_data_pd, left_on='ind', right_on='Punt2', how='left')
+        merged = merged[['name', 'nom_abocam']].dropna()
 
     #convert df to dict
     discharge_point_to_id = {}
@@ -644,7 +667,8 @@ def suma_industries_abocament(abocaments, contaminants_i_nutrients, store_id = T
         abocaments_sumat[id_abocament] = aux
     return abocaments_sumat
 
-#Si id_nom_abocament, retorna diccionari on l'id és el nom abocament (i no id de SWAT)
+#Si id_nom_abocament, retorna diccionari on l'id és el nom abocament (i no id de SWAT). #Return info of industries discharging to environment in kg/day (and flow in m3/day)
+
 def read_industries(industries_to_river, industrial_data_file, recall_points_file, contaminants_i_nutrients, connection, removal_rate, conca, id_nom_abocament = False):
 
     industries_grouped = {}

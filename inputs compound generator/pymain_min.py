@@ -23,10 +23,11 @@ connection = pg(pg_url, pg_db, pg_user, pg_pass)
 edar_data_xlsx = 'inputs/edar_data.xlsx'
 
 
-#industrial_data = 'inputs/industrial.xlsx'
-#recall_points = "inputs/recall_points.xlsx"
-industrial_data = f'inputs/ind_{conca}.csv'
-recall_points = f"inputs/ptsources_{conca}.csv"
+industrial_data = 'inputs/industrial.xlsx'
+recall_points = "inputs/recall_points.xlsx"
+#industrial_data = f'inputs/ind_{conca}.csv'
+#recall_points = f"inputs/ptsources_{conca}.csv"
+ignore_industries = True    #Nomes tractem contminacio d'origen domestic
 
 table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
 
@@ -36,7 +37,7 @@ contaminants_i_nutrients = [contaminant]
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate, conca)      #Dades de contaminants abocats directament a riu o a sortida depuradora
-edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca)    #Dades de contaminants despres de ser filtrats per edar
+edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca, ignore_industries=ignore_industries)    #Dades de contaminants despres de ser filtrats per edar
 
 
 reader = TxtinoutReader(txtinput_path)
@@ -105,15 +106,13 @@ for es_code, wwtp in edars_calibrated.items():
         
 
 #llegir abocaments industries i afegir a pollutants_om_df
-"""
-for pt, abocament in id_discharge_to_volumes.items():
-    add_data_to_txtinout(pt, abocament)
-"""
+if not ignore_industries:
+    for pt, abocament in id_discharge_to_volumes.items():
+        add_data_to_txtinout(pt, abocament)
+
 
 
 pollutants_om.df = pollutants_om_df
-
-
 pollutants_om.overwrite_file()
 
 

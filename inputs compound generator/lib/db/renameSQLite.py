@@ -289,8 +289,6 @@ class renameSQLite:
                 conn.close()
 
 
-    def add_data_to_swat_txtinout(self, edars_calibrated, volumes, contaminants_i_nutrients, compound_features_path, conca):
-        print('function called')
 
     def dist(self, lat1, long1, lat2, long2):
         """

@@ -4,9 +4,16 @@ from lib.calibrationMainConcentration import read_industries, read_edars, export
 from lib.db.ConnectPostgree import ConnectDb as pg
 import sys
 
+
 conca = sys.argv[1]
 removal_rate = sys.argv[2]
 contaminant = sys.argv[3]
+
+"""
+conca = 'llobregat'
+removal_rate = 'C:/Users/jsalo/Desktop/ICRA/traca_contaminacio/traca/traca/inputs compound generator/inputs/atenuacions_generacions.xlsx'
+contaminant = 'Ciprofloxacina'
+"""
 
 pg_url = "217.61.208.188"
 pg_user = "traca_user"
@@ -14,8 +21,12 @@ pg_pass = "EdificiH2O!"
 pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
+inputs_path = Path.cwd() / 'inputs'
+
 #Fitxers per executar en projecte
-edar_data_xlsx = 'inputs/edar_data.xlsx'
+
+"""
+edar_data_xlsx = 'edar_data.xlsx'
 industrial_data = 'inputs/industrial.xlsx'
 recall_points = "inputs/recall_points.xlsx"
 edar_ptr = "inputs/prtr_edars.xlsx"
@@ -24,6 +35,17 @@ review = "inputs/review.xlsx"
 resum_eliminacio = "inputs/resum_eliminacio.xlsx"
 table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
 contaminants_i_nutrients = [contaminant]
+"""
+edar_data_xlsx = str(inputs_path / 'edar_data.xlsx')
+industrial_data = str(inputs_path / 'industrial.xlsx')
+recall_points = str(inputs_path / "recall_points.xlsx")
+edar_ptr = str(inputs_path / "prtr_edars.xlsx")
+analitiques_sistemes = str(inputs_path / "edars_analitiques_sistemes_2.xlsx")
+review = str(inputs_path / "review.xlsx")
+resum_eliminacio = str(inputs_path / "resum_eliminacio.xlsx")
+table_name = 'cens_v4_1_prova'    #Taula del cens industrial amb estimacions
+contaminants_i_nutrients = [contaminant]
+
 
 
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
@@ -38,6 +60,9 @@ print(edars_calibrated)
 
 #sys.stdout.write('Bugs: 5|Other: 10\n')
 #sys.stdout.flush()
+
+
+
 
 
 
