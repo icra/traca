@@ -61,7 +61,6 @@ if len(sys.argv) > 1:
     pass
 
 
-
 if generate_exe:
 #Codi per generar executable
     """
@@ -88,10 +87,10 @@ else:
     #Fitxers per executar en projecte
     edar_data_xlsx = 'inputs/edar_data.xlsx'
     removal_rate = "inputs/atenuacions_generacions.xlsx"
-    industrial_data = 'inputs/industrial.xlsx'
-    recall_points = "inputs/recall_points.xlsx"
-    #industrial_data = f'inputs/ind_{conca}.csv'
-    #recall_points = f"inputs/ptsources_{conca}.csv"
+    #industrial_data = 'inputs/industrial.xlsx'
+    #recall_points = "inputs/recall_points.xlsx"
+    industrial_data = f'inputs/ind_{conca}.csv'
+    recall_points = f"inputs/ptsources_{conca}.csv"
     edar_ptr = "inputs/prtr_edars.xlsx"
     analitiques_sistemes = "inputs/edars_analitiques_sistemes_2.xlsx"
     review = "inputs/review.xlsx"

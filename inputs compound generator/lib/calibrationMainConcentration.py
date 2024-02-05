@@ -393,12 +393,14 @@ def read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, rem
         swat_to_edar_code_df = swat_to_edar_code_df[['name_ind', 'edar_code', 'lat', 'lon']]
         swat_to_edar_code_df.rename(columns={'name_ind': 'name'}, inplace=True)
     else:   #reads ptsources_{conca}.csv
+
         swat_to_edar_code_df = pd.read_csv(swat_to_edar_code, encoding="latin-1")
         swat_to_edar_code_df = swat_to_edar_code_df[['name', 'edar_code', 'lat', 'lon']]
 
     swat_to_edar_code_df = swat_to_edar_code_df.dropna()
 
     for row in swat_to_edar_code_df.itertuples():
+
         edar_code = row.edar_code
         name = row.name
         lat = row.lat

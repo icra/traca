@@ -21,6 +21,8 @@ pg_pass = "EdificiH2O!"
 pg_db = "traca_1"
 connection = pg(pg_url, pg_db, pg_user, pg_pass)
 
+ignore_industries = True    #Nomes tractem contminacio d'origen domestic
+
 inputs_path = Path.cwd() / 'inputs'
 
 #Fitxers per executar en projecte
@@ -48,9 +50,10 @@ contaminants_i_nutrients = [contaminant]
 
 
 
+
 industries_to_edar, industries_to_river = connection.get_industries_to_edar_and_industry_separated(table_name)
 id_discharge_to_volumes = read_industries(industries_to_river, industrial_data, recall_points, contaminants_i_nutrients, connection, removal_rate, conca)      #Dades de contaminants abocats directament a riu o a sortida depuradora
-edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca)    #Dades de contaminants despres de ser filtrats per edar
+edars_calibrated = read_edars(contaminants_i_nutrients, industries_to_edar, edar_data_xlsx, removal_rate, recall_points, conca, ignore_industries=ignore_industries)    #Dades de contaminants despres de ser filtrats per edar
 
 #contaminacio = exportDataForNils(industries_to_edar, contaminants_i_nutrients, edar_data_xlsx, analitiques_sistemes, edar_ptr, connection, file_name = None)
 #coeficients = wwtp_info(review, contaminants_i_nutrients, resum_eliminacio, file_name= None)
